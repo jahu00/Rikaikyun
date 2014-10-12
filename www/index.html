@@ -7,17 +7,529 @@
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <title>Rikaikyun</title>
+		<style>
+			html
+			{
+				height:100%;
+				width:100%;
+			}
+			body
+			{
+				margin: 0;
+				overflow:hidden;
+				height:100%;
+				width:100%
+			}
+			.screen
+			{
+				height:100%;
+				width:100%
+				overflow:hidden;
+			}
+			.reader .scroller
+			{
+				height:100%;
+				width:100%;
+				overflow-x:hidden;
+				overflow-y:scroll;
+			}
+			.container
+			{
+				padding-right:10px;
+				padding-left:10px
+			}
+			.container p
+			{
+				word-wrap:break-word;
+				text-indent: 16px;
+			}
+			.container img
+			{
+				margin-top:5px;
+				margin:bottom:5px;
+				display: block;
+				max-width:100%;
+				width: auto;
+				height: auto;
+			}
+			.floater
+			{
+				box-sizing: border-box;
+				position:fixed;
+				display:none;
+				width: 100%;
+				background-color:white;
+			}
+			.floater.top
+			{
+				top:0;
+				border-bottom:2px solid black;
+			}
+			.floater.bottom
+			{
+				/*bottom:0;*/
+				border-bottom:1px solid black;
+				border-top:2px solid black;
+			}
+			.floater .bar
+			{
+				display: none;
+				width:100%; 
+				table-layout:fixed;
+			}
+			.floater.bottom .bar.top
+			{
+				display:table;
+				border-bottom:1px solid black;
+			}
+			.floater.top .bar.bottom
+			{
+				display:table;
+				border-top:1px solid black;
+			}
+			.floater .bar .resizer
+			{
+				display:table-cell;
+				vertical-align:middle;
+				text-align:center;
+				cursor:ns-resize
+			}
+			.floater .bar .resizer:before
+			{
+				content:'...';
+			}
+			.floater .bar .close
+			{
+				width:40px;
+				height:40px;
+				display:table-cell;
+				vertical-align:middle;
+				text-align:center;
+				font-weight:bold;
+				font-family:sans-serif;
+				border-left:1px solid black;
+				cursor:pointer;
+				
+			}
+			.floater .bar .close:before
+			{
+				content:'x';
+			}
+			.dictionary
+			{
+				width:100%;
+				/*height:150px;*/
+				/*overflow:auto;*/
+			}
+			.dictionary-container
+			{
+				width:100%;
+				height:150px;
+				overflow:hidden;
+			}
+			.dictionary .dictionary-entry
+			{
+				box-sizing:border-box;
+				width:100%;
+				padding:5px;
+				border-top: 1px dashed black;
+			}
+			.dictionary .dictionary-entry:first-child
+			{
+				border-top: none;
+			}
+			.dictionary .dictionary-entry .kanji
+			{
+				font-size:16px;
+			}
+			.dictionary .dictionary-entry .grammar
+			{
+				font-size:10px;
+			}
+
+			.dictionary .dictionary-entry .description
+			{
+				font-size:12px;
+			}
+			.dictionary .empty
+			{
+				box-sizing:border-box;
+				width:100%;
+				padding:5px;
+				text-align:center;
+			}
+			.dictionary .dictionary-entry ~ .empty
+			{
+				display:none;
+			}
+			.statusBar
+			{
+				box-sizing:border-box;
+				bottom:0;
+				position:fixed;
+				width: 100%;
+				padding:5px;
+				background-color:white;
+			}
+			.statusBar .grid
+			{
+				display:table;
+				width:100%; 
+				table-layout:fixed;
+			}
+			.statusBar .grid .col
+			{
+				display:table-cell;
+				vertical-align:middle;
+			}
+			.statusBar .grid .progress
+			{
+				background:white;
+				border: 1px solid black;
+				height: 10px;
+				line-height:0;
+			}
+			.statusBar .grid .progress .bar
+			{
+				display:block;
+				height:100%;
+				background-color:gray;
+			}
+			.statusBar .grid .col.status
+			{
+				box-sizing:border-box;
+				text-align:center;
+				width:0;
+				padding-left:5px;
+				padding-right:5px;
+			}
+			.statusBar .grid .col.status span
+			{
+				white-space: nowrap;
+			}
+			.blink
+			{
+				position:fixed;
+				background-color: black;
+				height: 100%;
+				width: 100%;
+				top:0;
+			}
+			.blink.white
+			{
+				background-color: white;
+			}
+			@media only screen and (min-device-width : 720px)
+			{
+				body
+				{
+					zoom:300%;
+				}
+			}
+		</style>
     </head>
     <body>
+		<style class="dynamicStyle">
+			.container img
+			{
+				max-height:100%;
+			}
+			.floater.bottom
+			{
+				bottom:0;
+			}
+			.dictionary-container
+			{
+				max-height:0;
+			}
+		</style>
+		<div class="screen reader">
+			<div class="scroller">
+				<div class="container">
+				</div>
+			</div>
+			<div class="statusBar">
+				<div class="grid">
+					<div class="col">
+						<div class="progress">
+							<div class="bar" style="width:0%"></div>
+						</div>
+					</div>
+					<div class="col status">
+						<span>1/1</span>
+					</div>
+				</div>
+			</div>
+			<div class="floater top">
+				<div class="bar top">
+					<div class="resizer"></div><div class="close"></div>
+				</div>
+				<div class="dictionary-container">
+					<div class="dictionary">
+						<div class="empty">No words found.</div>
+					</div>
+				</div>
+				<div class="bar bottom">
+					<div class="resizer"></div><div class="close"></div>
+				</div>
+			</div>
+		</div>
+		
+		<!--<div class="statusBarDummy"></div>-->
+		
+		<div class="blink" style="display:none">
+		</div>
         <script type="text/javascript" src="cordova.js"></script>
 		<script src="./rikaikun/data.js"></script>
+		<script src="./wanakana.min.js"></script>
 		<script src="./jquery-1.8.3.min.js"></script>
+		<script src="./jquery-stylesheet.js"></script>
+		<script src="./jquery-absolutezoom.js"></script>
+		<!-- <script src="./jquery-privatescroll.js"></script> -->
+		<script src="./jquery-fakescroll.js"></script>
+		<script src="./getWordAtPoint.js"></script>
         <script type="text/javascript">
 			$(function()
 			{
 				var dict = new rcxDict();
-				$(document.body).append('<p>Rikaichan loaded \\(^ω^)/</p>');
+				$('.reader > .scroller > .container').click(function(e)
+				{
+					var zoom = parseInt($(document.body).css("zoom"));
+					if (isNaN(zoom))
+					{
+						zoom = 1;
+					}
+					var find = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
+					//var find = getWordAtPoint(e.target, e.pageX, e.pageY);
+					//console.log(e.pageY);
+					if (find != null)
+					{
+						if ($('.floater:visible').length == 0)
+						{
+							$('.floater').removeClass("top bottom");
+							if (e.pageY < $(window).height() /2)
+							{
+								$('.floater').addClass("bottom");
+							}
+							else
+							{
+								$('.floater').addClass("top");
+							}
+						}
+						var range = document.createRange();//find.elem.ownerDocument.createRange();
+						range.setStart(find.element, find.position);
+						var end = find.position + 13;
+						if (end > find.element.nodeValue.length)
+						{
+							end = find.element.nodeValue.length;
+						}
+						var search = find.element.nodeValue.substring(find.position, end);
+						var result = dict.wordSearch(search, false, 10);
+						$('.reader > .floater .dictionary .dictionary-entry').remove();
+						$('.reader > .floater .dictionary').fakeScrollReset();
+						if (result != null)
+						{
+							end = find.position + result.matchLen;
+							for (var n = 0; n < result.data.length; n ++)
+							{
+								var split = result.data[n][0].split("/");
+								var kanji = split.shift();
+								if (kanji[0] == '[')
+								{
+									kanji = kanji.substring(1, kanji.length-1);
+								}
+								split.pop();
+								$('<div class="dictionary-entry">' +
+								'<span class="kanji">' + kanji.trim() + '</span>' + 
+								(
+									result.data[n][1] !== null ?
+									' <span class="grammar">(' + result.data[n][1] + ')</span>' :
+									''
+								) +
+								'<br/>' +
+								'<span class="description">' + split.join('; ') + '</span>' +
+								'</div>').insertBefore('.reader > .floater .dictionary .empty');
+							}
+						}
+						else
+						{
+							end = find.position + 1;
+						}
+						//var word = find.element.nodeValue.substring(find.position, end);
+						range.setEnd(find.element, end);
+						var sel = window.getSelection();
+						sel.removeAllRanges();
+						sel.addRange(range);
+						range.detach();
+						$('.floater').show();
+					}
+				});
+				$('.reader > .floater > .bar > .close').click(function()
+				{
+					$('.floater').css("display", "");
+				});
+				
+				function resizeFloater(e)
+				{
+					var zoom = parseInt($(document.body).css("zoom"));
+					if (isNaN(zoom))
+					{
+						zoom = 1;
+					}
+					var newHeight = resizeStartSize;
+					if ($('.floater').hasClass("top"))
+					{
+						newHeight += (e.pageY - resizeStartPosition) / zoom;
+					}
+					else
+					{
+						newHeight += (resizeStartPosition - e.pageY) / zoom;
+					}
+					if (newHeight < 0)
+					{
+						newHeight = 0;
+					}
+					newHeight = parseInt(newHeight);
+					$('.floater .dictionary-container').css('height', newHeight + "px");
+				}
+				
+				//$('.floater .bar .resizer').mousedown(function(e)
+				$('.reader > .floater .bar .resizer').on("touchstart", function(ev)
+				//$('.floater .bar .resizer').bind("touchstart", function(ev)
+				//$('.floater .bar .resizer').each(function()
+				{
+					var e = ev.originalEvent.touches[0];
+					//resizeDictionary = true;
+					resizeStartPosition = e.pageY;
+					resizeStartSize = $('.floater .dictionary-container').height();
+				});
+				
+				//$(document.body).mousemove(function(e)
+				//$(document.body).on("touchmove", function(ev)
+				$('.reader > .floater .bar .resizer').on("touchmove", function(ev)
+				{
+					//if (resizeDictionary == true)
+					//{
+						var e = ev.originalEvent.touches[0];
+						resizeFloater(e);
+						return false;
+					//}
+				});
+				//$(document.body).mouseup(function(e)
+				//$(document.body).on("touchend", function(ev)
+				/*$('.reader > .floater .bar .resizer').on("touchend", function(ev)
+				{
+					if (resizeDictionary == true)
+					{
+						resizeDictionary = false;
+						return false;
+					}
+				});*/
+				$.get("genji-01.txt", function(data)
+				{
+					$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
+					//updateStatus();
+					$(window).resize();
+				}, 'html');
+				$('.reader > .scroller').scroll(function()
+				{
+					updateStatus();
+				});
+				
+				//$('.reader > .floater > .dictionary').privateScroll();
+				$('.reader > .floater .dictionary').fakeScroll();
+
+				$('.reader > .floater > .dictionary-container').on('touchmove', function (e) {
+					e.preventDefault();
+				});
+				
+				
+				/*$('.reader > .floater > .dictionary').on('touchstart', function (e) {
+					//preventScroll = true;
+				});
+				$('.reader > .floater > .dictionary').on('touchmove', function (e) {
+					//e.stopPropagation();
+					e.preventDefault();
+				});*/
+
+				$(window).resize(function()
+				{
+					var statusBarZoom = $('.reader .statusBar').absoluteZoom();
+					var floaterZoom = $('.reader .floater').absoluteZoom();
+					var containerZoom = $('.reader .scroller .container').absoluteZoom();
+					var zoom = $('.reader .scroller').absoluteZoom();
+					if (isNaN(zoom))
+					{
+						zoom = 1;
+					}
+					var statusBarHeight = $('.statusBar').outerHeight();
+					var windowHeight = $(window).height();
+					/*$('.dynamicStyle').cssRule('.statusBarDummy').css('height', statusBarHeight + "px");*/
+					$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
+					$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
+					$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
+					$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
+					blink();
+					updateStatus();
+				});
 			});
+			function blink()
+			{
+				scrollDistance = 0;
+				/*$('.blink').show();
+				setTimeout(function()
+				{
+					$('.blink').addClass("white");
+					setTimeout(function()
+					{
+						$('.blink').hide();
+						$('.blink').removeClass("white");
+					}, 200);
+				}, 200);*/
+			}
+			//var resizeDictionary = false;
+			var resizeStartPosition = 0;
+			var resizeStartSize = 0;
+			var lastPosition = null;
+			var scrollDistance = 0;
+			function updateStatus()
+			{
+				var reader = $('.reader');
+				var scroller = reader.children('.scroller');
+				//var container = scroller.children('.container')
+				//var documentHeight = container.outerHeight();
+				var documentHeight = scroller[0].scrollHeight;
+				var windowHeight = scroller.height();
+				var length = documentHeight - windowHeight;
+				var progress = 0;
+				if (length < 0)
+				{
+					progress = 100;
+				}
+				else
+				{
+					progress = (scroller.scrollTop() / length * 100).toFixed(2);
+				}
+				var statusBar = reader.find('> .statusBar');
+				statusBar.find('> .grid  .progress > .bar').css('width', progress+"%");
+				var pages = Math.ceil(documentHeight / windowHeight);
+				var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
+				var status = statusBar.find('.status');//$('.statusBar .status');
+				var pagesSpan = status.children('span');
+				pagesSpan.html(page+"/"+pages);
+				status.css('width', pagesSpan.width() + "px");
+				if (lastPosition == null)
+				{
+					lastPosition = scroller.scrollTop();
+				}
+				scrollDistance += Math.abs(scroller.scrollTop() - lastPosition);
+				//console.log(scrollDistance + " " + lastPosition);
+				if (scrollDistance >= windowHeight * 3)
+				{
+					blink();
+				}
+				lastPosition = scroller.scrollTop();
+			}
         </script>
     </body>
 </html>
