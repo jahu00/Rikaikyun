@@ -5,18 +5,128 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <title>Rikaikyun</title>
+        <!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> -->
+		<!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" /> -->
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=320, target-densitydpi=device-dpi" />
+        <title>Rikaikyun-test</title>
+		<style>
+			body
+			{
+				margin: 0;
+			}
+		
+			.search-bar
+			{
+				position: fixed;
+				top:0;
+				height:50px;
+				width:100%;
+				border-bottom: 2px solid black;
+				background:white;
+			}
+			
+			.search-bar .padding
+			{
+				padding-top: 10px;
+				padding-left:20px;
+				padding-right:85px;
+				display:block;
+			}
+			
+			.search-bar .search-input
+			{
+				width: 100%;
+			}
+			
+			.search-bar .search-button
+			{
+				position:absolute;
+				top:7px;
+				right:10px;
+				padding:5px;
+				border:1px solid black;
+			}
+			
+			.dictionary
+			{
+				margin-top: 50px;
+			}
+			
+			.dictionary .dictionary-entry
+			{
+				padding:5px;
+				border-bottom: 1px solid black;
+			}
+			
+			.dictionary .dictionary-entry .kanji
+			{
+				font-size:16px;
+			}
+			
+			.dictionary .dictionary-entry .grammar
+			{
+				font-size:10px;
+			}
+			
+			.dictionary .dictionary-entry .description
+			{
+				font-size:12px;
+			}
+			
+			@media only screen and (min-device-width : 720px)
+			{
+				body
+				{
+					zoom:300%;
+				}
+			}
+			
+		</style>
     </head>
     <body>
+        <div class="search-bar">
+			<div class="padding">
+				<input class="search-input" />
+				<div class="search-button">Search</div>
+			</div>
+		</div>
+		<div class="dictionary">
+		</div>
         <script type="text/javascript" src="cordova.js"></script>
 		<script src="./rikaikun/data.js"></script>
+		<script src="./wanakana.min.js"></script>
 		<script src="./jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
 			$(function()
 			{
+				//wanakana.bind($('.search-input')[0]);
 				var dict = new rcxDict();
-				$(document.body).append('<p>Rikaichan loaded \\(^ω^)/</p>');
+				$('.search-button').click(function()
+				{
+					var result = dict.wordSearch(wanakana.toKana($('.search-input').val()), false, 20);
+					$('.dictionary').html("");
+					for (var n = 0; n < result.data.length; n ++)
+					{
+						var split = result.data[n][0].split("/");
+						var kanji = split.shift();
+						if (kanji[0] == '[')
+						{
+							kanji = kanji.substring(1, kanji.length-1);
+						}
+						split.pop();
+						$('.dictionary').append(
+							'<div class="dictionary-entry">' +
+							'<span class="kanji">' + kanji.trim() + '</span>' + 
+							(
+								result.data[n][1] !== null ?
+								' <span class="grammar">(' + result.data[n][1] + ')</span>' :
+								''
+							) +
+							'<br/>' +
+							'<span class="description">' + split.join('; ') + '</span>' +
+							'</div>');
+					}
+				});
 			});
         </script>
     </body>
