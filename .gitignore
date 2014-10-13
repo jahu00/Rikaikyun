@@ -1,3 +1,6 @@
+#Binaries and files used during building
+platforms/*
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
