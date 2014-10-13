@@ -1,2 +1,211 @@
-/*Dictionary*/
-/*Content*/
+html
+{
+	height:100%;
+	width:100%;
+}
+body
+{
+	margin: 0;
+	overflow:hidden;
+	height:100%;
+	width:100%
+}
+.screen
+{
+	height:100%;
+	width:100%
+	overflow:hidden;
+}
+.reader .scroller
+{
+	height:100%;
+	width:100%;
+	overflow-x:hidden;
+	overflow-y:scroll;
+}
+.container
+{
+	padding-right:10px;
+	padding-left:10px
+}
+.container p
+{
+	word-wrap:break-word;
+	text-indent: 16px;
+}
+.container img
+{
+	margin-top:5px;
+	margin:bottom:5px;
+	display: block;
+	max-width:100%;
+	width: auto;
+	height: auto;
+}
+.floater
+{
+	box-sizing: border-box;
+	position:fixed;
+	display:none;
+	width: 100%;
+	background-color:white;
+}
+.floater.top
+{
+	top:0;
+	border-bottom:2px solid black;
+}
+.floater.bottom
+{
+	/*bottom:0;*/
+	border-bottom:1px solid black;
+	border-top:2px solid black;
+}
+.floater .bar
+{
+	display: none;
+	width:100%; 
+	table-layout:fixed;
+}
+.floater.bottom .bar.top
+{
+	display:table;
+	border-bottom:1px solid black;
+}
+.floater.top .bar.bottom
+{
+	display:table;
+	border-top:1px solid black;
+}
+.floater .bar .resizer
+{
+	display:table-cell;
+	vertical-align:middle;
+	text-align:center;
+	cursor:ns-resize
+}
+.floater .bar .resizer:before
+{
+	content:'...';
+}
+.floater .bar .close
+{
+	width:40px;
+	height:40px;
+	display:table-cell;
+	vertical-align:middle;
+	text-align:center;
+	font-weight:bold;
+	font-family:sans-serif;
+	border-left:1px solid black;
+	cursor:pointer;
+	
+}
+.floater .bar .close:before
+{
+	content:'x';
+}
+.dictionary
+{
+	width:100%;
+	/*height:150px;*/
+	/*overflow:auto;*/
+}
+.dictionary-container
+{
+	width:100%;
+	height:150px;
+	overflow:hidden;
+}
+.dictionary .dictionary-entry
+{
+	box-sizing:border-box;
+	width:100%;
+	padding:5px;
+	border-top: 1px dashed black;
+}
+.dictionary .dictionary-entry:first-child
+{
+	border-top: none;
+}
+.dictionary .dictionary-entry .kanji
+{
+	font-size:16px;
+}
+.dictionary .dictionary-entry .grammar
+{
+	font-size:10px;
+}
+
+.dictionary .dictionary-entry .description
+{
+	font-size:12px;
+}
+.dictionary .empty
+{
+	box-sizing:border-box;
+	width:100%;
+	padding:5px;
+	text-align:center;
+}
+.dictionary .dictionary-entry ~ .empty
+{
+	display:none;
+}
+.statusBar
+{
+	box-sizing:border-box;
+	bottom:0;
+	position:fixed;
+	width: 100%;
+	padding:5px;
+	background-color:white;
+}
+.statusBar .grid
+{
+	display:table;
+	width:100%; 
+	table-layout:fixed;
+}
+.statusBar .grid .col
+{
+	display:table-cell;
+	vertical-align:middle;
+}
+.statusBar .grid .progress
+{
+	background:white;
+	border: 1px solid black;
+	height: 10px;
+	line-height:0;
+}
+.statusBar .grid .progress .bar
+{
+	display:block;
+	height:100%;
+	background-color:gray;
+}
+.statusBar .grid .col.break
+{
+	width:5px;
+}
+.statusBar .grid .col.status
+{
+	width:0;
+}
+.statusBar .grid .col.status span
+{
+	white-space: nowrap;
+}
+.blink
+{
+	position:fixed;
+	background-color: black;
+	height: 100%;
+	width: 100%;
+	top:0;
+}
+.blink.white
+{
+	background-color: white;
+}
