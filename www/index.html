@@ -6,6 +6,7 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+		<link href="./css/screen.css" type="text/css" rel="stylesheet" />
         <title>Rikaikyun</title>
 		<style>
 			html
@@ -219,13 +220,6 @@
 			{
 				background-color: white;
 			}
-			@media only screen and (min-device-width : 720px)
-			{
-				body
-				{
-					zoom:300%;
-				}
-			}
 		</style>
     </head>
     <body>
@@ -296,7 +290,7 @@
 				var dict = new rcxDict();
 				$('.reader > .scroller > .container').click(function(e)
 				{
-					var zoom = parseInt($(document.body).css("zoom"));
+					var zoom = $(this).absoluteZoom();
 					if (isNaN(zoom))
 					{
 						zoom = 1;
@@ -373,7 +367,8 @@
 				
 				function resizeFloater(e)
 				{
-					var zoom = parseInt($(document.body).css("zoom"));
+					var dictionaryContainer = $('.reader > .floater > .dictionary-container');
+					var zoom = dictionaryContainer.absoluteZoom();
 					if (isNaN(zoom))
 					{
 						zoom = 1;
@@ -392,7 +387,7 @@
 						newHeight = 0;
 					}
 					newHeight = parseInt(newHeight);
-					$('.floater .dictionary-container').css('height', newHeight + "px");
+					dictionaryContainer.css('height', newHeight + "px");
 				}
 				
 				//$('.floater .bar .resizer').mousedown(function(e)
