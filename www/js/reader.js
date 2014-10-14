@@ -95,7 +95,7 @@ Reader.prototype = {
 	// Handling user clicking\touching a word
 	containerClick: function(e)
 	{
-		var zoom = this.screen.absoluteZoom();
+		var zoom = this.screen.find('.container').absoluteZoom();
 		if (isNaN(zoom))
 		{
 			zoom = 1;
