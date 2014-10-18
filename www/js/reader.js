@@ -88,6 +88,21 @@ Reader.prototype = {
 			// Here is a simple conversion txt => html
 			// TODO: Again things here are subject to change
 			$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
+			
+			$(window).resize();
+		}, 'html');
+	},
+	loadHtmlDocument: function(path)
+	{
+		// TODO: This will change a lot later on when I implement selecting files
+		$.get(path, function(data)
+		{
+			// Here is a simple conversion txt => html
+			// TODO: Again things here are subject to change
+			console.log(data);
+			$('.container').html(data);
+			//console.log(encoding.getHtmlCharset(data));
+			//$('.container').html($(data).find('body').html());
 			//updateStatus();
 			$(window).resize();
 		}, 'html');

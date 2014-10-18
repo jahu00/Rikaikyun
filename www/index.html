@@ -58,28 +58,28 @@
 				</div>
 			</div>
 		</div>
-		
-		<!--<div class="statusBarDummy"></div>-->
+
 		
 		<div class="blink" style="display:none">
 		</div>
         <script type="text/javascript" src="cordova.js"></script>
-		<!-- TODO: Place the scripts in more appropriate location -->
 		<script src="./rikaikun/data.js"></script>
 		<script src="./wanakana.min.js"></script>
-		<script src="./jquery-1.8.3.min.js"></script>
-		<script src="./jquery-stylesheet.js"></script>
-		<script src="./jquery-absolutezoom.js"></script>
+		<script src="./js/jquery/jquery-1.8.3.min.js"></script>
+		<script src="./js/jquery/jquery-stylesheet.js"></script>
+		<script src="./js/jquery/jquery-absolutezoom.js"></script>
 		<!-- <script src="./jquery-privatescroll.js"></script> -->
-		<script src="./jquery-fakescroll.js"></script>
-		<script src="./getWordAtPoint.js"></script>
+		<script src="./js/jquery/jquery-fakescroll.js"></script>
+		<script src="./js/getWordAtPoint.js"></script>
 		<script src="./js/reader.js"></script>
+		<script src="./js/encoding.js"></script>
         <script type="text/javascript">
 			$(function()
 			{
 				var dict = new rcxDict();
 				var reader = new Reader(dict);
-				reader.loadDocument('genji-01.txt');
+				//reader.loadDocument('genji-01.txt');
+				reader.loadHtmlDocument('test.html');
 			});
         </script>
     </body>
