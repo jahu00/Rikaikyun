@@ -72,14 +72,16 @@
 		<script src="./js/jquery/jquery-fakescroll.js"></script>
 		<script src="./js/getWordAtPoint.js"></script>
 		<script src="./js/reader.js"></script>
-		<script src="./js/encoding.js"></script>
+		<!-- <script src="./js/encoding.js"></script> -->
+		<script src="./js/htmlHelpers.js"></script>
         <script type="text/javascript">
 			$(function()
 			{
 				var dict = new rcxDict();
 				var reader = new Reader(dict);
 				//reader.loadDocument('genji-01.txt');
-				reader.loadHtmlDocument('test.html');
+				reader.loadHtmlDocument('genji-01.html');
+				//reader.loadHtmlDocument('test.html');
 			});
         </script>
     </body>

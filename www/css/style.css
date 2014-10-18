@@ -25,12 +25,16 @@ body
 }
 .container
 {
+	/*padding-right:10px;
+	padding-left:10px;
 	padding-right:10px;
-	padding-left:10px
+	padding-left:10px*/
+	padding:10px;
+	word-wrap:break-word;
 }
 .container p
 {
-	word-wrap:break-word;
+	/*word-wrap:break-word;*/
 	text-indent: 16px;
 }
 .container img

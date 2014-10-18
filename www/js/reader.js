@@ -97,13 +97,26 @@ Reader.prototype = {
 		// TODO: This will change a lot later on when I implement selecting files
 		$.get(path, function(data)
 		{
-			// Here is a simple conversion txt => html
 			// TODO: Again things here are subject to change
-			console.log(data);
-			$('.container').html(data);
-			//console.log(encoding.getHtmlCharset(data));
-			//$('.container').html($(data).find('body').html());
-			//updateStatus();
+			var body = htmlHelpers.extractBody(data);
+			data = null;
+			body = htmlHelpers.trimAllLines(body);
+			var temp = document.createElement('div');
+			temp.innerHTML = body;
+			body = null;
+			var $temp = $(temp);
+			$temp.find('script, style, link').remove();
+			var idCount = 0;
+			$temp.find('*[id]').each(function()
+			{
+				var originalId = this.id;
+				var newId = "documentId_" + idCount;
+				$temp('a[href=' + newId + ']').attr("href", "#" + newId);
+				this.id = newId;
+				id_count++;
+			});
+			$('.container').html(temp.innerHTML);
+			
 			$(window).resize();
 		}, 'html');
 	},
