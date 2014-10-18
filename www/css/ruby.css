@@ -1,0 +1,40 @@
+ruby
+{
+	display:inline-block;
+	/*display:table;*/
+	text-align:center;
+	/*height: 1.6em;*/
+	padding-top:0.2em;
+	word-wrap:normal;
+	vertical-align: bottom;
+}
+
+ruby rp
+{
+	display:none;
+}
+
+ruby rb, ruby rt
+{
+	display:block;
+	text-align:center;
+	vertical-align:bottom;
+}
+
+ruby rt
+{
+	display: table-header-group;
+	font-size:0.5em;
+	line-height:1.5em;
+}
+
+ruby rt.dot
+{
+	vertical-align:justify;
+}
+
+ruby rb
+{
+	display: table-row-group;
+	vertical-align:bottom;
+}

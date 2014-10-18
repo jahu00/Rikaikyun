@@ -1,3 +1,5 @@
+// Based on code by Eyal (http://stackoverflow.com/users/4454/eyal)
+// http://stackoverflow.com/a/3710561
 function getWordAtPoint(elem, x, y) {
 	if(elem.nodeType == elem.TEXT_NODE) {
 		var range = elem.ownerDocument.createRange();
@@ -9,13 +11,8 @@ function getWordAtPoint(elem, x, y) {
 			range.setEnd(elem, currentPos+1);
 			if(range.getBoundingClientRect().left <= x && range.getBoundingClientRect().right >= x &&
 				range.getBoundingClientRect().top  <= y && range.getBoundingClientRect().bottom >= y) {
-				//range.expand("word");
-				/*var sel = window.getSelection();
-				sel.removeAllRanges();
-				sel.addRange(range);
-				var ret = range.toString();*/
+
 				range.detach();
-				//return(ret);
 				return { "position": currentPos, "element": elem };
 			}
 			currentPos += 1;

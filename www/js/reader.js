@@ -18,7 +18,7 @@ Reader.prototype = {
 		var self = this;
 		this.screen = $('.reader');
 		// Our function for handling the event is inside another to not confuse what 'this' is
-		this.screen.click(function(e){self.containerClick(e)});
+		this.screen.find('.container').click(function(e){self.containerClick(e)});
 		$(window).resize(function(){self.resizeScreen()});
 		$('.reader > .scroller').scroll(function(){self.updateStatus();});
 		
@@ -40,14 +40,14 @@ Reader.prototype = {
 		$('.reader > .floater .bar .resizer').on("touchstart", function(ev)
 		{
 			var e = ev.originalEvent.touches[0];
-			resizeStartPosition = e.pageY;
-			resizeStartSize = $('.floater .dictionary-container').height();
+			self.resizeStartPosition = e.pageY;
+			self.resizeStartSize = $('.floater .dictionary-container').height();
 		});
 		
 		$('.reader > .floater .bar .resizer').on("touchmove", function(ev)
 		{
 			var e = ev.originalEvent.touches[0];
-			resizeFloater(e);
+			self.resizeFloater(e);
 			return false;
 		});
 		
@@ -59,18 +59,18 @@ Reader.prototype = {
 	{
 		var dictionaryContainer = $('.reader > .floater > .dictionary-container');
 		var zoom = dictionaryContainer.absoluteZoom();
-		if (isNaN(zoom))
+		/*if (isNaN(zoom))
 		{
 			zoom = 1;
-		}
-		var newHeight = resizeStartSize;
+		}*/
+		var newHeight = this.resizeStartSize;
 		if ($('.floater').hasClass("top"))
 		{
-			newHeight += (e.pageY - resizeStartPosition) / zoom;
+			newHeight += (e.pageY - this.resizeStartPosition) / zoom;
 		}
 		else
 		{
-			newHeight += (resizeStartPosition - e.pageY) / zoom;
+			newHeight += (this.resizeStartPosition - e.pageY) / zoom;
 		}
 		if (newHeight < 0)
 		{
@@ -86,7 +86,7 @@ Reader.prototype = {
 		$.get(path, function(data)
 		{
 			// Here is a simple conversion txt => html
-			// TODO: Again things here are subject to change
+			// TODO: Add injecting furigana
 			$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
 			
 			$(window).resize();
@@ -94,10 +94,10 @@ Reader.prototype = {
 	},
 	loadHtmlDocument: function(path)
 	{
-		// TODO: This will change a lot later on when I implement selecting files
+		var self = this;
+		// TODO: The method of opening files is likely to change when file selection is implemented, but the operations on the file itself will stay the same
 		$.get(path, function(data)
 		{
-			// TODO: Again things here are subject to change
 			var body = htmlHelpers.extractBody(data);
 			data = null;
 			body = htmlHelpers.trimAllLines(body);
@@ -111,12 +111,40 @@ Reader.prototype = {
 			{
 				var originalId = this.id;
 				var newId = "documentId_" + idCount;
-				$temp('a[href=' + newId + ']').attr("href", "#" + newId);
+				$temp.find('a[href=#' + originalId + ']').attr("href", "#" + newId);
 				this.id = newId;
-				id_count++;
+				idCount++;
+			});
+			$temp.find('*:hasAttributes').each(function()
+			{
+				var elem = $(this);
+				if (this.nodeName === "A")
+				{
+					elem.removeAttributes(null, ['id', 'href']);
+					/*if (elem.attr('href').indexOf('#') != 0)
+					{
+						//this.onclick = self.openExternalLink;
+						elem.attr('onclick', 'return openExternalLink(this)');
+					}*/
+				}
+				else if (this.nodeName === "IMG")
+				{
+					elem.removeAttributes(null, ['id', 'src']);
+				}
+				else
+				{
+					elem.removeAttributes(null, 'id');
+				}
 			});
 			$('.container').html(temp.innerHTML);
-			
+			var anchors = $('.container a');
+			//$('.container a').each(function()
+			//{
+				console.log(anchors);
+				anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
+				anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
+				anchors.click(function(e){ self.containerClick(e); return false; });
+			//});
 			$(window).resize();
 		}, 'html');
 	},
@@ -124,10 +152,10 @@ Reader.prototype = {
 	containerClick: function(e)
 	{
 		var zoom = this.screen.find('.container').absoluteZoom();
-		if (isNaN(zoom))
+		/*if (isNaN(zoom))
 		{
 			zoom = 1;
-		}
+		}*/
 		// Find the letter and text node containing it at the point of click; We divide the coordinates to compensate the zoom
 		var find = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
 		// Check if there was anything at the point of the click
@@ -227,10 +255,10 @@ Reader.prototype = {
 		var floaterZoom = $('.reader .floater').absoluteZoom();
 		var containerZoom = $('.reader .scroller .container').absoluteZoom();
 		var zoom = $('.reader .scroller').absoluteZoom();
-		if (isNaN(zoom))
+		/*if (isNaN(zoom))
 		{
 			zoom = 1;
-		}
+		}*/
 		var statusBarHeight = $('.statusBar').outerHeight();
 		var windowHeight = $(window).height();
 		$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
@@ -301,5 +329,35 @@ Reader.prototype = {
 				$('.blink').removeClass("white");
 			}, 200);
 		}, 200);*/
+	},
+	anchorTimer: null,
+	anchorTouchStart: function(e, a)
+	{
+		// TODO: allow long click time to be customized
+		var self = this;
+		this.anchorTimer = setTimeout(function() { e.preventDefault(); self.anchorClick(a); }, 1000);
+	},
+	anchorTouchEnd: function(e, a)
+	{
+		clearTimeout(this.anchorTimer);
+	},
+	anchorClick: function(a)
+	{
+		if (a.getAttribute("href").indexOf('#') == 0)
+		{
+			//scrollTo($(a.getAttribute("href")));
+			$(a.getAttribute("href")).each(function() { this.scrollIntoView(true); });
+		}
+		else
+		{
+			window.open(a.href);
+		}
+	},
+	scrollTo: function(element)
+	{
+		if (elemetn.length == 1)
+		{
+			screen.find('> .scroller').scrollTop((this.screen.find('.container').offset().top + element.offset().top) + 'px');
+		}
 	}
 };

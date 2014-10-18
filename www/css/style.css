@@ -9,6 +9,9 @@ body
 	overflow:hidden;
 	height:100%;
 	width:100%
+	/* block copy&paste on android */
+	/*-webkit-touch-callout: none;*/
+    -webkit-user-select: none;  
 }
 .screen
 {
@@ -31,6 +34,7 @@ body
 	padding-left:10px*/
 	padding:10px;
 	word-wrap:break-word;
+	line-height:1.5em;
 }
 .container p
 {
