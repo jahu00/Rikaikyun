@@ -10,8 +10,8 @@ body
 	height:100%;
 	width:100%
 	/* block copy&paste on android */
-	/*-webkit-touch-callout: none;
-    -webkit-user-select: none;*/
+	/*-webkit-touch-callout: none;*/
+    -webkit-user-select: none;
 }
 .screen
 {

@@ -59,10 +59,6 @@ Reader.prototype = {
 	{
 		var dictionaryContainer = $('.reader > .floater > .dictionary-container');
 		var zoom = dictionaryContainer.absoluteZoom();
-		/*if (isNaN(zoom))
-		{
-			zoom = 1;
-		}*/
 		var newHeight = this.resizeStartSize;
 		if ($('.floater').hasClass("top"))
 		{

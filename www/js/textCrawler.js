@@ -79,7 +79,7 @@ var textCrawler = {
 		}
 		if (length != null && result.length > length)
 		{
-			result = result.substr(length);
+			result = result.substr(0, length);
 		}
 		return result;
 	},
