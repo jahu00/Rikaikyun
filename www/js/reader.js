@@ -343,7 +343,7 @@ Reader.prototype = {
 		else
 		{
 			if(confirm('Open ' + a.href + ' in a browser?'))
-				window.open(a.href);
+				window.open(a.href, '_system');
 		}
 	}/*,
 	scrollTo: function(element)
