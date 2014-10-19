@@ -73,6 +73,7 @@
 		<script src="./js/jquery/jquery-hasattributes.js"></script>
 		<script src="./js/jquery/jquery-removeattributes.js"></script>
 		<script src="./js/getWordAtPoint.js"></script>
+		<script src="./js/textCrawler.js"></script>
 		<script src="./js/reader.js"></script>
 		<!-- <script src="./js/encoding.js"></script> -->
 		<script src="./js/htmlHelpers.js"></script>
@@ -88,11 +89,11 @@
 				var dict = new rcxDict();
 				var reader = new Reader(dict);
 				// Block context menu (makes the app run less buggy on chrome on desktop)
-				$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
+				//$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 				
 				//reader.loadDocument('genji-01.txt');
-				reader.loadHtmlDocument('genji-01.html');
-				//reader.loadHtmlDocument('test.html');
+				//reader.loadHtmlDocument('genji-01.html');
+				reader.loadHtmlDocument('test1.html');
 			});
         </script>
     </body>

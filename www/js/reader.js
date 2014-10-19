@@ -98,14 +98,19 @@ Reader.prototype = {
 		// TODO: The method of opening files is likely to change when file selection is implemented, but the operations on the file itself will stay the same
 		$.get(path, function(data)
 		{
+			// extract body of the html file
 			var body = htmlHelpers.extractBody(data);
 			data = null;
+			// trim excess whitespace in all lines of the body
 			body = htmlHelpers.trimAllLines(body);
+			// Create temporary element for storing the body (allows modifying the elements)
 			var temp = document.createElement('div');
 			temp.innerHTML = body;
 			body = null;
 			var $temp = $(temp);
+			// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
 			$temp.find('script, style, link').remove();
+			// Rename ids to avoid collision
 			var idCount = 0;
 			$temp.find('*[id]').each(function()
 			{
@@ -115,17 +120,13 @@ Reader.prototype = {
 				this.id = newId;
 				idCount++;
 			});
+			// Remove all unnecessary attributes (the only ones we spare are id on all elements, href on anchors and src on images)
 			$temp.find('*:hasAttributes').each(function()
 			{
 				var elem = $(this);
 				if (this.nodeName === "A")
 				{
 					elem.removeAttributes(null, ['id', 'href']);
-					/*if (elem.attr('href').indexOf('#') != 0)
-					{
-						//this.onclick = self.openExternalLink;
-						elem.attr('onclick', 'return openExternalLink(this)');
-					}*/
 				}
 				else if (this.nodeName === "IMG")
 				{
@@ -133,33 +134,33 @@ Reader.prototype = {
 				}
 				else
 				{
-					elem.removeAttributes(null, 'id');
+					elem.removeAttributes(null, ['id']);
 				}
 			});
+			// TODO: Insert detecting dot furigana
+			// Insert the text into reader
 			$('.container').html(temp.innerHTML);
+			// Init actions for anchors
 			var anchors = $('.container a');
 			//$('.container a').each(function()
 			//{
-				console.log(anchors);
 				anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
 				anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
 				anchors.click(function(e){ self.containerClick(e); return false; });
 			//});
+			// Adjust status etc.
 			$(window).resize();
 		}, 'html');
 	},
 	// Handling user clicking\touching a word
 	containerClick: function(e)
 	{
-		var zoom = this.screen.find('.container').absoluteZoom();
-		/*if (isNaN(zoom))
-		{
-			zoom = 1;
-		}*/
-		// Find the letter and text node containing it at the point of click; We divide the coordinates to compensate the zoom
-		var find = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
+		var container = this.screen.find('.container');
+		var zoom = container.absoluteZoom();
+		// Find the letter and text node containing it at the point of click (start of selection); We divide the coordinates to compensate the zoom
+		var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
 		// Check if there was anything at the point of the click
-		if (find != null)
+		if (start != null)
 		{
 			// If popup was closed determine where to show it and make it visible
 			if ($('.floater:visible').length == 0)
@@ -177,17 +178,16 @@ Reader.prototype = {
 			}
 			// Construct the initial range for finding the word (13 characters from the point of click)
 			// TODO: Number of characters should be customizable
-			// TODO: The range will need to be remade to accept words that go beyond a single text node (will be most likely used for furigana)
-			var range = document.createRange();
-			range.setStart(find.element, find.position);
-			// Determine the length of the word (how many letters are there left in the node)
-			var end = find.position + 13;
-			if (end > find.element.nodeValue.length)
-			{
-				end = find.element.nodeValue.length;
-			}
+			var length = 13;
+			var textNodes = textCrawler.getTextNodeList(start.node, start.position, length, container[0], ["RT","RP"]);
+			
 			// Extract the word
-			var search = find.element.nodeValue.substring(find.position, end);
+			// TODO: Possibly getTextNodeList and getText should be combined as they process the same data
+			var search = textCrawler.getText(textNodes, start.position, length);
+			
+			// init end of selection
+			var end = null;
+			
 			// Feed it to the dictionary
 			// TODO: Allow customizing the number of words to be searched
 			// TODO: Allow searching both regular words and names
@@ -201,14 +201,12 @@ Reader.prototype = {
 			// If there were any results, start feeding the dictionary popup
 			if (result != null)
 			{
-				// For starters store the length of the longest word
-				end = find.position + result.matchLen;
 				// Iterate through all found words
 				// TODO: Make it visible to the user if there are more words available for the search than what is shown
 				for (var n = 0; n < result.data.length; n ++)
 				{
 					// Parse the entry for each word
-					// TODO: This probably should be done more accurately
+					// TODO: This probably should be done more accurately (split kanji, kana, grammar, meaning etc.) so it'll be easier to style
 					var split = result.data[n][0].split("/");
 					var kanji = split.shift();
 					if (kanji[0] == '[')
@@ -229,15 +227,20 @@ Reader.prototype = {
 					'<span class="description">' + split.join('; ') + '</span>' +
 					'</div>').insertBefore('.reader > .floater .dictionary .empty');
 				}
+				// Store the end position
+				end = textCrawler.getEndNode(textNodes, start.position, result.matchLen);
 			}
 			else
 			{
-				// If no words in the dictionary were found we will only hilight a single character
-				end = find.position + 1;
+				// If no words in the dictionary were found we will only highlight a single character
+				// TODO: Running getEndNode here is an overkill; should be changed to:
+				// end = { "node": start.node, "position": (start.position + 1) };
+				end = textCrawler.getEndNode(textNodes, start.position, 1);
 			}
-			// We take the liberty to reuse previous range to highlight found word
-			// TODO: As mentioned above this needs to be remade to accept words spread among multiple elements and committing furigana (wedon't want to select it)
-			range.setEnd(find.element, end);
+			// Select the word
+			var range = document.createRange();
+			range.setStart(start.node, start.position);
+			range.setEnd(end.node, end.position);
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 			sel.addRange(range);
@@ -255,10 +258,6 @@ Reader.prototype = {
 		var floaterZoom = $('.reader .floater').absoluteZoom();
 		var containerZoom = $('.reader .scroller .container').absoluteZoom();
 		var zoom = $('.reader .scroller').absoluteZoom();
-		/*if (isNaN(zoom))
-		{
-			zoom = 1;
-		}*/
 		var statusBarHeight = $('.statusBar').outerHeight();
 		var windowHeight = $(window).height();
 		$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
@@ -274,12 +273,9 @@ Reader.prototype = {
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
 		var scroller = reader.children('.scroller');
-		//var container = scroller.children('.container')
-		//var documentHeight = container.outerHeight();
 		var documentHeight = scroller[0].scrollHeight;
 		var windowHeight = scroller.height();
 		var length = documentHeight - windowHeight;
-		//var progress = 0;
 		// Calculate progress percentage
 		if (length < 0)
 		{
@@ -350,14 +346,15 @@ Reader.prototype = {
 		}
 		else
 		{
-			window.open(a.href);
+			if(confirm('Open ' + a.href + ' in a browser?'))
+				window.open(a.href);
 		}
-	},
+	}/*,
 	scrollTo: function(element)
 	{
 		if (elemetn.length == 1)
 		{
 			screen.find('> .scroller').scrollTop((this.screen.find('.container').offset().top + element.offset().top) + 'px');
 		}
-	}
+	}*/
 };

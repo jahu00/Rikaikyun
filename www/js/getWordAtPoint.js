@@ -13,7 +13,7 @@ function getWordAtPoint(elem, x, y) {
 				range.getBoundingClientRect().top  <= y && range.getBoundingClientRect().bottom >= y) {
 
 				range.detach();
-				return { "position": currentPos, "element": elem };
+				return { "node": elem, "position": currentPos };
 			}
 			currentPos += 1;
 		}
