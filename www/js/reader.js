@@ -155,6 +155,7 @@ Reader.prototype = {
 		var zoom = container.absoluteZoom();
 		// Find the letter and text node containing it at the point of click (start of selection); We divide the coordinates to compensate the zoom
 		var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
+		//console.log(e.target);
 		// Check if there was anything at the point of the click
 		if (start != null)
 		{

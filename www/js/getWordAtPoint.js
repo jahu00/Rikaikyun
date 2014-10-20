@@ -6,7 +6,7 @@ function getWordAtPoint(elem, x, y) {
 		range.selectNodeContents(elem);
 		var currentPos = 0;
 		var endPos = range.endOffset;
-		while(currentPos+1 <= endPos) {
+		while(currentPos < endPos) {
 			range.setStart(elem, currentPos);
 			range.setEnd(elem, currentPos+1);
 			if(range.getBoundingClientRect().left <= x && range.getBoundingClientRect().right >= x &&
