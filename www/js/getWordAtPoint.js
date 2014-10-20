@@ -18,11 +18,14 @@ function getWordAtPoint(elem, x, y) {
 			currentPos += 1;
 		}
 	} else {
+		
 		for(var i = 0; i < elem.childNodes.length; i++) {
 			var range = elem.childNodes[i].ownerDocument.createRange();
 			range.selectNodeContents(elem.childNodes[i]);
-			if(range.getBoundingClientRect().left <= x && range.getBoundingClientRect().right  >= x &&
-				range.getBoundingClientRect().top  <= y && range.getBoundingClientRect().bottom >= y)
+			var boundingBox = range.getBoundingClientRect();
+			//console.log(elem.childNodes[i], x, y, boundingBox);
+			if(boundingBox.left <= x && boundingBox.right  >= x &&
+				boundingBox.top  <= y && boundingBox.bottom >= y)
 			{
 				range.detach();
 				return(getWordAtPoint(elem.childNodes[i], x, y));

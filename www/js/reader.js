@@ -140,6 +140,7 @@ Reader.prototype = {
 			var anchors = $('.container a');
 			//$('.container a').each(function()
 			//{
+				//console.log(anchors.length);
 				anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
 				anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
 				anchors.click(function(e){ self.containerClick(e); return false; });
@@ -154,8 +155,9 @@ Reader.prototype = {
 		var container = this.screen.find('.container');
 		var zoom = container.absoluteZoom();
 		// Find the letter and text node containing it at the point of click (start of selection); We divide the coordinates to compensate the zoom
-		var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
-		//console.log(e.target);
+		//var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
+		var start = getCharacterAtPoint.find(e.target, e.pageX / zoom, e.pageY / zoom);
+		
 		// Check if there was anything at the point of the click
 		if (start != null)
 		{
