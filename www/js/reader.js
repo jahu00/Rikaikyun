@@ -5,7 +5,6 @@ function Reader(dict)
 }
 
 Reader.prototype = {
-	
 	resizeStartPosition: 0,
 	resizeStartSize: 0,
 	lastPosition: null,
@@ -84,6 +83,7 @@ Reader.prototype = {
 			// Here is a simple conversion txt => html
 			// TODO: Add injecting furigana
 			$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
+			//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
 			
 			$(window).resize();
 		}, 'html');

@@ -8,7 +8,7 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
 		<link href="./css/style.css" type="text/css" rel="stylesheet" />
 		<link href="./css/screen.css" type="text/css" rel="stylesheet" />
-		<link href="./css/ruby.css" type="text/css" rel="stylesheet" />
+		<!-- <link href="./css/ruby.css" type="text/css" rel="stylesheet" /> -->
         <title>Rikaikyun</title>
     </head>
     <body>
@@ -78,6 +78,7 @@
 		<script src="./js/reader.js"></script>
 		<!-- <script src="./js/encoding.js"></script> -->
 		<script src="./js/htmlHelpers.js"></script>
+		<script src="./js/fpsCount.js"></script>
         <script type="text/javascript">
 			function openExternalLink(a)
 			{
@@ -92,9 +93,10 @@
 				// Block context menu (makes the app run less buggy on chrome on desktop)
 				$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 				
-				//reader.loadDocument('genji-01.txt');
-				reader.loadHtmlDocument('genji-01utf.html');
+				reader.loadDocument('genji-01.txt');
+				//reader.loadHtmlDocument('genji-01utf.html');
 				//reader.loadHtmlDocument('test1.html');
+				fpsCount.go();
 			});
         </script>
     </body>

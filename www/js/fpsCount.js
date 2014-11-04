@@ -3,7 +3,8 @@ var fpsCount = {
 	framesSinceLastUpdate: 0,
 	go: function()
 	{
-		setInterval(this.measure, 1);
+		var self = this;
+		setInterval(function() { self.measure() }, 1);
 	},
 	measure: function()
 	{
