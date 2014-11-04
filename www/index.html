@@ -5,127 +5,321 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-        <!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> -->
-		<!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" /> -->
-		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=320, target-densitydpi=device-dpi" />
-        <title>Rikaikyun-test</title>
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <title>jVocabDrill</title>
 		<style>
+			html
+			{
+				height: 100%;
+			}
 			body
 			{
 				margin: 0;
+				height: 100%;
 			}
-		
-			.search-bar
+			.questionContainer
 			{
-				position: fixed;
-				top:0;
-				height:50px;
-				width:100%;
-				border-bottom: 2px solid black;
-				background:white;
-			}
-			
-			.search-bar .padding
-			{
-				padding-top: 10px;
-				padding-left:20px;
-				padding-right:85px;
-				display:block;
-			}
-			
-			.search-bar .search-input
-			{
+				padding: 5px;
 				width: 100%;
+				height: 50%;
+				/*display: table-cell;*/
+				text-align: center;
+				vertical-align: middle;
+				box-sizing: border-box;
+				overflow-x:hidden;
+				overflow-y:scroll;
 			}
-			
-			.search-bar .search-button
+			.questionContainer *
 			{
-				position:absolute;
-				top:7px;
-				right:10px;
-				padding:5px;
-				border:1px solid black;
+				word-wrap:break-word;
 			}
-			
-			.dictionary
+			.progress
 			{
-				margin-top: 50px;
+				/*box-sizing: border-box;*/
+				margin-left -1px;
+				width: 100%;
+				border: 1px solid black;
+				position: relative;
+				/*position:fixed;
+				top:4px;
+				left:4px;*/
+				text-align: center;
 			}
-			
-			.dictionary .dictionary-entry
+			.progress .bar
 			{
-				padding:5px;
+				position: absolute;
+				top:0;
+				left:0;
+				background: lightgray;
+				height: 100%;
+				z-index: -1;
+			}
+			.answers
+			{
+				height: 50%;
+				width: 100%;
+				box-sizing: border-box;
+				border-top: 1px solid black;
+				overflow-x:hidden;
+				overflow-y:scroll;
+			}
+			.answer
+			{
+				box-sizing: border-box;
+				padding: 5px;
 				border-bottom: 1px solid black;
+				cursor: pointer;
+				word-wrap:break-word;
 			}
-			
-			.dictionary .dictionary-entry .kanji
-			{
-				font-size:16px;
-			}
-			
-			.dictionary .dictionary-entry .grammar
-			{
-				font-size:10px;
-			}
-			
-			.dictionary .dictionary-entry .description
-			{
-				font-size:12px;
-			}
-			
 			@media only screen and (min-device-width : 720px)
 			{
-				body
+				.questionContainer, .answers
 				{
 					zoom:300%;
 				}
 			}
-			
 		</style>
     </head>
     <body>
-        <div class="search-bar">
-			<div class="padding">
-				<input class="search-input" />
-				<div class="search-button">Search</div>
+		<div class="questionContainer">
+			<div class="progress">
+				<div class="bar"></div>
+				<span>0.00%<span>
+			</div>
+			<div class="question">
 			</div>
 		</div>
-		<div class="dictionary">
-		</div>
-        <script type="text/javascript" src="cordova.js"></script>
+		<div class="answers"></div>
+		<script type="text/javascript" src="cordova.js"></script>
 		<script src="./rikaikun/data.js"></script>
-		<script src="./wanakana.min.js"></script>
 		<script src="./jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
+			//var dict = new rcxDict(true);
+			var dict = new rcxDict(false);
+			function WordStats()//_word)
+			{
+				//this.word = _word;
+				this.weight = 0;
+				this.correct = 0;
+				this.wrong = 0;
+			}
+			
+			function WordEntry(_word, _weight)
+			{
+				this.word = _word;
+				this.weight = _weight;
+			}
+			
+			function calculateProcentage(_wordList, _words)
+			{
+				var totalWeight = 0;
+				var learnt = 0;
+				for(var i = 0; i < _wordList.length; i++)
+				{
+					var word = wordList[i];
+					totalWeight += word.weight;
+					var stats = _words[word.word];
+					if (typeof stats == "undefined")
+						continue;
+					learnt += (stats.weight > 0 ? stats.weight * word.weight / 5 : 0);
+				}
+				//console.log(learnt);
+				return (learnt / totalWeight).toFixed(2);
+				//return learnt / totalWeight;
+			}
+			
+			function updateStatus(_wordList, _words)
+			{
+				var progress = calculateProcentage(_wordList, _words) + "%";
+				$('.progress .bar').css('width', progress);
+				$('.progress span').html(progress);
+			}
+			
+			function getDefinitions(_word, _dict)
+			{
+				var currentDict = _dict.wordDict;
+				var pos = _dict.find(_dict.wordIndex, _word + ",");
+				/*if (pos == null)
+				{
+					currentDict = _dict.nameDict;
+					var pos = _dict.find(_dict.nameIndex, _word + ",");
+				}*/
+				//console.log(_word, pos);
+				var definitions = [];
+				var indexes = pos.split(',');
+				for (var i = 1; i < indexes.length; i++)
+				{
+					var index = indexes[i];
+					definitions.push(currentDict.substring(index, currentDict.indexOf('\n', index)))
+				}
+				return definitions;
+			}
+			
+			function newQuestion(_wordList, _words)
+			{
+				updateStatus(wordList, words);
+				$('.question, .answers').html("");
+				var answers = [];
+				var knownWords = [];
+				var wordPool = 50;
+				var newWords = 40;
+				var numberOfAnswers = 5;
+				// Pool possible questions
+				for (var i = 0; i < _wordList.length && answers.length < wordPool; i++)
+				{
+					if (answers.length >= newWords && knownWords.length > 0)
+					{
+						var knownWordId = Math.floor(Math.random() * knownWords.length);
+						answers.push(knownWord[knownWordId]);
+						knownWords.splice(knownWordId, 1)
+						continue;
+					}
+					var answer = _wordList[i];
+					var stats = _words[answer.word];
+					if (typeof stats == "undefined" || stats.weight < 5)
+					{
+						answers.push(answer);
+						continue;
+					}
+					if (status == 5)
+					{
+						knownWords.push(answer);
+					}
+				}
+				// Randomly number of questions
+				while (answers.length > numberOfAnswers)
+				{
+					answers.splice(Math.floor(Math.random() * answers.length), 1);
+				}
+				// Pick question to ask and keep the rest as alternative answers
+				var questionId = 0;
+				if (answers.length > 1)
+				{
+					var tempAnswerIds = [];
+					for (var i = 0; i < answers.length; i++)
+					{
+						if (answers[i].word != lastWord)
+						{
+							tempAnswerIds.push(i);
+						}
+					}
+					var questionId = tempAnswerIds[Math.floor(Math.random() * tempAnswerIds.length)];
+				}
+				var question = answers[questionId];
+				lastWord = question.word;
+				$('.question').html('<h1>' + question.word + '</h1>');
+				while (answers.length > 0)
+				{
+					var answerId = Math.floor(Math.random() * answers.length);
+					var answer = answers[answerId];
+					var correctAnswer = answer.word == question.word;
+					var definitions = getDefinitions(answer.word, dict);
+					var answerTranslation = [];
+					var answerKana = [];
+					var tempTranslation = {};
+					var tempKana = {};
+					for (var i = 0; i < definitions.length; i++)
+					{
+						var definition = definitions[i];
+						var translation = definition.split('/').slice(1, -1).join(';');
+						var kana = definition.match(/\[(.*?)\]/)[1];
+						if (typeof tempTranslation[translation] == "undefined" )
+						{
+							tempTranslation[translation] = true;
+							answerTranslation.push(translation);
+						}
+						if (typeof tempKana[kana] == "undefined" )
+						{
+							tempKana[kana] = true;
+							answerKana.push(kana);
+						}
+					}
+					if (correctAnswer)
+					{
+						//var answerKana = definition.match(/\[(.*?)\]/)[1];
+						$('.question').append('<h3 style="display:none">' + answerKana.join(', ') + '</h3>');
+					}
+					var translation = definition.split('/').slice(1, -1).join(';');
+					$('.answers').append('<div class="answer ' + (correctAnswer ? "correct" : "") + '">' + answerTranslation.join('<br/>') + '</div>');
+					answers.splice(answerId,1);
+				}
+			}
+			
+			var lastWord = "";
+			var words = {};
+			var wordList = [];
 			$(function()
 			{
-				//wanakana.bind($('.search-input')[0]);
-				var dict = new rcxDict();
-				$('.search-button').click(function()
+				if (typeof localStorage["words"] != "undefined" && JSON.parse(localStorage["words"]) != null)
 				{
-					var result = dict.wordSearch(wanakana.toKana($('.search-input').val()), false, 20);
-					$('.dictionary').html("");
-					for (var n = 0; n < result.data.length; n ++)
+					words = JSON.parse(localStorage["words"]);
+				}
+				console.log(words);
+				var req = new XMLHttpRequest();
+				
+				req.open("GET", "word_freq_report.txt", false);
+				//req.open("GET", "ch0128.word_freq.txt", false);
+				req.send(null);
+				var data = req.responseText.split("\n");
+				for (var i = 0; i < data.length; i++)
+				{
+					var _data = data[i];
+					if (_data.trim() == "")
+						continue;
+					var _split = _data.split("\t");
+					var _weight = parseInt(_split[0].trim());
+					var _word = _split[1].trim();
+					//console.log(_word);
+					if (_word.match(/[\u4E00-\u9FAF]/g) != null)
 					{
-						var split = result.data[n][0].split("/");
-						var kanji = split.shift();
-						if (kanji[0] == '[')
+						if (dict.find(dict.wordIndex, _word + ",") != null)
 						{
-							kanji = kanji.substring(1, kanji.length-1);
+							wordList.push(new WordEntry(_word, _weight));
 						}
-						split.pop();
-						$('.dictionary').append(
-							'<div class="dictionary-entry">' +
-							'<span class="kanji">' + kanji.trim() + '</span>' + 
-							(
-								result.data[n][1] !== null ?
-								' <span class="grammar">(' + result.data[n][1] + ')</span>' :
-								''
-							) +
-							'<br/>' +
-							'<span class="description">' + split.join('; ') + '</span>' +
-							'</div>');
+						/*else
+						{
+							console.log(_weight, _word);
+						}*/
 					}
+				}
+				localStorage["words"] = JSON.stringify(words);
+				//$.get()
+				//updateStatus(wordList, words);
+				newQuestion(wordList, words);
+				$('.answers').on('click', '.answer', function()
+				{
+					var answer = $(this);
+					var question = $('.question h1').text().trim();
+					$('.question h3').show();
+					var stat = words[question];
+					if (typeof stat == "undefined")
+					{
+						stat = new WordStats();
+					}
+					if (answer.hasClass('correct'))
+					{
+						if (stat.weight < 5)
+						{
+							stat.weight++;
+						}
+						stat.correct++;
+					}
+					else
+					{
+						answer.css('background', "gray");
+						answer = answer.closest('.answers').find('.correct');
+						if (stat.weight > -5)
+						{
+							stat.weight--;
+						}
+						stat.wrong++;
+					}
+					words[question] = stat;
+					localStorage["words"] = JSON.stringify(words);
+					answer.css('background', "black");
+					answer.css('color', "white");
+					//updateStatus(wordList, words);
+					setTimeout(function(){newQuestion(wordList, words)}, 1500);
 				});
 			});
         </script>
