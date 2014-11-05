@@ -7,89 +7,20 @@
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <title>jVocabDrill</title>
-		<style>
-			html
-			{
-				height: 100%;
-			}
-			body
-			{
-				margin: 0;
-				height: 100%;
-			}
-			.questionContainer
-			{
-				padding: 5px;
-				width: 100%;
-				height: 50%;
-				/*display: table-cell;*/
-				text-align: center;
-				vertical-align: middle;
-				box-sizing: border-box;
-				overflow-x:hidden;
-				overflow-y:scroll;
-			}
-			.questionContainer *
-			{
-				word-wrap:break-word;
-			}
-			.progress
-			{
-				/*box-sizing: border-box;*/
-				margin-left -1px;
-				width: 100%;
-				border: 1px solid black;
-				position: relative;
-				/*position:fixed;
-				top:4px;
-				left:4px;*/
-				text-align: center;
-			}
-			.progress .bar
-			{
-				position: absolute;
-				top:0;
-				left:0;
-				background: lightgray;
-				height: 100%;
-				z-index: -1;
-			}
-			.answers
-			{
-				height: 50%;
-				width: 100%;
-				box-sizing: border-box;
-				border-top: 1px solid black;
-				overflow-x:hidden;
-				overflow-y:scroll;
-			}
-			.answer
-			{
-				box-sizing: border-box;
-				padding: 5px;
-				border-bottom: 1px solid black;
-				cursor: pointer;
-				/*word-wrap:break-word;*/
-			}
-			@media only screen and (min-device-width : 720px)
-			{
-				body
-				{
-					zoom:300%;
-				}
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
     </head>
     <body>
-		<div class="questionContainer">
-			<div class="progress">
-				<div class="bar"></div>
-				<span>0.00%<span>
+		<div class="screen" id="drill">
+			<div class="questionContainer">
+				<div class="progress">
+					<div class="bar"></div>
+					<span>0.00%<span>
+				</div>
+				<div class="question">
+				</div>
 			</div>
-			<div class="question">
-			</div>
+			<div class="answers"></div>
 		</div>
-		<div class="answers"></div>
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="./rikaikun/data.js"></script>
 		<script src="./jquery-1.8.3.min.js"></script>

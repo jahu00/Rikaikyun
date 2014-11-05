@@ -1,0 +1,89 @@
+html
+{
+	height:100%;
+	width:100%;
+}
+body
+{
+	margin: 0;
+	overflow:hidden;
+	height:100%;
+	width:100%;
+	/* Turn off touch highlight */
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	-webkit-tap-highlight-color: transparent;
+	/* block copy&paste on android */
+	-webkit-touch-callout: none;
+    /*-webkit-user-select: none;*/
+}
+.screen
+{
+	height:100%;
+	width:100%
+	overflow:hidden;
+}
+.questionContainer
+{
+	padding: 5px;
+	width: 100%;
+	height: 40%;
+	/*display: table-cell;*/
+	text-align: center;
+	vertical-align: middle;
+	box-sizing: border-box;
+	overflow-x:hidden;
+	overflow-y:scroll;
+}
+.questionContainer *
+{
+	word-wrap:break-word;
+}
+.progress
+{
+	/*box-sizing: border-box;*/
+	margin-left -1px;
+	width: 100%;
+	border: 1px solid black;
+	position: relative;
+	/*position:fixed;
+	top:4px;
+	left:4px;*/
+	text-align: center;
+}
+.progress .bar
+{
+	position: absolute;
+	top:0;
+	left:0;
+	background: lightgray;
+	height: 100%;
+	z-index: -1;
+}
+.answers
+{
+	height: 60%;
+	width: 100%;
+	box-sizing: border-box;
+	border-top: 1px solid black;
+	overflow-x:hidden;
+	overflow-y:scroll;
+}
+.answer
+{
+	box-sizing: border-box;
+	padding: 7px;
+	border-bottom: 1px solid black;
+	cursor: pointer;
+	/*word-wrap:break-word;*/
+}
+@media only screen and (min-device-width : 720px)
+{
+	.questionContainer
+	{
+		zoom:300%;
+	}
+	.answers
+	{
+		zoom:250%;
+	}
+}
