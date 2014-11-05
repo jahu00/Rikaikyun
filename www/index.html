@@ -69,11 +69,11 @@
 				padding: 5px;
 				border-bottom: 1px solid black;
 				cursor: pointer;
-				word-wrap:break-word;
+				/*word-wrap:break-word;*/
 			}
 			@media only screen and (min-device-width : 720px)
 			{
-				.questionContainer, .answers
+				body
 				{
 					zoom:300%;
 				}
@@ -159,6 +159,7 @@
 			{
 				updateStatus(wordList, words);
 				$('.question, .answers').html("");
+				$('.question, .answers').scrollTop(0);
 				var answers = [];
 				var knownWords = [];
 				var wordPool = 50;
@@ -221,7 +222,7 @@
 					for (var i = 0; i < definitions.length; i++)
 					{
 						var definition = definitions[i];
-						var translation = definition.split('/').slice(1, -1).join(';');
+						var translation = definition.split('/').slice(1, -1).join('; ');
 						var kana = definition.match(/\[(.*?)\]/)[1];
 						if (typeof tempTranslation[translation] == "undefined" )
 						{
