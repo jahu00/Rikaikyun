@@ -76,9 +76,26 @@ body
 	cursor: pointer;
 	/*word-wrap:break-word;*/
 }
+
+.drillList
+{
+	width: 100%;
+	height: 100%;
+	overflow-x:hidden;
+	overflow-y:scroll;
+}
+
+.drillList .item
+{
+	box-sizing: border-box;
+	padding: 7px;
+	border-bottom: 1px solid black;
+	cursor: pointer;
+}
+
 @media only screen and (min-device-width : 720px)
 {
-	.questionContainer
+	.questionContainer, .drillList
 	{
 		zoom:300%;
 	}
