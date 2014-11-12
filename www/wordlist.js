@@ -51,6 +51,6 @@ WordList.prototype = {
 				continue;
 			learnt += (stats.weight > 0 ? (stats.weight * word.weight / 5) : 0);
 		}
-		return (learnt / totalWeight).toFixed(2);
+		return (learnt / totalWeight * 100).toFixed(2);
 	}
 }

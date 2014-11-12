@@ -33,12 +33,12 @@
 		<script src="./drill.js"></script>
         <script type="text/javascript">
 			function WordStats()//_word)
-				{
-					//this.word = _word;
-					this.weight = 0;
-					this.correct = 0;
-					this.wrong = 0;
-				}
+			{
+				//this.word = _word;
+				this.weight = 0;
+				this.correct = 0;
+				this.wrong = 0;
+			}
 			$(function()
 			{
 				var dict = new rcxDict(false);
@@ -46,6 +46,24 @@
 				var words = {};
 				var wordLists = [];
 				var drill = null;
+				
+				document.addEventListener("deviceready", function(){
+					document.addEventListener("backbutton", function(e)
+					{
+						if (drill != null)
+						{
+							drill == null;
+							$('#drill').hide();
+							$('#select').show();
+							e.preventDefault();
+						}
+						else
+						{
+							navigator.app.exitApp();
+						}
+					}, false);
+				});
+				
 				if (typeof localStorage["words"] != "undefined" && JSON.parse(localStorage["words"]) != null)
 				{
 					words = JSON.parse(localStorage["words"]);
