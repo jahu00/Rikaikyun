@@ -1,7 +1,7 @@
 getCharacterAtPoint = {
 	find: function(element, x, y)
 	{
-		var lastBottom = 0;
+		//var lastBottom = 0;
 		for (var i = 0; i < element.childNodes.length; i++)
 		{
 			var node = element.childNodes[i];
@@ -15,22 +15,10 @@ getCharacterAtPoint = {
 				var compensation = 0;
 				var firstPosition = node.nodeValue.indexOf(trim[0]);
 				var lastPosition = firstPosition + trim.length;
-				//console.log(trim, firstPosition, lastPosition);
 				var firstCharacter = this.getBoundingBox(node, firstPosition);
 				var lastCharacter = this.getBoundingBox(node, lastPosition - 1);
-				//console.log(firstCharacter);
-				//console.log(lastCharacter);
-				/*if (firstCharacter.bottom < lastBottom)
-				{
-					compensation = lastBottom - firstCharacter.bottom;
-					firstCharacter.y += compensation;
-					firstCharacter.top += compensation;
-					firstCharacter.bottom += compensation;
-					lastCharacter.y += compensation;
-					lastCharacter.top += compensation;
-					lastCharacter.bottom += compensation;
-				}*/
-				if (
+				if
+				(
 					(
 						firstCharacter.bottom == lastCharacter.bottom && firstCharacter.left <= x && lastCharacter.right >= x && firstCharacter.top <= y && lastCharacter.bottom >= y
 					) ||
@@ -38,7 +26,7 @@ getCharacterAtPoint = {
 						firstCharacter.bottom < lastCharacter.bottom &&
 						(
 							(firstCharacter.left <= x && firstCharacter.top <= y && firstCharacter.bottom >= y) ||
-							(lastCharacter.top <= y && firstCharacter.bottom >= y) ||
+							(firstCharacter.bottom <= y && lastCharacter.top >= y) ||
 							(lastCharacter.right >= x && lastCharacter.top <= y && lastCharacter.bottom >= y)
 						)
 					)
@@ -64,11 +52,7 @@ getCharacterAtPoint = {
 					}
 					range.detach();
 					return null;
-				}/* else if (lastCharacter.bottom < y)
-				{
-					return null;
-				}*/
-				
+				}
 			}
 			else
 			{
@@ -83,8 +67,8 @@ getCharacterAtPoint = {
 		range.setEnd(element, position + 1);
 		var boundingBox = range.getBoundingClientRect();
 		range.detach();
-		return this.editableBoundingBox(boundingBox);
-		//return boundingBox;
+		//return this.editableBoundingBox(boundingBox);
+		return boundingBox;
 	},
 	editableBoundingBox: function(boundingBox)
 	{
