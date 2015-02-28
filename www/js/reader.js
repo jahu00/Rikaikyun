@@ -16,9 +16,16 @@ Reader.prototype = {
 	{
 		var self = this;
 		this.screen = $('.reader');
+		// Copy contents of top loater bar to the bottom one (reuse html without having to write it twice)
+		this.screen.find('.floater .bar.bottom').html(this.screen.find('.floater .bar.top').html());
+		this.initDictionarySelection();
+		
 		// Our function for handling the event is inside another to not confuse what 'this' is
+		// clicks on the screen (handles word lookups)
 		this.screen.find('.container').click(function(e){self.containerClick(e)});
+		// Handling resizes of the screen
 		$(window).resize(function(){self.resizeScreen()});
+		// Handling scrolling within the document
 		$('.reader > .scroller').scroll(function(){self.updateStatus();});
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
@@ -149,6 +156,21 @@ Reader.prototype = {
 			$(window).resize();
 		}, 'html');
 	},
+	initDictionarySelection: function()
+	{
+		$('.floater .bar .tab').click(function()
+		{
+			if(!$(this).hasClass('active'))
+			{
+				var activeTab = $('.floater .bar .tab.active');
+				activeTab.removeClass('active');
+				$('.floater .dictionary[data-tab=' + activeTab.attr('data-tab') + ']').removeClass('active');
+				var thisTab = $('.floater .bar .tab[data-tab=' + $(this).attr('data-tab') + ']');
+				thisTab.addClass('active');
+				$('.floater .dictionary[data-tab=' + thisTab.attr('data-tab') + ']').addClass('active');
+			}
+		});
+	},
 	// Handling user clicking\touching a word
 	containerClick: function(e)
 	{
@@ -224,7 +246,7 @@ Reader.prototype = {
 					) +
 					'<br/>' +
 					'<span class="description">' + split.join('; ') + '</span>' +
-					'</div>').insertBefore('.reader > .floater .dictionary .empty');
+					'</div>').insertBefore('.reader > .floater .dictionary[data-tab=word] .empty');
 				}
 				// Store the end position
 				end = textCrawler.getEndNode(textNodes, start.position, result.matchLen);
