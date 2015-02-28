@@ -593,7 +593,24 @@ if (0) {
 
 		return entry;
 	},
-
+	getKanjiRadicals: function(entry)
+	{
+		bn = entry.misc['B'] - 1;
+		entry.radicals = [];
+		for (i = 0; i < this.radData.length; ++i) {
+			var s = this.radData[i];
+			if ((s.indexOf(entry.kanji) != -1)) {
+				var k = s.split('\t');
+				var obj = {'kanji': k[0], 'yomi': k[2], 'eigo': k[3]};
+				entry.radicals.push(obj);
+				if (i == bn)
+				{
+					entry.radical = obj;
+				}
+			}
+		}
+		return entry;
+	},
 	numList: [
 /*
 		'C', 	'Classical Radical',

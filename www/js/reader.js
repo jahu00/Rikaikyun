@@ -158,18 +158,22 @@ Reader.prototype = {
 	},
 	initDictionarySelection: function()
 	{
+		var self = this;
 		$('.floater .bar .tab').click(function()
 		{
-			if(!$(this).hasClass('active'))
-			{
-				var activeTab = $('.floater .bar .tab.active');
-				activeTab.removeClass('active');
-				$('.floater .dictionary[data-tab=' + activeTab.attr('data-tab') + ']').removeClass('active');
-				var thisTab = $('.floater .bar .tab[data-tab=' + $(this).attr('data-tab') + ']');
-				thisTab.addClass('active');
-				$('.floater .dictionary[data-tab=' + thisTab.attr('data-tab') + ']').addClass('active');
-			}
+			self.switchDictionaryTab($(this).attr('data-tab'));
 		});
+	},
+	switchDictionaryTab: function(tabName)
+	{
+		var activeTab = $('.floater .bar .tab.active');
+		if (activeTab.attr('data-tab') != tabName)
+		{
+			activeTab.removeClass('active');
+			$('.floater .dictionary.active').removeClass('active');
+			$('.floater .bar .tab[data-tab=' + tabName + ']').addClass('active');
+			$('.floater .dictionary[data-tab=' + tabName + ']').addClass('active');
+		}
 	},
 	// Handling user clicking\touching a word
 	containerClick: function(e)
@@ -213,51 +217,97 @@ Reader.prototype = {
 			// TODO: Allow customizing the number of words to be searched
 			// TODO: Allow searching both regular words and names
 			// TODO: Try moving the lookup to another thread
-			var result = this.dict.wordSearch(search, false, 10);
-			
+			var words = (search.length > 0 ? this.dict.wordSearch(search, false) : null);//, 10);
+			var names = (search.length > 0 ? this.dict.wordSearch(search, true) : null);//, 20);
+			var kanji = (search.length > 0 ? this.dict.kanjiSearch(search[0]) : null);
 			// Restart the dictionary contents (remove all items and rewind the scroll)
 			// TODO: This should be probably elsewhere (like in a separate object, but I have no concept for that now)
 			$('.reader > .floater .dictionary .dictionary-entry').remove();
 			$('.reader > .floater .dictionary').fakeScrollReset();
-			// If there were any results, start feeding the dictionary popup
-			if (result != null)
+			
+			function populateDictionary(type, result)
 			{
-				// Iterate through all found words
-				// TODO: Make it visible to the user if there are more words available for the search than what is shown
-				for (var n = 0; n < result.data.length; n ++)
+				if (result != null)
 				{
-					// Parse the entry for each word
-					// TODO: This probably should be done more accurately (split kanji, kana, grammar, meaning etc.) so it'll be easier to style
-					var split = result.data[n][0].split("/");
-					var kanji = split.shift();
-					if (kanji[0] == '[')
+					// Iterate through all found words
+					// TODO: Make it visible to the user if there are more words available for the search than what is shown
+					for (var n = 0; n < result.data.length; n++)
 					{
-						kanji = kanji.substring(1, kanji.length-1);
+						// Parse the entry for each word
+						// TODO: This probably should be done more accurately (split kanji, kana, grammar, meaning etc.) so it'll be easier to style
+						var split = result.data[n][0].split("/");
+						var kanji = split.shift();
+						if (kanji[0] == '[')
+						{
+							kanji = kanji.substring(1, kanji.length-1);
+						}
+						split.pop();
+						// Insert entry to the dictionary popup
+						// TODO: Some optimizations suggested dumping it all into a string and injecting just the massive string
+						$('<div class="dictionary-entry">' +
+						'<span class="kanji">' + kanji.trim() + '</span>' + 
+						(
+							result.data[n][1] !== null ?
+							' <span class="grammar">(' + result.data[n][1] + ')</span>' :
+							''
+						) +
+						'<br/>' +
+						'<span class="description">' + split.join('; ') + '</span>' +
+						'</div>').insertBefore('.reader > .floater .dictionary[data-tab=' + type + '] .empty');
 					}
-					split.pop();
-					// Insert entry to the dictionary popup
-					// TODO: Some optimizations suggested dumping it all into a string and injecting just the massive string
-					$('<div class="dictionary-entry">' +
-					'<span class="kanji">' + kanji.trim() + '</span>' + 
-					(
-						result.data[n][1] !== null ?
-						' <span class="grammar">(' + result.data[n][1] + ')</span>' :
-						''
-					) +
-					'<br/>' +
-					'<span class="description">' + split.join('; ') + '</span>' +
-					'</div>').insertBefore('.reader > .floater .dictionary[data-tab=word] .empty');
+					// Store the end position
+					//end = textCrawler.getEndNode(textNodes, start.position, result.matchLen);
 				}
-				// Store the end position
-				end = textCrawler.getEndNode(textNodes, start.position, result.matchLen);
+				else
+				{
+					// If no words in the dictionary were found we will only highlight a single character
+					// TODO: Running getEndNode here is an overkill; should be changed to:
+					// end = { "node": start.node, "position": (start.position + 1) };
+					//end = textCrawler.getEndNode(textNodes, start.position, 1);
+				}
 			}
-			else
+			
+			// If there were any results, start feeding the dictionary popup
+			populateDictionary('word', words);
+			populateDictionary('name', names);
+			
+			if (kanji != null)
 			{
-				// If no words in the dictionary were found we will only highlight a single character
-				// TODO: Running getEndNode here is an overkill; should be changed to:
-				// end = { "node": start.node, "position": (start.position + 1) };
-				end = textCrawler.getEndNode(textNodes, start.position, 1);
+				kanji = this.dict.getKanjiRadicals(kanji);
+				
+				$('<div class="dictionary-entry">' +
+				'<span class="kanji">' + kanji.kanji + ' [' + kanji.onkun + ']' + (kanji.nanori ? ' {' + kanji.nanori + '}' : '') + '</span>' +
+				//(
+				//	result.data[n][1] !== null ?
+				//	' <span class="grammar">(' + result.data[n][1] + ')</span>' :
+				//	''
+				//) +
+				'<br/>' +
+				'<span class="description">(Rad.:' + kanji.radical.kanji + ', Strokes:' + kanji.misc['S'] + (kanji.misc['F'] ? ', Freq.: ' + kanji.misc['F'] : '') + ')<br/>' + kanji.eigo + '</span>' +
+				'</div>').insertBefore('.reader > .floater .dictionary[data-tab=kanji] .empty');
+				for (var i = 0; i < kanji.radicals.length; i++)
+				{
+					var radical = kanji.radicals[i];
+					$('<div class="dictionary-entry">' +
+					'<span class="kanji">' + radical.kanji + ' [' + radical.yomi + ']' + '</span>' + 
+					'<br/>' +
+					'<span class="description">' + radical.eigo + '</span>' +
+					'</div>').insertBefore('.reader > .floater .dictionary[data-tab=kanji] .empty');
+				}
 			}
+			//console.log(kanji);
+			
+			var maxLength = 1;
+			if (words != null)
+			{
+				maxLength = words.matchLen;
+			}
+			if (names != null && names.matchLen > maxLength)
+			{
+				maxLength = names.matchLen;
+			}
+			end = textCrawler.getEndNode(textNodes, start.position, maxLength);
+
 			// Select the word
 			var range = document.createRange();
 			range.setStart(start.node, start.position);

@@ -96,7 +96,7 @@
 			}
 			$(function()
 			{
-				var dict = new rcxDict();
+				var dict = new rcxDict(true);
 				var reader = new Reader(dict);
 				// Block context menu (makes the app run less buggy on chrome on desktop)
 				$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
