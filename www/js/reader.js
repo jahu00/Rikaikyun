@@ -257,12 +257,14 @@ Reader.prototype = {
 	// Handling user clicking\touching a word
 	containerClick: function(e)
 	{
+		//alert('can\'t touch this');
 		var container = this.screen.find('.container');
 		var zoom = container.absoluteZoom();
 		// Find the letter and text node containing it at the point of click (start of selection); We divide the coordinates to compensate the zoom
 		//var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
 		var start = getCharacterAtPoint.find(e.target, e.pageX / zoom, e.pageY / zoom);
-		
+		//alert(start);
+
 		// Check if there was anything at the point of the click
 		if (start != null)
 		{
@@ -299,6 +301,7 @@ Reader.prototype = {
 			var words = (search.length > 0 ? this.dict.wordSearch(search, false) : null);//, 10);
 			var names = (search.length > 0 ? this.dict.wordSearch(search, true) : null);//, 20);
 			var kanji = (search.length > 0 ? this.dict.kanjiSearch(search[0]) : null);
+			
 			// Restart the dictionary contents (remove all items and rewind the scroll)
 			// TODO: This should be probably elsewhere (like in a separate object, but I have no concept for that now)
 			$('.reader > .floater .dictionary .dictionary-entry').remove();

@@ -99,18 +99,32 @@
 				window.open(a.href);
 				return false;
 			}
-			$(function()
+			function run()
 			{
-				var dict = new rcxDict(true);
-				var reader = new Reader(dict);
-				// Block context menu (makes the app run less buggy on chrome on desktop)
-				$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
-				
-				reader.openDocument('genji-01.txt');
-				//reader.openHtmlDocument('genji-01utf.html');
-				//reader.openHtmlDocument('test1.html');
-				//fpsCount.go();
-			});
+				$(function()
+				{
+					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
+					//console.log(localStorage['edictPath']);
+					var dict = new rcxDict(true);
+					var reader = new Reader(dict);
+					// Block context menu (makes the app run less buggy on chrome on desktop)
+					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
+					
+					reader.openDocument('genji-01.txt');
+					//reader.openHtmlDocument('genji-01utf.html');
+					//reader.openHtmlDocument('test1.html');
+					//fpsCount.go();
+				});
+			}
+			//console.log(typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined');
+			if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
+			{
+				document.addEventListener("deviceready", run, false);
+			}
+			else
+			{
+				run();
+			}
         </script>
     </body>
 </html>

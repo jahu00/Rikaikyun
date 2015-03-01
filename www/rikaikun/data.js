@@ -40,6 +40,9 @@
 */
 
 function rcxDict(loadNames) {
+	this.edictPath = localStorage['edictPath'] || '';
+	this.ready = false;
+	//this.fileRequests = [];
 	this.loadDictionary();
 	if (loadNames) this.loadNames();
 	this.loadDIF();
@@ -47,20 +50,80 @@ function rcxDict(loadNames) {
 
 rcxDict.prototype = {
 	config: {},
-
+	edictPath: '',
 	setConfig: function(c) {
 		this.config = c;
 	},
 
 	//
+	fileReadAsync: function(url, callback, charset)
+	{
+		//console.log('this is async');
+		//if (typeof FileReader !== 'undefined')
+		if (typeof window.requestFileSystem !== 'undefined')
+		{
+			
+			//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fs)
+			window.resolveLocalFileSystemURL(this.edictPath, function(dir)
+			{
+				dir.getFile(url, null, function(entry)
+				{
+					//console.log(entry);
+					entry.file(function(f){
+						console.log(f);
+						var reader = new FileReader();
+						reader.onloadend = function (evt) {
+							//alert('done');
+							callback(evt.target.result)
+						};
+						reader.onerror = function(error)
+						{
+							console.log('File reader error:' + JSON.stringify(error));
+						};
+						reader.readAsText(f);
+					});
+				}
+				,function(error)
+				{
+					console.log('File entry error:' + JSON.stringify(error));
+				});
+				//console.log(dir);
+			},function(error)
+			{
+				console.log('File system error:' + JSON.stringify(error));
+			});
 
+			//console.log('trying to do magic');
+			/*var reader = new FileReader();
+			reader.onloadend = function (evt) {
+				callback(evt.target.result)
+			};
+			reader.readAsText(url);*/
+			
+		}
+		else
+		{
+			var req = new XMLHttpRequest();
+			req.open("GET", this.edictPath + url, true);
+			req.onreadystatechange=function()
+			{
+				callback(req.responseText);
+			};
+			req.send(null);
+		}
+		//return req.responseText;
+	},
 	fileRead: function(url, charset) {
 		var req = new XMLHttpRequest();
 		req.open("GET", url, false);
 		req.send(null);
 		return req.responseText;
 	},
-
+	readArray: function(a)
+	{
+		while ((a.length > 0) && (a[a.length - 1].length == 0)) a.pop();
+		return a;
+	},
 	fileReadArray: function(name, charset) {
 		var a = this.fileRead(name, charset).split('\n');
 		// Is this just in case there is blank shit in the file.  It was writtin by Jon though.
@@ -93,28 +156,47 @@ rcxDict.prototype = {
 
 	loadNames: function() {
 		if ((this.nameDict) && (this.nameIndex)) return;
-		/*this.nameDict = this.fileRead(rcxNamesDict.datURI, rcxNamesDict.datCharset);
-		this.nameIndex = this.fileRead(rcxNamesDict.idxURI, rcxNamesDict.idxCharset);*/
-		/*this.nameDict = this.fileRead(chrome.extension.getURL("data/names.dat"));
-		this.nameIndex = this.fileRead(chrome.extension.getURL("data/names.idx"));*/
+		
+		//var self = this;
+		
+		/*this.nameDict = this.fileRead("./rikaikun/data/names.dat");
+		this.nameIndex = this.fileRead("./rikaikun/data/names.idx");*/
+		
 		this.nameDict = this.fileRead("./rikaikun/data/names.dat");
+		/*this.fileReadAsync("names.dat", function(result)
+		{
+			self.nameDict = result;
+		});*/
 		this.nameIndex = this.fileRead("./rikaikun/data/names.idx");
+		/*this.fileReadAsync("names.idx", function(result)
+		{
+			self.nameIndex = result;
+		});*/
 	},
 
 	//	Note: These are mostly flat text files; loaded as one continous string to reduce memory use
 	loadDictionary: function() {
-		/* this.wordDict = this.fileRead(rcxWordDict.datURI, rcxWordDict.datCharset);
-		this.wordIndex = this.fileRead(rcxWordDict.idxURI, rcxWordDict.idxCharset); */
-		/*this.wordDict = this.fileRead(chrome.extension.getURL("data/dict.dat"));
-		this.wordIndex = this.fileRead(chrome.extension.getURL("data/dict.idx"));
-		this.kanjiData = this.fileRead(chrome.extension.getURL("data/kanji.dat"), 'UTF-8');
-		this.radData = this.fileReadArray(chrome.extension.getURL("data/radicals.dat"), 'UTF-8'); */
-
+		//var self = this;
 		this.wordDict = this.fileRead("./rikaikun/data/dict.dat");
+		/*this.fileReadAsync(/"dict.dat", function(result)
+		{
+			self.wordDict = result;
+		});*/
 		this.wordIndex = this.fileRead("./rikaikun/data/dict.idx");
+		/*this.fileReadAsync("dict.idx", function(result)
+		{
+			self.wordIndex = result;
+		});*/
 		this.kanjiData = this.fileRead("./rikaikun/data/kanji.dat", 'UTF-8');
+		/*this.fileReadAsync("kanji.dat", function(result)
+		{
+			self.kanjiData = result;
+		}, 'UTF-8');*/
 		this.radData = this.fileReadArray("./rikaikun/data/radicals.dat", 'UTF-8');
-		
+		/*this.fileReadAsync("radicals.dat", function(result)
+		{
+			self.radData = self.readArray(result);
+		}, 'UTF-8');*/
 		//	this.test_kanji();
 	},
 /*
@@ -205,34 +287,38 @@ if (0) {
 		this.difRules = [];
 		this.difExact = [];
 
-		/*var buffer = this.fileReadArray(chrome.extension.getURL("data/deinflect.dat"), 'UTF-8');*/
+		var self = this;
 		var buffer = this.fileReadArray("./rikaikun/data/deinflect.dat", 'UTF-8');
-		var prevLen = -1;
-		var g, o;
+		//this.fileReadAsync("deinflect.dat", function(result)
+		//{
+			//var buffer = self.readArray(result);//this.fileReadArray(this.edictPath + "deinflect.dat", 'UTF-8');
+			var prevLen = -1;
+			var g, o;
 
-		// i = 1: skip header
-		for (var i = 1; i < buffer.length; ++i) {
-			var f = buffer[i].split('\t');
+			// i = 1: skip header
+			for (var i = 1; i < buffer.length; ++i) {
+				var f = buffer[i].split('\t');
 
-			if (f.length == 1) {
-				this.difReasons.push(f[0]);
-			}
-			else if (f.length == 4) {
-				o = {};
-				o.from = f[0];
-				o.to = f[1];
-				o.type = f[2];
-				o.reason = f[3];
-
-				if (prevLen != o.from.length) {
-					prevLen = o.from.length;
-					g = [];
-					g.flen = prevLen;
-					this.difRules.push(g);
+				if (f.length == 1) {
+					self.difReasons.push(f[0]);
 				}
-				g.push(o);
+				else if (f.length == 4) {
+					o = {};
+					o.from = f[0];
+					o.to = f[1];
+					o.type = f[2];
+					o.reason = f[3];
+
+					if (prevLen != o.from.length) {
+						prevLen = o.from.length;
+						g = [];
+						g.flen = prevLen;
+						self.difRules.push(g);
+					}
+					g.push(o);
+				}
 			}
-		}
+		//}, 'UTF-8');
 	},
 
 	deinflect: function(word) {
