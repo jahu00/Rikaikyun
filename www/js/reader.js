@@ -1,16 +1,27 @@
 function Reader(dict)
 {
 	this.dict = dict;
+	this.resizeStartPosition = 0;
+	this.resizeStartSize = 0;
+	this.lastPosition = null;
+	this.scrollDistance = 0;
+	this.progress = 0;
 	this.init();
+	this.loadSettings();
+	//console.log(this.lastFile);
 }
 
 Reader.prototype = {
-	resizeStartPosition: 0,
-	resizeStartSize: 0,
-	lastPosition: null,
-	scrollDistance: 0,
+//Reader = {
+	dict: null,
+	settings: null,
 	screen: null,
-	progress: 0,
+	loadSettings: function()
+	{
+		//words = JSON.parse(localStorage["words"]);
+		//localStorage["words"] = JSON.stringify(words);
+		this.lastFile = localStorage["lastFile"] || '';
+	},
 	// Setup initial values, events etc.
 	init: function()
 	{
@@ -57,6 +68,58 @@ Reader.prototype = {
 			return false;
 		});
 		
+		
+		$('.menu .file').click(function()
+		{
+			if (typeof window.requestFileSystem !== 'undefined')
+			{
+				window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+				{
+					console.log('not an error: ' + fileSystem.name);
+					//console.log(fileSystem);
+				}, function(error){console.log('error:' + error)});
+			}
+			else
+			{
+				document.querySelector(".menu .file input").dispatchEvent(new Event('click'));
+			}
+		});
+		
+		$('.menu .file input').change(function(e)
+		{
+			var file = e.target.files[0];
+			console.log(file);
+			if (!file) {
+				return;
+			}
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				//self.loadDocument(e.target.result);
+				var contents = e.target.result;
+				if (/.html?$/.test(file.name))
+				{
+					self.loadHtmlDocument(e.target.result);
+				}
+				else
+				{
+					self.loadDocument(e.target.result);
+				}
+				//displayContents(contents);
+			};
+			reader.readAsText(file);
+		});
+		
+		$('.menu .exit').click(function()
+		{
+			if (typeof navigator.app !== 'undefined')
+			{
+				navigator.app.exitApp();
+			}
+			else
+			{
+				window.close();
+			}
+		});
 		// Setup screen dependant elements that can't be handled by css alone
 		$(window).resize();
 	},
@@ -81,79 +144,95 @@ Reader.prototype = {
 		newHeight = parseInt(newHeight);
 		dictionaryContainer.css('height', newHeight + "px");
 	},
-	loadDocument: function(path)
+	prepareLoad: function()
 	{
-		//$.get("genji-01.txt", function(data)
+		$('.screen').removeClass('active');
+		$('.screen.reader').addClass('active');
+		$('.container').html('');
+	},
+	loadDocument: function(text)
+	{
+		this.prepareLoad();
+		// Here is a simple conversion txt => html
+		// TODO: Add injecting furigana
+		$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
+		//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
+		$(window).resize();
+	},
+	openDocument: function(path)
+	{
+		var self = this;
 		// TODO: This will change a lot later on when I implement selecting files
 		$.get(path, function(data)
 		{
-			// Here is a simple conversion txt => html
-			// TODO: Add injecting furigana
-			$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
-			//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
-			
-			$(window).resize();
+			self.loadDocument(data);
 		}, 'html');
 	},
-	loadHtmlDocument: function(path)
+	loadHtmlDocument: function(data)
+	{
+		var self = this;
+		this.prepareLoad();
+		// extract body of the html file
+		var body = htmlHelpers.extractBody(data);
+		data = null;
+		// trim excess whitespace in all lines of the body
+		body = htmlHelpers.trimAllLines(body);
+		// Create temporary element for storing the body (allows modifying the elements)
+		var temp = document.createElement('div');
+		temp.innerHTML = body;
+		body = null;
+		var $temp = $(temp);
+		// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
+		$temp.find('script, style, link').remove();
+		// Rename ids to avoid collision
+		var idCount = 0;
+		$temp.find('*[id]').each(function()
+		{
+			var originalId = this.id;
+			var newId = "documentId_" + idCount;
+			$temp.find('a[href=#' + originalId + ']').attr("href", "#" + newId);
+			this.id = newId;
+			idCount++;
+		});
+		// Remove all unnecessary attributes (the only ones we spare are id on all elements, href on anchors and src on images)
+		$temp.find('*:hasAttributes').each(function()
+		{
+			var elem = $(this);
+			if (this.nodeName === "A")
+			{
+				elem.removeAttributes(null, ['id', 'href']);
+			}
+			else if (this.nodeName === "IMG")
+			{
+				elem.removeAttributes(null, ['id', 'src']);
+			}
+			else
+			{
+				elem.removeAttributes(null, ['id']);
+			}
+		});
+		// TODO: Insert detecting dot furigana
+		// Insert the text into reader
+		$('.container').html(temp.innerHTML);
+		// Init actions for anchors
+		var anchors = $('.container a');
+		//$('.container a').each(function()
+		//{
+			//console.log(anchors.length);
+			anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
+			anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
+			anchors.click(function(e){ self.containerClick(e); return false; });
+		//});
+		// Adjust status etc.
+		$(window).resize();
+	},
+	openHtmlDocument: function(path)
 	{
 		var self = this;
 		// TODO: The method of opening files is likely to change when file selection is implemented, but the operations on the file itself will stay the same
 		$.get(path, function(data)
 		{
-			// extract body of the html file
-			var body = htmlHelpers.extractBody(data);
-			data = null;
-			// trim excess whitespace in all lines of the body
-			body = htmlHelpers.trimAllLines(body);
-			// Create temporary element for storing the body (allows modifying the elements)
-			var temp = document.createElement('div');
-			temp.innerHTML = body;
-			body = null;
-			var $temp = $(temp);
-			// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
-			$temp.find('script, style, link').remove();
-			// Rename ids to avoid collision
-			var idCount = 0;
-			$temp.find('*[id]').each(function()
-			{
-				var originalId = this.id;
-				var newId = "documentId_" + idCount;
-				$temp.find('a[href=#' + originalId + ']').attr("href", "#" + newId);
-				this.id = newId;
-				idCount++;
-			});
-			// Remove all unnecessary attributes (the only ones we spare are id on all elements, href on anchors and src on images)
-			$temp.find('*:hasAttributes').each(function()
-			{
-				var elem = $(this);
-				if (this.nodeName === "A")
-				{
-					elem.removeAttributes(null, ['id', 'href']);
-				}
-				else if (this.nodeName === "IMG")
-				{
-					elem.removeAttributes(null, ['id', 'src']);
-				}
-				else
-				{
-					elem.removeAttributes(null, ['id']);
-				}
-			});
-			// TODO: Insert detecting dot furigana
-			// Insert the text into reader
-			$('.container').html(temp.innerHTML);
-			// Init actions for anchors
-			var anchors = $('.container a');
-			//$('.container a').each(function()
-			//{
-				//console.log(anchors.length);
-				anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
-				anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
-				anchors.click(function(e){ self.containerClick(e); return false; });
-			//});
-			// Adjust status etc.
-			$(window).resize();
+			self.openHtmlDocument(data);
 		}, 'html');
 	},
 	initDictionarySelection: function()
@@ -274,14 +353,9 @@ Reader.prototype = {
 			if (kanji != null)
 			{
 				kanji = this.dict.getKanjiRadicals(kanji);
-				
+				//console.log(kanji);
 				$('<div class="dictionary-entry">' +
 				'<span class="kanji">' + kanji.kanji + ' [' + kanji.onkun + ']' + (kanji.nanori ? ' {' + kanji.nanori + '}' : '') + '</span>' +
-				//(
-				//	result.data[n][1] !== null ?
-				//	' <span class="grammar">(' + result.data[n][1] + ')</span>' :
-				//	''
-				//) +
 				'<br/>' +
 				'<span class="description">(Rad.:' + kanji.radical.kanji + ', Strokes:' + kanji.misc['S'] + (kanji.misc['F'] ? ', Freq.: ' + kanji.misc['F'] : '') + ')<br/>' + kanji.eigo + '</span>' +
 				'</div>').insertBefore('.reader > .floater .dictionary[data-tab=kanji] .empty');
@@ -295,7 +369,6 @@ Reader.prototype = {
 					'</div>').insertBefore('.reader > .floater .dictionary[data-tab=kanji] .empty');
 				}
 			}
-			//console.log(kanji);
 			
 			var maxLength = 1;
 			if (words != null)
@@ -322,21 +395,24 @@ Reader.prototype = {
 	},
 	resizeScreen: function()
 	{
-		// Setup some element sizes that are screen dependant
-		// TODO: Needs a lot of cleaning up
-		// TODO: This even should not trigger when on other screens, instead it should trigger when coming back to this one
-		var statusBarZoom = $('.reader .statusBar').absoluteZoom();
-		var floaterZoom = $('.reader .floater').absoluteZoom();
-		var containerZoom = $('.reader .scroller .container').absoluteZoom();
-		var zoom = $('.reader .scroller').absoluteZoom();
-		var statusBarHeight = $('.statusBar').outerHeight();
-		var windowHeight = $(window).height();
-		$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
-		$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
-		$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
-		$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
-		this.blink();
-		this.updateStatus();
+		if (this.screen.is(":visible"))
+		{
+			// Setup some element sizes that are screen dependant
+			// TODO: Needs a lot of cleaning up
+			// TODO: This even should not trigger when on other screens, instead it should trigger when coming back to this one
+			var statusBarZoom = $('.reader .statusBar').absoluteZoom();
+			var floaterZoom = $('.reader .floater').absoluteZoom();
+			var containerZoom = $('.reader .scroller .container').absoluteZoom();
+			var zoom = $('.reader .scroller').absoluteZoom();
+			var statusBarHeight = $('.statusBar').outerHeight();
+			var windowHeight = $(window).height();
+			$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
+			$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
+			$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
+			$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
+			this.blink();
+			this.updateStatus();
+		}
 	},
 	// Updates reading status
 	updateStatus: function()
@@ -423,7 +499,7 @@ Reader.prototype = {
 	}/*,
 	scrollTo: function(element)
 	{
-		if (elemetn.length == 1)
+		if (element.length == 1)
 		{
 			screen.find('> .scroller').scrollTop((this.screen.find('.container').offset().top + element.offset().top) + 'px');
 		}

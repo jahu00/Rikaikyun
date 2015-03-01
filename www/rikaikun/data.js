@@ -597,16 +597,17 @@ if (0) {
 	{
 		bn = entry.misc['B'] - 1;
 		entry.radicals = [];
+		// Main radical has to be handled separately, because it seems that sometimes it's not listed as the radical
+		var rs = this.radData[bn];
+		var rk = rs.split('\t');
+		entry.radical = {'kanji': rk[0], 'yomi': rk[2], 'eigo': rk[3]};
+		entry.radicals.push(entry.radical);
 		for (i = 0; i < this.radData.length; ++i) {
 			var s = this.radData[i];
-			if ((s.indexOf(entry.kanji) != -1)) {
+			if (i != bn &&(s.indexOf(entry.kanji) != -1)) {
 				var k = s.split('\t');
 				var obj = {'kanji': k[0], 'yomi': k[2], 'eigo': k[3]};
 				entry.radicals.push(obj);
-				if (i == bn)
-				{
-					entry.radical = obj;
-				}
 			}
 		}
 		return entry;

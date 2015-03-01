@@ -67,7 +67,12 @@
 				</div>
 			</div>
 		</div>
-
+		<div class="screen menu active">
+			<div class="item file">Load file
+				<input type="file" style="display:none"/>
+			</div>
+			<div class="item exit">Exit</div>
+		</div>
 		
 		<div class="blink" style="display:none">
 		</div>
@@ -101,9 +106,9 @@
 				// Block context menu (makes the app run less buggy on chrome on desktop)
 				$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 				
-				reader.loadDocument('genji-01.txt');
-				//reader.loadHtmlDocument('genji-01utf.html');
-				//reader.loadHtmlDocument('test1.html');
+				reader.openDocument('genji-01.txt');
+				//reader.openHtmlDocument('genji-01utf.html');
+				//reader.openHtmlDocument('test1.html');
 				//fpsCount.go();
 			});
         </script>
