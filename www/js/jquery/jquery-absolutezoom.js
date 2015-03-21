@@ -11,7 +11,7 @@
 		if (!isNaN(zoom))
 		{
 			value = value * zoom;
-			if (self.parent().length > 0 && (typeof topParent == 'undefined' || self.parent()[0] != topParent))
+			if (self.parent().length > 0 && self.parent()[0] instanceof HTMLElement && (typeof topParent == 'undefined' || self.parent()[0] != topParent))
 			{
 				value = value * getAbsoluteZoom(self.parent(), topParent);
 			}
