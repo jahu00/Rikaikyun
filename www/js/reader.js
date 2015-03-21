@@ -211,6 +211,18 @@ Reader.prototype = {
 				elem.removeAttributes(null, ['id']);
 			}
 		});
+		// Remove redundant new line characters from all text
+		$temp.find('*').each(function()
+		{
+			for (var i = 0; i < this.childNodes.length ; i++)
+			{
+				var node = this.childNodes[i];
+				if (node.nodeType === 3 && node.nodeValue.trim().length > 0)
+				{
+					node.nodeValue = node.nodeValue.replace(/([\S])\n+([\S])/, '$1$2');
+				}
+			}
+		});
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
 		$('.container').html(temp.innerHTML);
@@ -232,7 +244,7 @@ Reader.prototype = {
 		// TODO: The method of opening files is likely to change when file selection is implemented, but the operations on the file itself will stay the same
 		$.get(path, function(data)
 		{
-			self.openHtmlDocument(data);
+			self.loadHtmlDocument(data);
 		}, 'html');
 	},
 	initDictionarySelection: function()
@@ -290,7 +302,6 @@ Reader.prototype = {
 			// Extract the word
 			// TODO: Possibly getTextNodeList and getText should be combined as they process the same data
 			var search = textCrawler.getText(textNodes, start.position, length);
-			
 			// init end of selection
 			var end = null;
 			
