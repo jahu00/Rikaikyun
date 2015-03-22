@@ -62,6 +62,9 @@
 					<div class="dictionary" data-tab="kanji">
 						<div class="empty">No kanji found.</div>
 					</div>
+					<div class="dictionary-not-ready">
+						<span>Loading dictionaries...</span>
+					</div>
 				</div>
 				<div class="bar bottom">
 				</div>
@@ -105,11 +108,14 @@
 				{
 					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
 					//console.log(localStorage['edictPath']);
+					
 					var dict = new rcxDict(true);
 					var reader = new Reader(dict);
+					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 					reader.openDocument('genji-01.txt');
+					
 					//reader.openHtmlDocument('genji-01utf.html');
 					//reader.openHtmlDocument('test1.html');
 					//fpsCount.go();

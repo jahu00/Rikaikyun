@@ -247,6 +247,19 @@ Reader.prototype = {
 			self.loadHtmlDocument(data);
 		}, 'html');
 	},
+	openFile: function(filename)
+	{
+		var split = filename.split('.');
+		var extenstion = split[split.length - 1].toLowerCase();
+		if (extenstion == 'htm' || extension == 'html')
+		{
+			openHtmlDocument(path);
+		}
+		else
+		{
+			openDocument(path);
+		}
+	},
 	initDictionarySelection: function()
 	{
 		var self = this;
@@ -269,6 +282,20 @@ Reader.prototype = {
 	// Handling user clicking\touching a word
 	containerClick: function(e)
 	{
+		var self = this;
+		// if dictionary is not yet ready show loading info and
+		// set dictionary to trigger search after it becomes ready
+		if (!self.dict.ready())
+		{
+			self.dict.readyCallback = function()
+			{
+				self.containerClick(e);
+				$('.reader > .floater .dictionary-container').removeClass('loading');
+			};
+			$('.reader > .floater .dictionary-container:not(.loading)').addClass('loading');
+			this.showFloater(e);
+			return;
+		}
 		//alert('can\'t touch this');
 		var container = this.screen.find('.container');
 		var zoom = container.absoluteZoom();
@@ -280,20 +307,6 @@ Reader.prototype = {
 		// Check if there was anything at the point of the click
 		if (start != null)
 		{
-			// If popup was closed determine where to show it and make it visible
-			if ($('.floater:visible').length == 0)
-			{
-				$('.floater').removeClass("top bottom");
-				// Clicks in the upper half of the screen make it appear in the lower half and clicks in the lower half make it appear in the upper
-				if (e.pageY < $(window).height() /2)
-				{
-					$('.floater').addClass("bottom");
-				}
-				else
-				{
-					$('.floater').addClass("top");
-				}
-			}
 			// Construct the initial range for finding the word (13 characters from the point of click)
 			// TODO: Number of characters should be customizable
 			var length = 13;
@@ -404,8 +417,26 @@ Reader.prototype = {
 			sel.addRange(range);
 			range.detach();
 			// We only show the popup after everything is ready
-			$('.floater').show();
+			this.showFloater(e);
 		}
+	},
+	showFloater: function(e)
+	{
+		// If popup was closed determine where to show it and make it visible
+		if ($('.floater:visible').length == 0)
+		{
+			$('.floater').removeClass("top bottom");
+			// Clicks in the upper half of the screen make it appear in the lower half and clicks in the lower half make it appear in the upper
+			if (e.pageY < $(window).height() /2)
+			{
+				$('.floater').addClass("bottom");
+			}
+			else
+			{
+				$('.floater').addClass("top");
+			}
+		}
+		$('.floater').show();
 	},
 	resizeScreen: function()
 	{

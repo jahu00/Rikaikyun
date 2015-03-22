@@ -40,9 +40,9 @@
 */
 
 function rcxDict(loadNames) {
-	this.edictPath = localStorage['edictPath'] || '';
-	this.ready = false;
-	//this.fileRequests = [];
+	//this.edictPath = localStorage['edictPath'] || '';
+	this.edictPath = './rikaikun/data/';
+	this.fileRequests = [];
 	this.loadDictionary();
 	if (loadNames) this.loadNames();
 	this.loadDIF();
@@ -55,14 +55,18 @@ rcxDict.prototype = {
 		this.config = c;
 	},
 
-	//
+	ready: function()
+	{
+		if (this.fileRequests.length == 0)
+		{
+			return true;
+		}
+		return false;
+	},
 	fileReadAsync: function(url, callback, charset)
 	{
-		//console.log('this is async');
-		//if (typeof FileReader !== 'undefined')
-		if (typeof window.requestFileSystem !== 'undefined')
+		/*if (typeof window.requestFileSystem !== 'undefined')
 		{
-			
 			//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fs)
 			window.resolveLocalFileSystemURL(this.edictPath, function(dir)
 			{
@@ -92,26 +96,23 @@ rcxDict.prototype = {
 			{
 				console.log('File system error:' + JSON.stringify(error));
 			});
-
-			//console.log('trying to do magic');
-			/*var reader = new FileReader();
-			reader.onloadend = function (evt) {
-				callback(evt.target.result)
-			};
-			reader.readAsText(url);*/
-			
 		}
 		else
-		{
-			var req = new XMLHttpRequest();
-			req.open("GET", this.edictPath + url, true);
-			req.onreadystatechange=function()
+		{*/
+			this.fileRequests.push(url);
+			//console.log('start', url);
+			var self = this;
+			$.get(this.edictPath + url, function(data)
 			{
-				callback(req.responseText);
-			};
-			req.send(null);
-		}
-		//return req.responseText;
+				callback(data);
+				self.fileRequests.splice(self.fileRequests.indexOf(url), 1);
+				//console.log('stop', url, self.ready());
+				if (self.ready() && typeof self.readyCallback !== 'undefined')
+				{
+					self.readyCallback();
+				}
+			}, "html");
+		//}
 	},
 	fileRead: function(url, charset) {
 		var req = new XMLHttpRequest();
@@ -157,46 +158,46 @@ rcxDict.prototype = {
 	loadNames: function() {
 		if ((this.nameDict) && (this.nameIndex)) return;
 		
-		//var self = this;
+		var self = this;
 		
 		/*this.nameDict = this.fileRead("./rikaikun/data/names.dat");
 		this.nameIndex = this.fileRead("./rikaikun/data/names.idx");*/
 		
-		this.nameDict = this.fileRead("./rikaikun/data/names.dat");
-		/*this.fileReadAsync("names.dat", function(result)
+		//this.nameDict = this.fileRead("./rikaikun/data/names.dat");
+		this.fileReadAsync("names.dat", function(result)
 		{
 			self.nameDict = result;
-		});*/
-		this.nameIndex = this.fileRead("./rikaikun/data/names.idx");
-		/*this.fileReadAsync("names.idx", function(result)
+		});
+		//this.nameIndex = this.fileRead("./rikaikun/data/names.idx");
+		this.fileReadAsync("names.idx", function(result)
 		{
 			self.nameIndex = result;
-		});*/
+		});
 	},
 
 	//	Note: These are mostly flat text files; loaded as one continous string to reduce memory use
 	loadDictionary: function() {
-		//var self = this;
-		this.wordDict = this.fileRead("./rikaikun/data/dict.dat");
-		/*this.fileReadAsync(/"dict.dat", function(result)
+		var self = this;
+		//this.wordDict = this.fileRead("./rikaikun/data/dict.dat");
+		this.fileReadAsync("dict.dat", function(result)
 		{
 			self.wordDict = result;
-		});*/
-		this.wordIndex = this.fileRead("./rikaikun/data/dict.idx");
-		/*this.fileReadAsync("dict.idx", function(result)
+		});
+		//this.wordIndex = this.fileRead("./rikaikun/data/dict.idx");
+		this.fileReadAsync("dict.idx", function(result)
 		{
 			self.wordIndex = result;
-		});*/
-		this.kanjiData = this.fileRead("./rikaikun/data/kanji.dat", 'UTF-8');
-		/*this.fileReadAsync("kanji.dat", function(result)
+		});
+		//this.kanjiData = this.fileRead("./rikaikun/data/kanji.dat", 'UTF-8');
+		this.fileReadAsync("kanji.dat", function(result)
 		{
 			self.kanjiData = result;
-		}, 'UTF-8');*/
-		this.radData = this.fileReadArray("./rikaikun/data/radicals.dat", 'UTF-8');
-		/*this.fileReadAsync("radicals.dat", function(result)
+		}, 'UTF-8');
+		//this.radData = this.fileReadArray("./rikaikun/data/radicals.dat", 'UTF-8');
+		this.fileReadAsync("radicals.dat", function(result)
 		{
 			self.radData = self.readArray(result);
-		}, 'UTF-8');*/
+		}, 'UTF-8');
 		//	this.test_kanji();
 	},
 /*
@@ -288,10 +289,10 @@ if (0) {
 		this.difExact = [];
 
 		var self = this;
-		var buffer = this.fileReadArray("./rikaikun/data/deinflect.dat", 'UTF-8');
-		//this.fileReadAsync("deinflect.dat", function(result)
-		//{
-			//var buffer = self.readArray(result);//this.fileReadArray(this.edictPath + "deinflect.dat", 'UTF-8');
+		//var buffer = this.fileReadArray("./rikaikun/data/deinflect.dat", 'UTF-8');
+		this.fileReadAsync("deinflect.dat", function(result)
+		{
+			var buffer = self.readArray(result);//this.fileReadArray(this.edictPath + "deinflect.dat", 'UTF-8');
 			var prevLen = -1;
 			var g, o;
 
@@ -318,7 +319,7 @@ if (0) {
 					g.push(o);
 				}
 			}
-		//}, 'UTF-8');
+		}, 'UTF-8');
 	},
 
 	deinflect: function(word) {
