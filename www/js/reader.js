@@ -144,7 +144,13 @@ Reader.prototype = {
 		newHeight = parseInt(newHeight);
 		dictionaryContainer.css('height', newHeight + "px");
 	},
-	prepareLoad: function()
+	prepareLoad: function(name)
+	{
+		$('.screen').removeClass('active');
+		$('.screen.loading').addClass('active');
+		$('.screen.loading .message span').text('Loading please wait...');
+	},
+	loadReady: function()
 	{
 		$('.screen').removeClass('active');
 		$('.screen.reader').addClass('active');
@@ -152,7 +158,8 @@ Reader.prototype = {
 	},
 	loadDocument: function(text)
 	{
-		this.prepareLoad();
+		this.loadReady();
+		//this.prepareLoad();
 		// Here is a simple conversion txt => html
 		// TODO: Add injecting furigana
 		$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
@@ -171,7 +178,7 @@ Reader.prototype = {
 	loadHtmlDocument: function(data)
 	{
 		var self = this;
-		this.prepareLoad();
+		this.loadReady();
 		// extract body of the html file
 		var body = htmlHelpers.extractBody(data);
 		data = null;
@@ -247,18 +254,23 @@ Reader.prototype = {
 			self.loadHtmlDocument(data);
 		}, 'html');
 	},
-	openFile: function(filename)
+	openFile: function(path)
 	{
-		var split = filename.split('.');
-		var extenstion = split[split.length - 1].toLowerCase();
-		if (extenstion == 'htm' || extension == 'html')
+		var self = this;
+		var split = path.split('.');
+		var ext = split[split.length - 1].toLowerCase();
+		this.prepareLoad('path');
+		$.get(path, function(data)
 		{
-			openHtmlDocument(path);
-		}
-		else
-		{
-			openDocument(path);
-		}
+			if (ext == 'htm' || ext == 'html')
+			{
+				self.loadHtmlDocument(data);
+			}
+			else
+			{
+				self.loadDocument(data);
+			}
+		}, 'html');
 	},
 	initDictionarySelection: function()
 	{

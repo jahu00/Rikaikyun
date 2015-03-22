@@ -76,7 +76,11 @@
 			</div>
 			<div class="item exit">Exit</div>
 		</div>
-		
+		<div class="screen loading">
+			<div class="message">
+				<span></span>
+			</div>
+		</div>
 		<div class="blink" style="display:none">
 		</div>
         <script type="text/javascript" src="cordova.js"></script>
@@ -114,22 +118,22 @@
 					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
-					reader.openDocument('genji-01.txt');
+					//reader.openDocument('genji-01.txt');
+					reader.openFile('genji-01.txt');
 					
 					//reader.openHtmlDocument('genji-01utf.html');
 					//reader.openHtmlDocument('test1.html');
 					//fpsCount.go();
 				});
 			}
-			//console.log(typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined');
-			if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
+			/*if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
 			{
 				document.addEventListener("deviceready", run, false);
 			}
 			else
-			{
+			{*/
 				run();
-			}
+			//}
         </script>
     </body>
 </html>
