@@ -13,6 +13,7 @@ function Reader(dict)
 
 Reader.prototype = {
 //Reader = {
+	//deviceReady: false,
 	dict: null,
 	settings: null,
 	screen: null,
@@ -27,7 +28,7 @@ Reader.prototype = {
 	{
 		var self = this;
 		this.screen = $('.reader');
-		// Copy contents of top loater bar to the bottom one (reuse html without having to write it twice)
+		// Copy contents of top floater bar to the bottom one (reuse html without having to write it twice)
 		this.screen.find('.floater .bar.bottom').html(this.screen.find('.floater .bar.top').html());
 		this.initDictionarySelection();
 		
@@ -120,9 +121,20 @@ Reader.prototype = {
 				window.close();
 			}
 		});
+		
+		this.screen.find('.container').on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
+		this.screen.find('.container').on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
+		this.screen.find('.container').on('click', 'a', function(e){ self.containerClick(e); return false; });
+		
+		
 		// Setup screen dependant elements that can't be handled by css alone
 		$(window).resize();
 	},
+	/*onDeviceReady: function()
+	{
+		this.deviceReady = true;
+		$('.screen.menu .item.file').removeClass('disabled');
+	},*/
 	// Sets the size of dictionary popup (part of the popup events)
 	resizeFloater: function(e)
 	{
@@ -234,14 +246,8 @@ Reader.prototype = {
 		// Insert the text into reader
 		$('.container').html(temp.innerHTML);
 		// Init actions for anchors
-		var anchors = $('.container a');
-		//$('.container a').each(function()
-		//{
-			//console.log(anchors.length);
-			anchors.on('touchstart', function(e) { self.anchorTouchStart(e, this); });
-			anchors.on('touchend', function(e) { self.anchorTouchEnd(e, this); });
-			anchors.click(function(e){ self.containerClick(e); return false; });
-		//});
+		// Edit: Move to init function (anchors now get inited automatically)
+
 		// Adjust status etc.
 		$(window).resize();
 	},

@@ -100,6 +100,7 @@
 		<script src="./js/htmlHelpers.js"></script>
 		<script src="./js/fpsCount.js"></script>
         <script type="text/javascript">
+			var deviceReady = false;
 			function openExternalLink(a)
 			{
 				// this should prevent PhoneGap from opening external link in its WebView
@@ -112,28 +113,33 @@
 				{
 					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
 					//console.log(localStorage['edictPath']);
-					
 					var dict = new rcxDict(true);
 					var reader = new Reader(dict);
+					
 					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 					//reader.openDocument('genji-01.txt');
-					reader.openFile('genji-01.txt');
+					//reader.openFile('genji-01.txt');
+					reader.openFile('genji-01utf.html');
 					
 					//reader.openHtmlDocument('genji-01utf.html');
 					//reader.openHtmlDocument('test1.html');
 					//fpsCount.go();
 				});
 			}
-			/*if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
+			if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
 			{
-				document.addEventListener("deviceready", run, false);
+				document.addEventListener("deviceready", function()
+				{
+					deviceReady = true;
+					run();
+				}, false);
 			}
 			else
-			{*/
+			{
 				run();
-			//}
+			}
         </script>
     </body>
 </html>

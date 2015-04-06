@@ -36,6 +36,11 @@ body
 	font-family:sans-serif;
 	box-sizing:border-box;
 }
+.menu .item.disabled
+{
+	color:gray;
+}
+
 .screen.loading .message
 {
 	display:table;
