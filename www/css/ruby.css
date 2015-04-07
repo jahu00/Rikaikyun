@@ -1,5 +1,6 @@
 ruby
 {
+	/*-webkit-transform: translateZ(0);*/
 	display:inline-block;
 	text-align:center;
 	padding-top:0.2em;
@@ -46,3 +47,25 @@ ruby, ruby rb
 {
 	display: inline;
 }*/
+
+.ruby
+{
+	/*text-align:center;*/
+	display:inline-block;
+	/*padding-top:0.2em;*/
+	padding-top:0.7em;
+	word-wrap:normal;
+	position:relative;
+}
+
+.ruby .rt
+{
+	/*display: table-header-group;*/
+	display:block;
+	font-size:0.5em;
+	line-height:1.5em;
+	position:absolute;
+	top:0.2em;
+	left:0;
+	/*display:none;*/
+}

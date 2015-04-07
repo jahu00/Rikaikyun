@@ -245,9 +245,31 @@ Reader.prototype = {
 				}
 			}
 		});
+		
+		/*$temp.find('ruby').each(function()
+		{
+			var elem = $(this);
+			elem.replaceWith('<span class="ruby">' + elem.find('rb').text() + '<span class="rt">' + elem.find('rt').text() + '</span></span>');
+		});*/
+		
+
+		
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
 		$('.container').html(temp.innerHTML);
+		
+		$('.container').find('> div').each(function()
+		{
+			//console.log('div');
+			this.outerHTML = flatterer.flatten(this);
+		});
+		
+		$('.container').find('p').each(function()
+		{
+			//flatterer.divide(this);
+			this.outerHTML = flatterer.divide(this);
+		});	
+		
 		// Init actions for anchors
 		// Edit: Move to init function (anchors now get inited automatically)
 
