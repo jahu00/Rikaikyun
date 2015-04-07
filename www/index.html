@@ -92,6 +92,7 @@
 		<script src="./js/jquery/jquery-fakescroll.js"></script>
 		<script src="./js/jquery/jquery-hasattributes.js"></script>
 		<script src="./js/jquery/jquery-removeattributes.js"></script>
+		<script src="./js/fastclick/fastclick.js"></script>
 		<!-- <script src="./js/getWordAtPoint.js"></script> -->
 		<script src="./js/getCharacterAtPoint.js"></script>
 		<script src="./js/textCrawler.js"></script>
@@ -111,6 +112,7 @@
 			{
 				$(function()
 				{
+					FastClick.attach(document.body);
 					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
 					//console.log(localStorage['edictPath']);
 					var dict = new rcxDict(true);

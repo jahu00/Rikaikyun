@@ -36,3 +36,13 @@ ruby rb
 	display: table-row-group;
 	vertical-align:bottom;
 }
+
+/*ruby rt, ruby rp
+{
+	display:none;
+}
+
+ruby, ruby rb
+{
+	display: inline;
+}*/

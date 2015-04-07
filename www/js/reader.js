@@ -32,9 +32,13 @@ Reader.prototype = {
 		this.screen.find('.floater .bar.bottom').html(this.screen.find('.floater .bar.top').html());
 		this.initDictionarySelection();
 		
+		var container = this.screen.find('.container');
+		
 		// Our function for handling the event is inside another to not confuse what 'this' is
 		// clicks on the screen (handles word lookups)
-		this.screen.find('.container').click(function(e){self.containerClick(e)});
+		
+		container.click(function(e){ self.containerClick(e); });
+		
 		// Handling resizes of the screen
 		$(window).resize(function(){self.resizeScreen()});
 		// Handling scrolling within the document
@@ -122,10 +126,9 @@ Reader.prototype = {
 			}
 		});
 		
-		this.screen.find('.container').on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		this.screen.find('.container').on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
-		this.screen.find('.container').on('click', 'a', function(e){ self.containerClick(e); return false; });
-		
+		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
+		container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
+		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		
 		// Setup screen dependant elements that can't be handled by css alone
 		$(window).resize();
