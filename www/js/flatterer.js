@@ -22,7 +22,6 @@ var flatterer = {
 		for (var i = 0; i < elem.childNodes.length ; i++)
 		{
 			var node = elem.childNodes[i];
-			//console.log([node]);//, $(node).css('display'));
 			if (node.nodeType === 3)
 			{
 				if (node.nodeValue.trim().length > 0)
@@ -37,12 +36,10 @@ var flatterer = {
 			}
 			else if($.inArray(node.nodeName.toLowerCase(), nonInlinesToIgnore) > -1 || $(node).css('display').indexOf('inline') > -1)
 			{
-				//console.log('ever', node.nodeName);
 				output += node.outerHTML;
 			}
 			else
 			{
-				//console.log($(node).css('display'), node.nodeName);
 				if(!closed)
 				{
 					closed = true;
@@ -69,11 +66,7 @@ var flatterer = {
 	{
 		var output = "";
 		var tagName = elem.tagName.toLowerCase();
-		output += '<' + tagName + (elem.id ? ' id="' + elem.id + '"' : "") + '>';
-		//output += elem.innerHTML.replace(/(<br\s*?\/?>\s*){2,}/gi, '</' + tagName + ">\n<" + tagName + '>');
-		//output += elem.innerHTML.replace(/<br\s*?\/?>\s*()?/gi, '</' + tagName + ">\n<" + tagName + '>');
-		output += elem.innerHTML.replace(/<br\s*?\/?>\s*((<br\s*?\/?>\s*){0,})\s*/gi, '</' + tagName + ">$1\n<" + tagName + '>');
-		output += '</' + tagName + '>';
+		output += elem.outerHTML.replace(/(<br\s*?\/?>\s*){1,2}((<br\s*?\/?>\s*){0,})?\s*/gi, '</' + tagName + ">$2\n<" + tagName + '>');
 		return output;
 	}
 }

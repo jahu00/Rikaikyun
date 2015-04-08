@@ -260,13 +260,11 @@ Reader.prototype = {
 		
 		$('.container').find('> div').each(function()
 		{
-			//console.log('div');
 			this.outerHTML = flatterer.flatten(this);
 		});
 		
 		$('.container').find('p').each(function()
 		{
-			//flatterer.divide(this);
 			this.outerHTML = flatterer.divide(this);
 		});	
 		
@@ -368,7 +366,7 @@ Reader.prototype = {
 			var words = (search.length > 0 ? this.dict.wordSearch(search, false) : null);//, 10);
 			var names = (search.length > 0 ? this.dict.wordSearch(search, true) : null);//, 20);
 			var kanji = (search.length > 0 ? this.dict.kanjiSearch(search[0]) : null);
-			
+
 			// Restart the dictionary contents (remove all items and rewind the scroll)
 			// TODO: This should be probably elsewhere (like in a separate object, but I have no concept for that now)
 			$('.reader > .floater .dictionary .dictionary-entry').remove();
@@ -419,7 +417,6 @@ Reader.prototype = {
 			// If there were any results, start feeding the dictionary popup
 			populateDictionary('word', words);
 			populateDictionary('name', names);
-			
 			if (kanji != null)
 			{
 				kanji = this.dict.getKanjiRadicals(kanji);

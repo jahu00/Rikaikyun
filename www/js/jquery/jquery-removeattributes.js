@@ -32,7 +32,7 @@
 				if ((include == null || $.inArray(attr.name,include) != -1) && (exclude == null || $.inArray(attr.name,exclude) == -1))
 				{
 					this.removeAttribute(attr.name);
-					i = -1;
+					i--;
 				}
 			}
 		});

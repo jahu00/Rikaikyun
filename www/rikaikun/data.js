@@ -120,8 +120,9 @@ rcxDict.prototype = {
 		req.send(null);
 		return req.responseText;
 	},
-	readArray: function(a)
+	readArray: function(str)
 	{
+		a = str.split('\n');
 		while ((a.length > 0) && (a[a.length - 1].length == 0)) a.pop();
 		return a;
 	},
@@ -152,8 +153,6 @@ rcxDict.prototype = {
 		}
 		return null;
 	},
-
-	//
 
 	loadNames: function() {
 		if ((this.nameDict) && (this.nameIndex)) return;
@@ -281,8 +280,6 @@ if (0) {
 	},
 
 */
-	///
-
 	loadDIF: function() {
 		this.difReasons = [];
 		this.difRules = [];
@@ -377,8 +374,6 @@ if (0) {
 
 		return r;
 	},
-
-
 
 	// katakana -> hiragana conversion tables
 	ch:[0x3092,0x3041,0x3043,0x3045,0x3047,0x3049,0x3083,0x3085,0x3087,0x3063,0x30FC,0x3042,0x3044,0x3046,
@@ -661,10 +656,8 @@ if (0) {
 
 		entry = { };
 		entry.kanji = a[0];
-
 		entry.misc = {};
 		entry.misc['U'] = hex[(i >>> 12) & 15] + hex[(i >>> 8) & 15] + hex[(i >>> 4) & 15] + hex[i & 15];
-
 		b = a[1].split(' ');
 		for (i = 0; i < b.length; ++i) {
 			if (b[i].match(/^([A-Z]+)(.*)/)) {
@@ -677,7 +670,6 @@ if (0) {
 		entry.nanori = a[3].replace(/\s+/g, '\u3001 ');
 		entry.bushumei = a[4].replace(/\s+/g, '\u3001 ');
 		entry.eigo = a[5];
-
 		return entry;
 	},
 	getKanjiRadicals: function(entry)
@@ -689,7 +681,7 @@ if (0) {
 		var rk = rs.split('\t');
 		entry.radical = {'kanji': rk[0], 'yomi': rk[2], 'eigo': rk[3]};
 		entry.radicals.push(entry.radical);
-		for (i = 0; i < this.radData.length; ++i) {
+		for (i = 0; i < this.radData.length; i++) {
 			var s = this.radData[i];
 			if (i != bn &&(s.indexOf(entry.kanji) != -1)) {
 				var k = s.split('\t');

@@ -76,7 +76,7 @@ body
 .container p
 {
 	/*word-wrap:break-word;*/
-	text-indent: 16px;
+	/*text-indent: 16px;*/
 }
 
 .container p *:not(p)
