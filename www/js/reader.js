@@ -7,6 +7,8 @@ function Reader(dict)
 	this.scrollDistance = 0;
 	this.progress = 0;
 	this.init();
+	this.initFileSelector();
+	this.initMenu();
 	this.loadSettings();
 	//console.log(this.lastFile);
 }
@@ -27,7 +29,7 @@ Reader.prototype = {
 	init: function()
 	{
 		var self = this;
-		this.screen = $('.reader');
+		this.screen = $('.screen.reader');
 		// Copy contents of top floater bar to the bottom one (reuse html without having to write it twice)
 		this.screen.find('.floater .bar.bottom').html(this.screen.find('.floater .bar.top').html());
 		this.initDictionarySelection();
@@ -42,7 +44,7 @@ Reader.prototype = {
 		// Handling resizes of the screen
 		$(window).resize(function()
 		{
-			self.resizeScreen(true)
+			self.resizeScreen(true);
 		});
 		// Handling scrolling within the document
 		var scrollDelay = 300;
@@ -84,16 +86,37 @@ Reader.prototype = {
 			return false;
 		});
 		
+		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
+		container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
+		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		
-		$('.menu .file').click(function()
+		document.addEventListener("menubutton", function()
+		{
+			if (self.screen.is(':visible'))
+			{
+				self.selectScreen('menu');
+			}
+		}, false);
+		
+		
+		// Setup screen dependant elements that can't be handled by css alone
+		$(window).resize();
+	},
+	initMenu: function()
+	{
+		var self = this;
+		var menu = $('.screen.menu');
+		menu.find('.file').click(function()
 		{
 			if (typeof window.requestFileSystem !== 'undefined')
 			{
-				window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+				/*window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
 				{
 					console.log('not an error: ' + fileSystem.name);
 					//console.log(fileSystem);
-				}, function(error){console.log('error:' + error)});
+				}, function(error){console.log('error:' + error)});*/
+				self.selectScreen('file');
+				self.fileSelector.open(self.lastPath);
 			}
 			else
 			{
@@ -101,7 +124,7 @@ Reader.prototype = {
 			}
 		});
 		
-		$('.menu .file input').change(function(e)
+		menu.find('.file input').change(function(e)
 		{
 			var file = e.target.files[0];
 			console.log(file);
@@ -125,7 +148,7 @@ Reader.prototype = {
 			reader.readAsText(file);
 		});
 		
-		$('.menu .exit').click(function()
+		menu.find('.exit').click(function()
 		{
 			if (typeof navigator.app !== 'undefined')
 			{
@@ -137,12 +160,52 @@ Reader.prototype = {
 			}
 		});
 		
-		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
-		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
-		
-		// Setup screen dependant elements that can't be handled by css alone
-		$(window).resize();
+		document.addEventListener("backbutton", function()
+		{
+			if (menu.is(':visible'))
+			{
+				self.selectScreen('reader');
+				self.resizeScreen(true);
+			}
+		}, false);
+	},
+	initFileSelector: function()
+	{
+		var self = this;
+		self.lastPath = localStorage['lastPath'] || 'file:///';
+		self.fileSelector = new FileSelector($('.screen.file .files'), self.lastPath, 'Documents (html, txt)|*.htm;*.html;*.txt|All files|*.*');
+		self.fileSelector.onCancel = function()
+		{
+			//$(self.fileSelector.elem).find('.file-container .item.back').click();
+			self.selectScreen('menu');
+		};
+		self.fileSelector.onSuccess = function(path)
+		{
+			console.log('Opening file: ' + path);
+			self.fileSelector.open(path);
+		};
+		self.fileSelector.onOpenFile = function(path, entry)
+		{
+			self.prepareLoad();
+			entry.file(function(file)
+			{
+				var reader = new FileReader();//entry.createReader();
+				reader.onloadend = function(e){
+					self.openFile(path, e.target.result, false);
+				};
+				reader.readAsText(file);
+			});
+		};
+		self.fileSelector.onPathChanged = function(path)
+		{
+			localStorage['lastPath'] = path;
+		};
+		self.fileSelector.onFail = function(error)
+		{
+			alert(error.message);
+			self.lastPath = 'file:///';
+		};
+		//fileSelector.open(path);
 	},
 	/*onDeviceReady: function()
 	{
@@ -170,16 +233,23 @@ Reader.prototype = {
 		newHeight = parseInt(newHeight);
 		dictionaryContainer.css('height', newHeight + "px");
 	},
-	prepareLoad: function(name)
+	selectScreen: function(name)
 	{
 		$('.screen').removeClass('active');
-		$('.screen.loading').addClass('active');
-		$('.screen.loading .message span').text('Loading please wait...');
+		$('.screen.' + name).addClass('active');
+	},
+	prepareLoad: function(name)
+	{
+		/*$('.screen').removeClass('active');
+		$('.screen.loading').addClass('active');*/
+		this.selectScreen('loading');
+		//$('.screen.loading .message span').text('Loading please wait...');
 	},
 	loadReady: function()
 	{
-		$('.screen').removeClass('active');
-		$('.screen.reader').addClass('active');
+		/*$('.screen').removeClass('active');
+		$('.screen.reader').addClass('active');*/
+		this.selectScreen('reader');
 		$('.container').html('');
 	},
 	loadDocument: function(text)
@@ -294,14 +364,21 @@ Reader.prototype = {
 			self.loadHtmlDocument(data);
 		}, 'html');
 	},
-	openFile: function(path)
+	openFile: function(path, data, preprare)
 	{
-		var self = this;
-		var split = path.split('.');
-		var ext = split[split.length - 1].toLowerCase();
-		this.prepareLoad('path');
-		$.get(path, function(data)
+		if (typeof prepare == "undefined")
 		{
+			prepare = true;
+		}
+		var self = this;
+		if (prepare)
+		{
+			self.prepareLoad('path');
+		}
+		function openCallback(path, data)
+		{
+			var split = path.split('.');
+			var ext = split[split.length - 1].toLowerCase();
 			if (ext == 'htm' || ext == 'html')
 			{
 				self.loadHtmlDocument(data);
@@ -310,7 +387,18 @@ Reader.prototype = {
 			{
 				self.loadDocument(data);
 			}
-		}, 'html');
+		}
+		if (typeof data == "undefined")
+		{
+			$.get(path, function(data)
+			{
+				openCallback(path, data);
+			}, 'html');
+		}
+		else
+		{
+			openCallback(path, data);
+		}
 	},
 	initDictionarySelection: function()
 	{

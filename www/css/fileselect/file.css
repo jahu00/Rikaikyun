@@ -1,0 +1,136 @@
+.file-selector 
+{
+	font-family:sans-serif;
+	position:relative;
+	width:100%;
+    height:100%;
+}
+
+.file-selector .path
+{
+	display:none;
+}
+
+.file-selector .path
+{
+	background:black;
+	color:white;
+	overflow:hidden;
+	border-bottom:1px solid black;
+	box-sizing:border-box;
+	width:100%;
+	padding:2px;
+	font-size:10px;
+	display:block;
+	position:absolute;
+	left:0;
+	top:0;
+}
+
+.file-selector .options
+{
+	display: none;
+}
+
+.file-selector .options.show
+{
+	display: block;
+	border-bottom:1px solid black;
+	box-sizing:border-box;
+	width:100%;
+	padding:2px;
+	position:absolute;
+	left:0;
+	bottom:0;
+	background:black;
+}
+
+.file-selector .options select
+{
+	width: 100%;
+}
+
+.file-selector .file-container
+{
+	height: 100%;
+	width: 100%;
+	box-sizing:border-box;
+	overflow-x:hidden;
+	overflow-y:scroll;
+}
+
+.file-selector .file-container .item
+{
+	width:100%;
+	padding:5px;
+	border-bottom:1px solid black;
+	box-sizing:border-box;
+	word-wrap:break-word;
+}
+.file-selector .file-container .item.hidden
+{
+	display:none;
+}
+.file-selector .file-container .item.selected
+{
+	color:white;
+	background:black;
+}
+.file-selector .file-container .item i
+{
+	width:20px;
+	height:20px;
+	/*background-size: 20px 20px;*/
+	background-size: 100% 100%;
+	display:inline-block;
+	vertical-align: top;
+}
+.file-selector .file-container .item.file i
+{
+	background-image: url("file.png");
+}
+.file-selector .file-container .item.file.selected i
+{
+	background-image: url("file-inv.png");
+}
+.file-selector .file-container .item.directory i
+{
+	background-image: url("directory.png");
+}
+.file-selector .file-container .item.directory.selected i
+{
+	background-image: url("directory-inv.png");
+}
+.file-selector .file-container .item.back i
+{
+	background-image: url("back.png");
+}
+.file-selector .file-container .item.back.selected i
+{
+	background-image: url("back-inv.png");
+}
+
+.file-selector .file-container .not-ready
+{
+	display: none;
+}
+
+.file-selector .file-container.loading .not-ready
+{
+	display:table;
+	width:100%;
+	height:100%;
+}
+.file-selector .file-container.loading .not-ready span
+{
+	display:table-cell;
+	width:100%;
+	height:100%;
+	text-align:center;
+	vertical-align:middle;
+}
+
+.file-selector .file-container.loading  .item
+{
+	display: none;
+}

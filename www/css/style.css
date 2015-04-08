@@ -64,7 +64,6 @@ body
 }
 .container
 {
-	/*-webkit-transform: translateZ(0);*/
 	/*padding-right:10px;
 	padding-left:10px;
 	padding-right:10px;
@@ -73,6 +72,12 @@ body
 	word-wrap:break-word;
 	line-height:1.5em;
 }
+
+.container.gpu
+{
+	-webkit-transform: translateZ(0);
+}
+
 .container p
 {
 	/*word-wrap:break-word;*/

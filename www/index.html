@@ -9,6 +9,7 @@
 		<link href="./css/style.css" type="text/css" rel="stylesheet" />
 		<link href="./css/screen.css" type="text/css" rel="stylesheet" />
 		<link href="./css/ruby.css" type="text/css" rel="stylesheet" />
+		<link href="./css/fileselect/file.css" type="text/css" rel="stylesheet" />
         <title>Rikaikyun</title>
     </head>
     <body>
@@ -76,9 +77,13 @@
 			</div>
 			<div class="item exit">Exit</div>
 		</div>
+		<div class="screen file">
+			<div class="files">
+			</div>
+		</div>
 		<div class="screen loading">
 			<div class="message">
-				<span></span>
+				<span>Loading please wait...</span>
 			</div>
 		</div>
 		<div class="blink" style="display:none">
@@ -97,6 +102,7 @@
 		<script src="./js/getCharacterAtPoint.js"></script>
 		<script src="./js/textCrawler.js"></script>
 		<script src="./js/flatterer.js"></script>
+		<script src="./js/fileSelect.js"></script>
 		<script src="./js/reader.js"></script>
 		<!-- <script src="./js/encoding.js"></script> -->
 		<script src="./js/htmlHelpers.js"></script>
@@ -119,16 +125,11 @@
 					var dict = new rcxDict(true);
 					var reader = new Reader(dict);
 					
-					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
-					//reader.openDocument('genji-01.txt');
-					//reader.openFile('genji-01.txt');
 					reader.openFile('genji-01utf.html');
 					//reader.openFile('test8.html');
-					
-					//reader.openHtmlDocument('genji-01utf.html');
-					//reader.openHtmlDocument('test1.html');
+
 					//fpsCount.go();
 				});
 			}
