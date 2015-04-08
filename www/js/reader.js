@@ -40,7 +40,10 @@ Reader.prototype = {
 		container.click(function(e){ self.containerClick(e); });
 		
 		// Handling resizes of the screen
-		$(window).resize(function(){self.resizeScreen()});
+		$(window).resize(function()
+		{
+			self.resizeScreen(true)
+		});
 		// Handling scrolling within the document
 		var scrollDelay = 300;
 		var scrollTimeout = null;
@@ -486,8 +489,12 @@ Reader.prototype = {
 		}
 		$('.floater').show();
 	},
-	resizeScreen: function()
+	resizeScreen: function(preserveProgress)
 	{
+		if (typeof preserveProgress == "undefined")
+		{
+			preserveProgress = false;
+		}
 		if (this.screen.is(":visible"))
 		{
 			// Setup some element sizes that are screen dependant
@@ -503,6 +510,10 @@ Reader.prototype = {
 			$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
 			$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
 			$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
+			if (preserveProgress)
+			{
+				this.scrollTo(this.progress, false);
+			}
 			this.blink();
 			this.updateStatus();
 		}
@@ -519,15 +530,15 @@ Reader.prototype = {
 		// Calculate progress percentage
 		if (length < 0)
 		{
-			this.progress = 100;
+			this.progress = 0;
 		}
 		else
 		{
-			this.progress = (scroller.scrollTop() / length * 100).toFixed(2);
+			this.progress = scroller.scrollTop() / length;//.toFixed(2);
 		}
 		// TODO: Optimize the element lookups
 		var statusBar = reader.find('> .statusBar');
-		statusBar.find('> .grid  .progress > .bar').css('width', this.progress+"%");
+		statusBar.find('> .grid  .progress > .bar').css('width', (this.progress * 100).toFixed(2)+"%");
 		var pages = Math.ceil(documentHeight / windowHeight);
 		var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
 		var status = statusBar.find('.status');
@@ -589,12 +600,31 @@ Reader.prototype = {
 			if(confirm('Open ' + a.href + ' in a browser?'))
 				window.open(a.href, '_system');
 		}
-	}/*,
-	scrollTo: function(element)
+	},
+	scrollTo: function(progress, update)
 	{
-		if (element.length == 1)
+		if (typeof update == "undefined")
 		{
-			screen.find('> .scroller').scrollTop((this.screen.find('.container').offset().top + element.offset().top) + 'px');
+			update = true;
 		}
-	}*/
+		var reader = this.screen;
+		var scroller = reader.children('.scroller');
+		var documentHeight = scroller[0].scrollHeight;
+		var windowHeight = scroller.height();
+		var length = documentHeight - windowHeight;
+		// Calculate progress percentage
+		if (length < 0)
+		{
+			this.progress = 0;
+		}
+		else
+		{
+			this.progress = progress;
+		}
+		scroller.scrollTop(Math.round(length * this.progress));
+		if (update)
+		{
+			this.updateStatus();
+		}
+	}
 };
