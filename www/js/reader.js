@@ -42,7 +42,15 @@ Reader.prototype = {
 		// Handling resizes of the screen
 		$(window).resize(function(){self.resizeScreen()});
 		// Handling scrolling within the document
-		$('.reader > .scroller').scroll(function(){self.updateStatus();});
+		var scrollDelay = 300;
+		var scrollTimeout = null;
+		$('.reader > .scroller').scroll(function()
+		{
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(function(){
+				self.updateStatus();
+			},scrollDelay);
+		});
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
 		$('.reader > .floater .dictionary').fakeScroll();

@@ -450,7 +450,7 @@ if (0) {
 			index = this.nameIndex;
 			maxTrim = 20;//this.config.namax;
 			entry.names = 1;
-			console.log('doNames');
+			//console.log('doNames');
 		}
 		else {
 			dict = this.wordDict;
