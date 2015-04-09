@@ -91,11 +91,12 @@ body
 
 .container img
 {
+	margin:0 auto;
 	margin-top:5px;
-	margin:bottom:5px;
+	margin-bottom:5px;
 	display: block;
 	max-width:100%;
-	width: auto;
+	/*width: auto;*/
 	height: auto;
 }
 .floater

@@ -24,6 +24,7 @@ Reader.prototype = {
 		//words = JSON.parse(localStorage["words"]);
 		//localStorage["words"] = JSON.stringify(words);
 		this.lastFile = localStorage["lastFile"] || '';
+		//console.log(this.lastFile);
 	},
 	// Setup initial values, events etc.
 	init: function()
@@ -87,14 +88,14 @@ Reader.prototype = {
 		});
 		
 		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
+		//container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
 		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		
 		document.addEventListener("menubutton", function()
 		{
 			if (self.screen.is(':visible'))
 			{
-				self.selectScreen('menu');
+				self.selectScreen('main.menu');
 			}
 		}, false);
 		
@@ -105,8 +106,8 @@ Reader.prototype = {
 	initMenu: function()
 	{
 		var self = this;
-		var menu = $('.screen.menu');
-		menu.find('.file').click(function()
+		var menu = $('.screen.main.menu');
+		menu.find('.openFile').click(function()
 		{
 			if (typeof window.requestFileSystem !== 'undefined')
 			{
@@ -120,30 +121,29 @@ Reader.prototype = {
 			}
 			else
 			{
-				document.querySelector(".menu .file input").dispatchEvent(new Event('click'));
+				document.querySelector(".main.menu .openFile input").dispatchEvent(new Event('click'));
 			}
 		});
 		
-		menu.find('.file input').change(function(e)
+		menu.find('.openFile input').change(function(e)
 		{
 			var file = e.target.files[0];
-			console.log(file);
+			//console.log(file);
 			if (!file) {
 				return;
 			}
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				//self.loadDocument(e.target.result);
-				var contents = e.target.result;
-				if (/.html?$/.test(file.name))
+				/*if (/.html?$/.test(file.name))
 				{
 					self.loadHtmlDocument(e.target.result);
 				}
 				else
 				{
 					self.loadDocument(e.target.result);
-				}
+				}*/
 				//displayContents(contents);
+				self.openFile(file.name, e.target.result, false);
 			};
 			reader.readAsText(file);
 		});
@@ -177,11 +177,11 @@ Reader.prototype = {
 		self.fileSelector.onCancel = function()
 		{
 			//$(self.fileSelector.elem).find('.file-container .item.back').click();
-			self.selectScreen('menu');
+			self.selectScreen('main.menu');
 		};
 		self.fileSelector.onSuccess = function(path)
 		{
-			console.log('Opening file: ' + path);
+			//console.log('Opening file: ' + path);
 			self.fileSelector.open(path);
 		};
 		self.fileSelector.onOpenFile = function(path, entry)
@@ -199,6 +199,7 @@ Reader.prototype = {
 		self.fileSelector.onPathChanged = function(path)
 		{
 			localStorage['lastPath'] = path;
+			self.lastPath = path;
 		};
 		self.fileSelector.onFail = function(error)
 		{
@@ -280,6 +281,10 @@ Reader.prototype = {
 		data = null;
 		// trim excess whitespace in all lines of the body
 		body = htmlHelpers.trimAllLines(body);
+		
+		// prevent images from loading at this time (images with absolute path will be unaffected)
+		body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>:]*)"|'([^>:]*)')[^>]*>)/img, "$1data-temp$2$3");
+		
 		// Create temporary element for storing the body (allows modifying the elements)
 		var temp = document.createElement('div');
 		temp.innerHTML = body;
@@ -307,12 +312,22 @@ Reader.prototype = {
 			}
 			else if (this.nodeName === "IMG")
 			{
-				elem.removeAttributes(null, ['id', 'src']);
+				elem.removeAttributes(null, ['id', 'src', 'data-tempsrc']);
 			}
 			else
 			{
 				elem.removeAttributes(null, ['id']);
 			}
+		});
+		// Adjust image path
+		var filePath = fileHelpers.getParentPath(self.lastFile)
+		$temp.find('img[data-tempsrc]').each(function()
+		{
+			//console.log(filePath + $(this).attr('data-tempsrc'));
+			this.src = filePath + $(this).attr('data-tempsrc');
+			$(this).removeAttr('data-tempsrc');
+			/*this.alt = filePath + this.src;*/
+			//$(this).replaceWith('<p>' + filePath + $(this).attr('data-src') + '</p>');
 		});
 		// Remove redundant new line characters from all text
 		$temp.find('*').each(function()
@@ -377,6 +392,8 @@ Reader.prototype = {
 		}
 		function openCallback(path, data)
 		{
+			localStorage["lastFile"] = path;
+			self.lastFile = path;
 			var split = path.split('.');
 			var ext = split[split.length - 1].toLowerCase();
 			if (ext == 'htm' || ext == 'html')
@@ -670,12 +687,57 @@ Reader.prototype = {
 	{
 		// TODO: allow long click time to be customized
 		var self = this;
-		this.anchorTimer = setTimeout(function() { e.preventDefault(); self.anchorClick(a); }, 1000);
+		var touchStart = e.originalEvent.touches[0];
+		var lastX = touchStart.pageX;
+        var lastY = touchStart.pageY;
+		var trigger = false;
+		var distanceThreshold = 10;
+		function setTimer()
+		{
+			self.anchorTimer = setTimeout(function() { e.preventDefault(); trigger = true; }, 1000);
+		}
+		function remove()
+		{
+			clearTimeout(self.anchorTimer);
+			$(a).off('touchend', end);
+			$(a).off('touchmove', move);
+		}
+		
+		function end()
+		{
+			remove();
+			if (trigger)
+			{
+				e.preventDefault(); self.anchorClick(a);
+			}
+		}
+		
+		function move(em)
+		{
+			var touchMove = em.originalEvent.touches[0];
+			if
+			(
+				Math.abs(lastX - touchMove.pageX) > distanceThreshold ||
+				Math.abs(lastY - touchMove.pageY) > distanceThreshold
+			)
+			{
+				clearTimeout(self.anchorTimer);
+				trigger = false;
+				setTimer();
+			}
+			lastX = touchMove.pageX;
+			lastY = touchMove.pageY;
+		}
+		
+		$(a).on('touchend', end);
+		$(a).on('touchmove', move);
+		setTimer();
 	},
-	anchorTouchEnd: function(e, a)
+	/*anchorTouchEnd: function(e, a)
 	{
 		clearTimeout(this.anchorTimer);
-	},
+		
+	},*/
 	anchorClick: function(a)
 	{
 		if (a.getAttribute("href").indexOf('#') == 0)

@@ -26,6 +26,13 @@ var maskHelpers = {
 	}
 };
 
+var fileHelpers = {
+	getParentPath: function(path)
+	{
+		return path.replace(/^(file:\/\/)(.*\/)(.+)$/i, '$1$2');
+	}
+};
+
 function Mask()
 {
 	this.init.apply(this, arguments);
@@ -188,7 +195,7 @@ FileSelector.prototype = {
 		var $elem = $(this.elem);
 		$elem.find('.path').text(decodeURI(this.path) + (this.masks.length == 1 ? this.masks[this.currentMask].rule.trim() : ''));
 		$elem.find('.file-container').css('padding-top', $elem.find('.path').outerHeight() + 'px');
-		var backUrl = this.path.replace(/^(file:\/\/)(.*\/)(.+)$/i, '$1$2');
+		var backUrl = fileHelpers.getParentPath(this.path);
 		$elem.find('.file-container .item.back').attr('data-url', backUrl);
 	},
 	updateMask: function()

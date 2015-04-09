@@ -71,11 +71,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="screen menu active">
-			<div class="item file">Load file
+		<div class="screen main menu active">
+			<div class="item openFile">Load file
 				<input type="file" style="display:none"/>
 			</div>
 			<div class="item exit">Exit</div>
+		</div>
+		<div class="screen settings menu">
+			<div class="item"> <input type="checkbox" name="useGpu"> Use GPU</div>
 		</div>
 		<div class="screen file">
 			<div class="files">
@@ -127,7 +130,7 @@
 					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
-					reader.openFile('genji-01utf.html');
+					//reader.openFile('genji-01utf.html');
 					//reader.openFile('test8.html');
 
 					//fpsCount.go();
