@@ -11,10 +11,6 @@
                         {
                             "xml": "<feature name=\"File\"><param name=\"android-package\" value=\"org.apache.cordova.file.FileUtils\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"FileTransfer\"><param name=\"android-package\" value=\"org.apache.cordova.filetransfer.FileTransfer\" /></feature>",
-                            "count": 1
                         }
                     ]
                 }
@@ -24,7 +20,7 @@
                     "/*": [
                         {
                             "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
-                            "count": 2
+                            "count": 1
                         }
                     ]
                 }
@@ -33,9 +29,6 @@
     },
     "installed_plugins": {
         "org.apache.cordova.file": {
-            "PACKAGE_NAME": "com.phonegap.rikaikyun"
-        },
-        "org.apache.cordova.file-transfer": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
