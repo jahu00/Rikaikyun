@@ -94,17 +94,18 @@
         <script type="text/javascript" src="cordova.js"></script>
 		<script src="./rikaikun/data.js"></script>
 		<script src="./js/jquery/jquery-1.8.3.min.js"></script>
-		<script src="./js/jquery/jquery-stylesheet.js"></script>
-		<script src="./js/jquery/jquery-absolutezoom.js"></script>
+		<script src="./js/jquery-ext/jquery-stylesheet.js"></script>
+		<script src="./js/jquery-ext/jquery-absolutezoom.js"></script>
 		<!-- <script src="./jquery-privatescroll.js"></script> -->
-		<script src="./js/jquery/jquery-fakescroll.js"></script>
-		<script src="./js/jquery/jquery-hasattributes.js"></script>
-		<script src="./js/jquery/jquery-removeattributes.js"></script>
+		<script src="./js/jquery-ext/jquery-fakescroll.js"></script>
+		<script src="./js/jquery-ext/jquery-hasattributes.js"></script>
+		<script src="./js/jquery-ext/jquery-removeattributes.js"></script>
 		<script src="./js/fastclick/fastclick.js"></script>
 		<!-- <script src="./js/getWordAtPoint.js"></script> -->
 		<script src="./js/getCharacterAtPoint.js"></script>
 		<script src="./js/textCrawler.js"></script>
 		<script src="./js/flatterer.js"></script>
+		<script src="./js/preloadStyleImages.js"></script>
 		<script src="./js/fileSelect.js"></script>
 		<script src="./js/reader.js"></script>
 		<!-- <script src="./js/encoding.js"></script> -->
@@ -122,6 +123,7 @@
 			{
 				$(function()
 				{
+					preloadStyleImages.preload();
 					FastClick.attach(document.body);
 					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
 					//console.log(localStorage['edictPath']);
