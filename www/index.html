@@ -26,6 +26,11 @@
 			{
 				max-height:0;
 			}
+			.img-frame
+			{
+				width:0;
+				height:0;
+			}
 		</style>
 		<div class="screen reader">
 			<div class="scroller">
@@ -107,10 +112,11 @@
 		<script src="./js/flatterer.js"></script>
 		<script src="./js/preloadStyleImages.js"></script>
 		<script src="./js/fileSelect.js"></script>
-		<script src="./js/reader.js"></script>
-		<!-- <script src="./js/encoding.js"></script> -->
 		<script src="./js/htmlHelpers.js"></script>
 		<script src="./js/fpsCount.js"></script>
+		<script src="./js/xxhash/xxhash.lmd.js"></script>
+		<script src="./js/reader.js"></script>
+		<!-- <script src="./js/encoding.js"></script> -->
         <script type="text/javascript">
 			var deviceReady = false;
 			function openExternalLink(a)
@@ -134,7 +140,12 @@
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 					//reader.openFile('genji-01utf.html');
 					//reader.openFile('test8.html');
-
+					var lastFile = localStorage["lastFile"] || '';
+					if (lastFile != '')
+					{
+						reader.openFile(lastFile);
+						//console.log("Open: " + lastFile);
+					}
 					//fpsCount.go();
 				});
 			}

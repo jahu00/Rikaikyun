@@ -6,11 +6,11 @@ function Reader(dict)
 	this.lastPosition = null;
 	this.scrollDistance = 0;
 	this.progress = 0;
+	this.currentFile = null;
 	this.init();
 	this.initFileSelector();
 	this.initMenu();
 	this.loadSettings();
-	//console.log(this.lastFile);
 }
 
 Reader.prototype = {
@@ -23,8 +23,7 @@ Reader.prototype = {
 	{
 		//words = JSON.parse(localStorage["words"]);
 		//localStorage["words"] = JSON.stringify(words);
-		this.lastFile = localStorage["lastFile"] || '';
-		//console.log(this.lastFile);
+		//this.lastFile = localStorage["lastFile"] || '';
 	},
 	// Setup initial values, events etc.
 	init: function()
@@ -88,8 +87,15 @@ Reader.prototype = {
 		});
 		
 		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		//container.on('touchend', 'a', function(e) { self.anchorTouchEnd(e, this); });
 		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
+		container.on('load error', 'img', function()
+		{
+			console.log('just passing by');
+			if (this.currentFile != null)
+			{
+				self.scrollTo(parseFloat(localStorage['progress-' + self.currentHash]));
+			}
+		});
 		
 		document.addEventListener("menubutton", function()
 		{
@@ -101,7 +107,8 @@ Reader.prototype = {
 		
 		
 		// Setup screen dependant elements that can't be handled by css alone
-		$(window).resize();
+		//$(window).resize();
+		self.resizeScreen();
 	},
 	initMenu: function()
 	{
@@ -111,13 +118,9 @@ Reader.prototype = {
 		{
 			if (typeof window.requestFileSystem !== 'undefined')
 			{
-				/*window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
-				{
-					console.log('not an error: ' + fileSystem.name);
-					//console.log(fileSystem);
-				}, function(error){console.log('error:' + error)});*/
+				var lastPath = localStorage['lastPath'] || 'file:///';
 				self.selectScreen('file');
-				self.fileSelector.open(self.lastPath);
+				self.fileSelector.open(lastPath);
 			}
 			else
 			{
@@ -128,21 +131,12 @@ Reader.prototype = {
 		menu.find('.openFile input').change(function(e)
 		{
 			var file = e.target.files[0];
-			//console.log(file);
 			if (!file) {
 				return;
 			}
 			var reader = new FileReader();
-			reader.onload = function(e) {
-				/*if (/.html?$/.test(file.name))
-				{
-					self.loadHtmlDocument(e.target.result);
-				}
-				else
-				{
-					self.loadDocument(e.target.result);
-				}*/
-				//displayContents(contents);
+			reader.onload = function(e)
+			{
 				self.openFile(file.name, e.target.result, false);
 			};
 			reader.readAsText(file);
@@ -172,16 +166,14 @@ Reader.prototype = {
 	initFileSelector: function()
 	{
 		var self = this;
-		self.lastPath = localStorage['lastPath'] || 'file:///';
-		self.fileSelector = new FileSelector($('.screen.file .files'), self.lastPath, 'Documents (html, txt)|*.htm;*.html;*.txt|All files|*.*');
+		var lastPath = localStorage['lastPath'] || 'file:///';
+		self.fileSelector = new FileSelector($('.screen.file .files'), lastPath, 'Documents (html, txt)|*.htm;*.html;*.txt|All files|*.*');
 		self.fileSelector.onCancel = function()
 		{
-			//$(self.fileSelector.elem).find('.file-container .item.back').click();
 			self.selectScreen('main.menu');
 		};
 		self.fileSelector.onSuccess = function(path)
 		{
-			//console.log('Opening file: ' + path);
 			self.fileSelector.open(path);
 		};
 		self.fileSelector.onOpenFile = function(path, entry)
@@ -189,7 +181,7 @@ Reader.prototype = {
 			self.prepareLoad();
 			entry.file(function(file)
 			{
-				var reader = new FileReader();//entry.createReader();
+				var reader = new FileReader();
 				reader.onloadend = function(e){
 					self.openFile(path, e.target.result, false);
 				};
@@ -199,14 +191,12 @@ Reader.prototype = {
 		self.fileSelector.onPathChanged = function(path)
 		{
 			localStorage['lastPath'] = path;
-			self.lastPath = path;
 		};
 		self.fileSelector.onFail = function(error)
 		{
 			alert(error.message);
-			self.lastPath = 'file:///';
+			localStorage['lastPath'] = 'file:///';
 		};
-		//fileSelector.open(path);
 	},
 	/*onDeviceReady: function()
 	{
@@ -236,20 +226,20 @@ Reader.prototype = {
 	},
 	selectScreen: function(name)
 	{
+		if(this.screen.is(":visible"))
+		{
+			this.updateStatus();
+		}
 		$('.screen').removeClass('active');
 		$('.screen.' + name).addClass('active');
 	},
 	prepareLoad: function(name)
 	{
-		/*$('.screen').removeClass('active');
-		$('.screen.loading').addClass('active');*/
 		this.selectScreen('loading');
 		//$('.screen.loading .message span').text('Loading please wait...');
 	},
 	loadReady: function()
 	{
-		/*$('.screen').removeClass('active');
-		$('.screen.reader').addClass('active');*/
 		this.selectScreen('reader');
 		$('.container').html('');
 	},
@@ -261,7 +251,6 @@ Reader.prototype = {
 		// TODO: Add injecting furigana
 		$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
 		//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
-		$(window).resize();
 	},
 	openDocument: function(path)
 	{
@@ -283,7 +272,7 @@ Reader.prototype = {
 		body = htmlHelpers.trimAllLines(body);
 		
 		// prevent images from loading at this time (images with absolute path will be unaffected)
-		body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>:]*)"|'([^>:]*)')[^>]*>)/img, "$1data-temp$2$3");
+		body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>]*)"|'([^>]*)')[^>]*>)/img, "$1data-temp$2$3");
 		
 		// Create temporary element for storing the body (allows modifying the elements)
 		var temp = document.createElement('div');
@@ -312,23 +301,14 @@ Reader.prototype = {
 			}
 			else if (this.nodeName === "IMG")
 			{
-				elem.removeAttributes(null, ['id', 'src', 'data-tempsrc']);
+				elem.removeAttributes(null, ['id', 'src', 'alt', 'data-tempsrc']);
 			}
 			else
 			{
 				elem.removeAttributes(null, ['id']);
 			}
 		});
-		// Adjust image path
-		var filePath = fileHelpers.getParentPath(self.lastFile)
-		$temp.find('img[data-tempsrc]').each(function()
-		{
-			//console.log(filePath + $(this).attr('data-tempsrc'));
-			this.src = filePath + $(this).attr('data-tempsrc');
-			$(this).removeAttr('data-tempsrc');
-			/*this.alt = filePath + this.src;*/
-			//$(this).replaceWith('<p>' + filePath + $(this).attr('data-src') + '</p>');
-		});
+
 		// Remove redundant new line characters from all text
 		$temp.find('*').each(function()
 		{
@@ -347,28 +327,36 @@ Reader.prototype = {
 			var elem = $(this);
 			elem.replaceWith('<span class="ruby">' + elem.find('rb').text() + '<span class="rt">' + elem.find('rt').text() + '</span></span>');
 		});*/
-		
 
-		
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
-		$('.container').html(temp.innerHTML);
+		var container = $('.container');
 		
-		$('.container').find('> div').each(function()
+		container.html(temp);
+		
+		container.find('> div').each(function()
 		{
 			this.outerHTML = flatterer.flatten(this);
 		});
 		
-		$('.container').find('p').each(function()
+		// Put imgaes in containers and adjust image path
+		var filePath = fileHelpers.getParentPath(self.currentFile)
+		container.find('img').each(function()
+		{
+			this.outerHTML = '<div class="img-frame"><div class="img-container">' + this.outerHTML + '</div></div>';
+		});
+		container.find('img[data-tempsrc]').each(function()
+		{
+			var img = $(this);
+			var tempSrc = img.attr('data-tempsrc');
+			img.attr('src', (tempSrc.indexOf(':') > -1 ? tempSrc : filePath + tempSrc));
+			img.removeAttr('data-tempsrc');
+		});
+		
+		container.find('p').each(function()
 		{
 			this.outerHTML = flatterer.divide(this);
 		});	
-		
-		// Init actions for anchors
-		// Edit: Move to init function (anchors now get inited automatically)
-
-		// Adjust status etc.
-		$(window).resize();
 	},
 	openHtmlDocument: function(path)
 	{
@@ -393,7 +381,9 @@ Reader.prototype = {
 		function openCallback(path, data)
 		{
 			localStorage["lastFile"] = path;
-			self.lastFile = path;
+			self.currentFile = path;
+			self.currentHash = XXH(path, 0).toString(16);
+			self.progress = parseFloat(localStorage["progress-" + self.currentHash] || '0');
 			var split = path.split('.');
 			var ext = split[split.length - 1].toLowerCase();
 			if (ext == 'htm' || ext == 'html')
@@ -404,13 +394,21 @@ Reader.prototype = {
 			{
 				self.loadDocument(data);
 			}
+					
+			// Adjust status etc.
+			self.resizeScreen(true);
+			//$(window).resize();
 		}
 		if (typeof data == "undefined")
 		{
 			$.get(path, function(data)
 			{
 				openCallback(path, data);
-			}, 'html');
+			}, 'html').error(function()
+			{
+				alert('Error: Opening file "' + path + '" failed!');
+				self.selectScreen("menu");
+			});
 		}
 		else
 		{
@@ -453,13 +451,10 @@ Reader.prototype = {
 			this.showFloater(e);
 			return;
 		}
-		//alert('can\'t touch this');
 		var container = this.screen.find('.container');
 		var zoom = container.absoluteZoom();
 		// Find the letter and text node containing it at the point of click (start of selection); We divide the coordinates to compensate the zoom
-		//var start = getWordAtPoint(e.target, e.pageX / zoom, e.pageY / zoom);
 		var start = getCharacterAtPoint.find(e.target, e.pageX / zoom, e.pageY / zoom);
-		//alert(start);
 
 		// Check if there was anything at the point of the click
 		if (start != null)
@@ -611,10 +606,12 @@ Reader.prototype = {
 			var zoom = $('.reader .scroller').absoluteZoom();
 			var statusBarHeight = $('.statusBar').outerHeight();
 			var windowHeight = $(window).height();
-			$('.reader .scroller').css('height', (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom) + "px");
+			var scrollerHeight = (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom);
+			$('.reader .scroller').css('height', scrollerHeight + "px");
 			$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
 			$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
 			$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
+			$('.dynamicStyle').cssRule('.img-frame').css({'width': this.screen.find('.container').width() + 'px', 'height': parseInt(scrollerHeight * zoom/containerZoom) + 'px'});
 			if (preserveProgress)
 			{
 				this.scrollTo(this.progress, false);
@@ -633,13 +630,18 @@ Reader.prototype = {
 		var windowHeight = scroller.height();
 		var length = documentHeight - windowHeight;
 		// Calculate progress percentage
+		// Todo: replace with something better (ie. figure out which element\line of text is visible at the top of the screen)
 		if (length < 0)
 		{
 			this.progress = 0;
 		}
 		else
 		{
-			this.progress = scroller.scrollTop() / length;//.toFixed(2);
+			this.progress = scroller.scrollTop() / length;
+		}
+		if (this.currentFile != null)
+		{
+			localStorage['progress-' + this.currentHash] = this.progress;
 		}
 		// TODO: Optimize the element lookups
 		var statusBar = reader.find('> .statusBar');
@@ -733,16 +735,10 @@ Reader.prototype = {
 		$(a).on('touchmove', move);
 		setTimer();
 	},
-	/*anchorTouchEnd: function(e, a)
-	{
-		clearTimeout(this.anchorTimer);
-		
-	},*/
 	anchorClick: function(a)
 	{
 		if (a.getAttribute("href").indexOf('#') == 0)
 		{
-			//scrollTo($(a.getAttribute("href")));
 			$(a.getAttribute("href")).each(function() { this.scrollIntoView(true); });
 		}
 		else
