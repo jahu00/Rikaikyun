@@ -1,6 +1,5 @@
-ruby
+/*ruby
 {
-	/*-webkit-transform: translateZ(0);*/
 	display:inline-block;
 	text-align:center;
 	padding-top:0.2em;
@@ -36,16 +35,6 @@ ruby rb
 {
 	display: table-row-group;
 	vertical-align:bottom;
-}
-
-/*ruby rt, ruby rp
-{
-	display:none;
-}
-
-ruby, ruby rb
-{
-	display: inline;
 }*/
 
 .ruby

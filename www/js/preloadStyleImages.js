@@ -18,13 +18,27 @@ var preloadStyleImages = {
 			{
 				var rule = this.sheet.cssRules[i];
 				//m = rule.cssText.match(/(?:url\((?:'|")?)([^:)]*\.(?:gif|png|jpg|jpeg))(?:(?:'|")?\))/ig);
-				m = rule.cssText.match(/url\(('|")?([^:)]*\.(gif|png|jpg|jpeg))('|")?\)/ig);
+				/*if (rule.cssText.indexOf('url') > -1)
+				{
+					console.log(rule.cssText);
+				}*/
+				m = rule.cssText.match(/url\(('|")?([^)]*\/)?([^:)]*\.(gif|png|jpg|jpeg))('|")?\)/ig);
 				if (m != null)
 				{
 					var path = fileHelpers.getParentPath(this.sheet.href);
 					for (var n = 0; n < m.length; m++)
 					{
-						self.preloadImage(path + m[n].match(/\((?:'|")?([^:)]*\.(?:gif|png|jpg|jpeg))(?:'|")?\)/i)[1]);
+						var split = m[n].match(/\((?:'|")?([^)]*\/)?([^:)]*\.(?:gif|png|jpg|jpeg))(?:'|")?\)/i);
+						var url = split[2];
+						if (typeof split[1] ==  "undefined" || split[1].indexOf(':') == -1)
+						{
+							url = path + url;
+						}
+						else
+						{
+							url = split[1] + url;
+						}
+						self.preloadImage(url);
 					}
 				}
 			}
