@@ -127,18 +127,18 @@ FileSelector.prototype = {
 				self.updatePath();//self.path);
 			}
 		});
-		document.addEventListener("backbutton", function()
+		document.addEventListener("backbutton", function(e)
 		{
 			if ($elem.is(':visible') && typeof self.onCancel !== 'undefined')
 			{
-				self.onCancel();
+				self.onCancel(e);
 			}
 		}, false);
-		document.addEventListener("menubutton", function()
+		document.addEventListener("menubutton", function(e)
 		{
 			if ($elem.is(':visible') && typeof self.onMenu !== 'undefined')
 			{
-				self.onMenu();
+				self.onMenu(e);
 			}
 		}, false);
 

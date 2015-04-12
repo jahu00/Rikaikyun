@@ -27,6 +27,11 @@ body
 {
 	display:block;
 }
+.menu
+{
+	font-family:sans-serif;
+}
+
 .menu .item
 {
 	width:100%;
@@ -39,6 +44,66 @@ body
 .menu .item.disabled
 {
 	color:gray;
+}
+
+.menu .item input/*, .menu .item select*/
+{
+	display:none;
+}
+
+.menu .item select
+{
+	height:100%;
+	width:100%;
+	position:absolute;
+	top:0;
+	left:0;
+	opacity:0;
+}
+
+.menu .item.checkbox, .menu .item.select
+{
+	padding-right:30px;
+	position:relative;
+}
+
+/* Not using plain image background, because there positioning issues on android */
+.menu .item.checkbox i, .menu .item.select i
+{
+	width:20px;
+	height:20px;
+	background-size: 100% 100%;
+	position:absolute;
+	top:5px;
+	right:5px;
+}
+
+.menu .item.checkbox i
+{
+	background-image: url("unchecked.png");
+}
+
+.menu .item.checkbox.checked i
+{
+	background-image: url("checked.png");
+}
+
+.menu .item.select i
+{
+	background-image: url("select.png");
+}
+
+.menu .header
+{
+	background:black;
+	color:white;
+	overflow:hidden;
+	border-bottom:1px solid black;
+	box-sizing:border-box;
+	width:100%;
+	padding:2px;
+	font-size:10px;
+	display:block;
 }
 
 .screen.loading .message
@@ -55,6 +120,12 @@ body
 	text-align:center;
 	vertical-align:middle;
 }
+
+.screen.reader.gpu
+{
+	-webkit-transform: translateZ(0);
+}
+
 .reader .scroller
 {
 	height:100%;
@@ -77,10 +148,6 @@ body
 .container h6
 {
 	line-height:1.5em;
-}
-.container.gpu
-{
-	-webkit-transform: translateZ(0);
 }
 
 .container p

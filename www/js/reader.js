@@ -1,16 +1,18 @@
-function Reader(dict)
+function Reader()//dict)
 {
-	this.dict = dict;
+	//this.dict = dict;
 	this.resizeStartPosition = 0;
 	this.resizeStartSize = 0;
 	this.lastPosition = null;
 	this.scrollDistance = 0;
 	this.progress = 0;
 	this.currentFile = null;
+	//this.settings = {};
 	this.init();
+	this.loadSettings();
 	this.initFileSelector();
 	this.initMenu();
-	this.loadSettings();
+	this.dict = new rcxDict(true);
 }
 
 Reader.prototype = {
@@ -21,9 +23,87 @@ Reader.prototype = {
 	screen: null,
 	loadSettings: function()
 	{
+		var self = this;
 		//words = JSON.parse(localStorage["words"]);
 		//localStorage["words"] = JSON.stringify(words);
 		//this.lastFile = localStorage["lastFile"] || '';
+		var settings = $('.screen.settings.menu');
+		document.addEventListener("backbutton", function(e)
+		{
+			if (settings.is(':visible'))
+			{
+				self.selectScreen('main.menu');
+				e.stop();
+			}
+		}, false);
+		
+		function readControlValueBool(control)
+		{
+			var control = $(control);
+			var value = (control.attr('data-value') || "false") == "true";
+			return value;
+		}
+		
+		function flipControl(control)
+		{
+			var control = $(control);
+			var value = (control.attr('data-value') || "false") == "true";
+			control.attr('data-value', value);
+			return value;
+		}
+		
+		function setControl(control, value)
+		{
+			var control = $(control);
+			control.attr('data-value', value);
+			// Using class because data attributes are wonky on android browser
+			if (value)
+			{
+				if (!control.hasClass('checked'))
+				{
+					control.addClass('checked');
+				}
+			}
+			else
+			{
+				control.removeClass('checked');
+			}
+		}
+		
+		function setGpu(value)
+		{
+			var control = settings.find('.useGpu');
+			setControl(control, value);
+			localStorage['useGpu'] = value;
+			if (value)
+			{
+				if (!self.screen.hasClass('gpu'))
+				{
+					self.screen.addClass('gpu');
+				}
+			}
+			else
+			{
+				self.screen.removeClass('gpu');
+			}
+		}
+		
+		settings.find('.useGpu').click(function()
+		{
+			var value = !readControlValueBool(this);
+			setGpu(value);
+		});
+		
+		settings.find('.openMethod select').change(function(e)
+		{
+			//self.settings['OpenMethod'] = this.value;
+			localStorage['openMethod'] = this.value;
+		});
+		
+		setGpu((localStorage['useGpu'] || "false") == "true");
+		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
+		//self.settings['OpenMethod'] = localStorage['openMethod'] || "FileSystem";
+		settings.find('.openMethod select').val(localStorage['openMethod']);
 	},
 	// Setup initial values, events etc.
 	init: function()
@@ -47,14 +127,18 @@ Reader.prototype = {
 			self.resizeScreen(true);
 		});
 		// Handling scrolling within the document
-		var scrollDelay = 300;
-		var scrollTimeout = null;
+		var scrollDelay = 200;
+		self.scrollTimeout = null;
 		$('.reader > .scroller').scroll(function()
 		{
-			clearTimeout(scrollTimeout);
-			scrollTimeout = setTimeout(function(){
-				self.updateStatus();
-			},scrollDelay);
+			clearTimeout(self.scrollTimeout);
+			if(self.screen.is(':visible'))
+			{
+				self.scrollTimeout = setTimeout(function(){
+					self.updateStatus();
+				},scrollDelay);
+			}
+
 		});
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
@@ -88,20 +172,21 @@ Reader.prototype = {
 		
 		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
 		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
-		container.on('load error', 'img', function()
+		// Unused: Solved document length changing after image is loaded by forcing images to take a whole page using css
+		/*container.on('load error', 'img', function()
 		{
-			console.log('just passing by');
 			if (this.currentFile != null)
 			{
 				self.scrollTo(parseFloat(localStorage['progress-' + self.currentHash]));
 			}
-		});
+		});*/
 		
-		document.addEventListener("menubutton", function()
+		document.addEventListener("menubutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{
 				self.selectScreen('main.menu');
+				e.stop();
 			}
 		}, false);
 		
@@ -137,29 +222,38 @@ Reader.prototype = {
 			var reader = new FileReader();
 			reader.onload = function(e)
 			{
-				self.openFile(file.name, e.target.result, false);
+				self.openFile(file.name, undefined, e.target.result);
 			};
 			reader.readAsText(file);
 		});
 		
+		menu.find('.settings').click(function()
+		{
+			self.selectScreen('settings');
+		});
+		
 		menu.find('.exit').click(function()
 		{
-			if (typeof navigator.app !== 'undefined')
+			if (confirm('Close app?'))
 			{
-				navigator.app.exitApp();
-			}
-			else
-			{
-				window.close();
+				if (typeof navigator.app !== 'undefined')
+				{
+					navigator.app.exitApp();
+				}
+				else
+				{
+					window.close();
+				}
 			}
 		});
 		
-		document.addEventListener("backbutton", function()
+		document.addEventListener("backbutton", function(e)
 		{
 			if (menu.is(':visible'))
 			{
 				self.selectScreen('reader');
 				self.resizeScreen(true);
+				e.stop();
 			}
 		}, false);
 	},
@@ -168,9 +262,10 @@ Reader.prototype = {
 		var self = this;
 		var lastPath = localStorage['lastPath'] || 'file:///';
 		self.fileSelector = new FileSelector($('.screen.file .files'), lastPath, 'Documents (html, txt)|*.htm;*.html;*.txt|All files|*.*');
-		self.fileSelector.onCancel = function()
+		self.fileSelector.onCancel = function(e)
 		{
 			self.selectScreen('main.menu');
+			e.stop();
 		};
 		self.fileSelector.onSuccess = function(path)
 		{
@@ -178,7 +273,7 @@ Reader.prototype = {
 		};
 		self.fileSelector.onOpenFile = function(path, entry)
 		{
-			self.prepareLoad();
+			/*self.prepareLoad();
 			entry.file(function(file)
 			{
 				var reader = new FileReader();
@@ -186,7 +281,8 @@ Reader.prototype = {
 					self.openFile(path, e.target.result, false);
 				};
 				reader.readAsText(file);
-			});
+			});*/
+			self.openFile(path, entry);
 		};
 		self.fileSelector.onPathChanged = function(path)
 		{
@@ -367,17 +463,18 @@ Reader.prototype = {
 			self.loadHtmlDocument(data);
 		}, 'html');
 	},
-	openFile: function(path, data, preprare)
+	openFile: function(path, entry, data)//, preprare)
 	{
-		if (typeof prepare == "undefined")
+		/*if (typeof prepare == "undefined")
 		{
 			prepare = true;
-		}
+		}*/
 		var self = this;
-		if (prepare)
+		/*if (prepare)
 		{
 			self.prepareLoad('path');
-		}
+		}*/
+		self.prepareLoad();
 		function openCallback(path, data)
 		{
 			localStorage["lastFile"] = path;
@@ -399,21 +496,64 @@ Reader.prototype = {
 			self.resizeScreen(true);
 			//$(window).resize();
 		}
+		function failCallback(path)
+		{
+			alert('Error: Opening file "' + path + '" failed!');
+			self.selectScreen("menu");
+		}
+		function entryCallback(path, entry)
+		{
+			entry.file(function(file)
+			{
+				var reader = new FileReader();
+				reader.onloadend = function(e){
+					openCallback(path, e.target.result)
+				};
+				reader.onerror = function(e)
+				{
+					failCallback(path);
+				}
+				reader.readAsText(file);
+			},function(error)
+			{
+				failCallback(path);
+			});
+		}
 		if (typeof data == "undefined")
 		{
-			$.get(path, function(data)
+			if (localStorage['openMethod'] == "AJAX")
 			{
-				openCallback(path, data);
-			}, 'html').error(function()
+				$.get(path, function(data)
+				{
+					openCallback(path, data);
+				}, 'html').error(function()
+				{
+					failCallback(path);
+				});
+			}
+			else
 			{
-				alert('Error: Opening file "' + path + '" failed!');
-				self.selectScreen("menu");
-			});
+				if (typeof entry == "undefined")
+				{
+					window.resolveLocalFileSystemURL(path, function(entry)
+					{
+						entryCallback(path, entry);
+					},function(error)
+					{
+						failCallback(path);
+					});
+				}
+				else
+				{
+					entryCallback(path, entry);
+				}
+			}
 		}
 		else
 		{
 			openCallback(path, data);
 		}
+
 	},
 	initDictionarySelection: function()
 	{
@@ -531,7 +671,6 @@ Reader.prototype = {
 			if (kanji != null)
 			{
 				kanji = this.dict.getKanjiRadicals(kanji);
-				//console.log(kanji);
 				$('<div class="dictionary-entry">' +
 				'<span class="kanji">' + kanji.kanji + ' [' + kanji.onkun + ']' + (kanji.nanori ? ' {' + kanji.nanori + '}' : '') + '</span>' +
 				'<br/>' +
@@ -623,6 +762,8 @@ Reader.prototype = {
 	// Updates reading status
 	updateStatus: function()
 	{
+		var self = this;
+		clearTimeout(self.scrollTimeout);
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
 		var scroller = reader.children('.scroller');
@@ -644,7 +785,11 @@ Reader.prototype = {
 			localStorage['progress-' + this.currentHash] = this.progress;
 		}
 		// TODO: Optimize the element lookups
-		var statusBar = reader.find('> .statusBar');
+		var statusBar = reader.children('.statusBar');
+		
+		//var statusBar = reader.find('> .statusBar');
+		// using > selector with find was causing infinite executions of scroll event for some reason
+		
 		statusBar.find('> .grid  .progress > .bar').css('width', (this.progress * 100).toFixed(2)+"%");
 		var pages = Math.ceil(documentHeight / windowHeight);
 		var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
@@ -666,6 +811,33 @@ Reader.prototype = {
 			this.blink();
 		}
 		this.lastPosition = scroller.scrollTop();
+	},
+	scrollTo: function(progress, update)
+	{
+		if (typeof update == "undefined")
+		{
+			update = true;
+		}
+		var reader = this.screen;
+		var scroller = reader.children('.scroller');
+		var documentHeight = scroller[0].scrollHeight;
+		var windowHeight = scroller.height();
+		var length = documentHeight - windowHeight;
+		// Calculate progress percentage
+		if (length < 0)
+		{
+			this.progress = 0;
+		}
+		else
+		{
+			this.progress = progress;
+		}
+		
+		scroller.scrollTop(Math.round(length * this.progress));
+		if (update)
+		{
+			this.updateStatus();
+		}
 	},
 	// Code responsible for blinking the screen on eink display
 	// TODO: Needs to be optimized or better yet made into a plugin that can be used on any element, so we can blink the dictionary popup without blinking the whole screen
@@ -745,32 +917,6 @@ Reader.prototype = {
 		{
 			if(confirm('Open ' + a.href + ' in a browser?'))
 				window.open(a.href, '_system');
-		}
-	},
-	scrollTo: function(progress, update)
-	{
-		if (typeof update == "undefined")
-		{
-			update = true;
-		}
-		var reader = this.screen;
-		var scroller = reader.children('.scroller');
-		var documentHeight = scroller[0].scrollHeight;
-		var windowHeight = scroller.height();
-		var length = documentHeight - windowHeight;
-		// Calculate progress percentage
-		if (length < 0)
-		{
-			this.progress = 0;
-		}
-		else
-		{
-			this.progress = progress;
-		}
-		scroller.scrollTop(Math.round(length * this.progress));
-		if (update)
-		{
-			this.updateStatus();
 		}
 	}
 };

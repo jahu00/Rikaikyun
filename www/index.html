@@ -77,13 +77,23 @@
 			</div>
 		</div>
 		<div class="screen main menu active">
+			<div class="header">Menu</div>
 			<div class="item openFile">Load file
-				<input type="file" style="display:none"/>
+				<input type="file"/>
 			</div>
+			<div class="item settings">Settings</div>
 			<div class="item exit">Exit</div>
 		</div>
 		<div class="screen settings menu">
-			<div class="item"> <input type="checkbox" name="useGpu"> Use GPU</div>
+			<div class="header">General setting</div>
+			<div class="item checkbox useGpu">Use GPU <i></i></div>
+			<div class="item select openMethod">File opening method
+				<i></i>
+				<select>
+					<option value="AJAX">AJAX</option>
+					<option value="FileSystem">File system</option>
+				</select>
+			</div>
 		</div>
 		<div class="screen file">
 			<div class="files">
@@ -133,8 +143,8 @@
 					FastClick.attach(document.body);
 					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
 					//console.log(localStorage['edictPath']);
-					var dict = new rcxDict(true);
-					var reader = new Reader(dict);
+					var reader = new Reader();//dict);
+					// Moved dictionary init to the end of reader init, to prevent it from blocking requests
 					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
