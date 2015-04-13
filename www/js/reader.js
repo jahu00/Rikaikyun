@@ -106,6 +106,14 @@ Reader.prototype = {
 			}
 		}, false);
 		
+		document.addEventListener("backbutton", function(e)
+		{
+			if (self.screen.is(':visible'))
+			{
+				$('.floater').css("display", "");
+				e.stop();
+			}
+		}, false);
 		
 		// Setup screen dependant elements that can't be handled by css alone
 		//$(window).resize();

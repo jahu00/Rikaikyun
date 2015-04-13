@@ -9,6 +9,7 @@
 		<link href="./css/style.css" type="text/css" rel="stylesheet" />
 		<link href="./css/screen.css" type="text/css" rel="stylesheet" />
 		<link href="./css/ruby.css" type="text/css" rel="stylesheet" />
+		<link href="./css/spinner.css" type="text/css" rel="stylesheet" />
 		<link href="./css/fileselect/file.css" type="text/css" rel="stylesheet" />
         <title>Rikaikyun</title>
     </head>
@@ -94,6 +95,7 @@
 					<option value="FileSystem">File system</option>
 				</select>
 			</div>
+			<div class="header">Display setting</div>
 		</div>
 		<div class="screen file">
 			<div class="files">
@@ -101,7 +103,10 @@
 		</div>
 		<div class="screen loading active">
 			<div class="message">
-				<span>Loading please wait...</span>
+				<span>
+					Loading, please wait...<br/><br/>
+					<div class="spinner"></div>
+				</span>
 			</div>
 		</div>
 		<div class="blink" style="display:none">

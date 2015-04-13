@@ -1,0 +1,17 @@
+@-webkit-keyframes spinner {
+	100% { background-position: -792px; }
+}
+
+.spinner
+{
+	display:inline-block;
+	background-color: transparent;
+	background-image: url("spinner1.png");
+	background-repeat: no-repeat;
+	background-position: 0 center;
+	background-size: auto 100%;
+	width: 66px;
+	height: 66px;
+	-webkit-animation: spinner .8s steps(12) infinite;
+	zoom:50%;
+ }
