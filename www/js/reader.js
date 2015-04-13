@@ -129,7 +129,7 @@ Reader.prototype = {
 		// Handling scrolling within the document
 		var scrollDelay = 200;
 		self.scrollTimeout = null;
-		$('.reader > .scroller').scroll(function()
+		$('.reader > .scroller > .container').scroll(function()
 		{
 			clearTimeout(self.scrollTimeout);
 			if(self.screen.is(':visible'))
@@ -140,9 +140,10 @@ Reader.prototype = {
 			}
 
 		});
+		$('.reader > .scroller > .container').fakeScrollOn();
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
-		$('.reader > .floater .dictionary').fakeScroll();
+		$('.reader > .floater .dictionary').fakeScrollOn();
 
 		// Prevent scrolling the document while touching empty dictionary popup
 		$('.reader > .floater > .dictionary-container').on('touchmove', function (e) {
@@ -767,8 +768,10 @@ Reader.prototype = {
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
 		var scroller = reader.children('.scroller');
-		var documentHeight = scroller[0].scrollHeight;
-		var windowHeight = scroller.height();
+		var container = scroller.children('.container');
+		//var documentHeight = scroller[0].scrollHeight;
+		var documentHeight = container.outerHeight();
+		var windowHeight = scroller.outerHeight();
 		var length = documentHeight - windowHeight;
 		// Calculate progress percentage
 		// Todo: replace with something better (ie. figure out which element\line of text is visible at the top of the screen)
@@ -778,7 +781,8 @@ Reader.prototype = {
 		}
 		else
 		{
-			this.progress = scroller.scrollTop() / length;
+			//this.progress = scroller.scrollTop() / length;
+			this.progress = container.fakeScroll() / length;
 		}
 		if (this.currentFile != null)
 		{
@@ -792,7 +796,8 @@ Reader.prototype = {
 		
 		statusBar.find('> .grid  .progress > .bar').css('width', (this.progress * 100).toFixed(2)+"%");
 		var pages = Math.ceil(documentHeight / windowHeight);
-		var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
+		//var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
+		var page = parseInt((container.fakeScroll() / documentHeight) * pages  + 1.5);
 		var status = statusBar.find('.status');
 		var pagesSpan = status.children('span');
 		// Update the page count
@@ -803,14 +808,17 @@ Reader.prototype = {
 		// TODO: The blink (should we use it or not) as well as the amount of pages after which the blink occurs should be customizable in the settings
 		if (this.lastPosition == null)
 		{
-			lastPosition = scroller.scrollTop();
+			//lastPosition = scroller.scrollTop();
+			lastPosition = container.fakeScroll();
 		}
-		this.scrollDistance += Math.abs(scroller.scrollTop() - this.lastPosition);
+		//this.scrollDistance += Math.abs(scroller.scrollTop() - this.lastPosition);
+		this.scrollDistance += Math.abs(container.fakeScroll() - this.lastPosition);
 		if (this.scrollDistance >= windowHeight * 3)
 		{
 			this.blink();
 		}
-		this.lastPosition = scroller.scrollTop();
+		//this.lastPosition = scroller.scrollTop();
+		this.lastPosition = container.fakeScroll();
 	},
 	scrollTo: function(progress, update)
 	{
@@ -821,8 +829,10 @@ Reader.prototype = {
 		}
 		var reader = this.screen;
 		var scroller = reader.children('.scroller');
-		var documentHeight = scroller[0].scrollHeight;
-		var windowHeight = scroller.height();
+		var container = scroller.children('.container');
+		//var documentHeight = scroller[0].scrollHeight;
+		var documentHeight = container.outerHeight();
+		var windowHeight = scroller.outerHeight();
 		var length = documentHeight - windowHeight;
 		// Calculate progress percentage
 		if (length < 0)
@@ -834,7 +844,8 @@ Reader.prototype = {
 			this.progress = progress;
 		}
 		
-		scroller.scrollTop(Math.round(length * this.progress));
+		//scroller.scrollTop(Math.round(length * this.progress));
+		container.fakeScroll(Math.round(length * this.progress));
 		if (update)
 		{
 			self.updateStatus();
