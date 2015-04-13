@@ -7,9 +7,8 @@ function Reader()//dict)
 	this.scrollDistance = 0;
 	this.progress = 0;
 	this.currentFile = null;
-	//this.settings = {};
 	this.init();
-	this.loadSettings();
+	this.settings = new Settings(this);
 	this.initFileSelector();
 	this.initMenu();
 	this.dict = new rcxDict(true);
@@ -21,90 +20,6 @@ Reader.prototype = {
 	dict: null,
 	settings: null,
 	screen: null,
-	loadSettings: function()
-	{
-		var self = this;
-		//words = JSON.parse(localStorage["words"]);
-		//localStorage["words"] = JSON.stringify(words);
-		//this.lastFile = localStorage["lastFile"] || '';
-		var settings = $('.screen.settings.menu');
-		document.addEventListener("backbutton", function(e)
-		{
-			if (settings.is(':visible'))
-			{
-				self.selectScreen('main.menu');
-				e.stop();
-			}
-		}, false);
-		
-		function readControlValueBool(control)
-		{
-			var control = $(control);
-			var value = (control.attr('data-value') || "false") == "true";
-			return value;
-		}
-		
-		function flipControl(control)
-		{
-			var control = $(control);
-			var value = (control.attr('data-value') || "false") == "true";
-			control.attr('data-value', value);
-			return value;
-		}
-		
-		function setControl(control, value)
-		{
-			var control = $(control);
-			control.attr('data-value', value);
-			// Using class because data attributes are wonky on android browser
-			if (value)
-			{
-				if (!control.hasClass('checked'))
-				{
-					control.addClass('checked');
-				}
-			}
-			else
-			{
-				control.removeClass('checked');
-			}
-		}
-		
-		function setGpu(value)
-		{
-			var control = settings.find('.useGpu');
-			setControl(control, value);
-			localStorage['useGpu'] = value;
-			if (value)
-			{
-				if (!self.screen.hasClass('gpu'))
-				{
-					self.screen.addClass('gpu');
-				}
-			}
-			else
-			{
-				self.screen.removeClass('gpu');
-			}
-		}
-		
-		settings.find('.useGpu').click(function()
-		{
-			var value = !readControlValueBool(this);
-			setGpu(value);
-		});
-		
-		settings.find('.openMethod select').change(function(e)
-		{
-			//self.settings['OpenMethod'] = this.value;
-			localStorage['openMethod'] = this.value;
-		});
-		
-		setGpu((localStorage['useGpu'] || "false") == "true");
-		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
-		//self.settings['OpenMethod'] = localStorage['openMethod'] || "FileSystem";
-		settings.find('.openMethod select').val(localStorage['openMethod']);
-	},
 	// Setup initial values, events etc.
 	init: function()
 	{
