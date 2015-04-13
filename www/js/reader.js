@@ -499,7 +499,7 @@ Reader.prototype = {
 		function failCallback(path)
 		{
 			alert('Error: Opening file "' + path + '" failed!');
-			self.selectScreen("menu");
+			self.selectScreen("main.menu");
 		}
 		function entryCallback(path, entry)
 		{
@@ -814,6 +814,7 @@ Reader.prototype = {
 	},
 	scrollTo: function(progress, update)
 	{
+		var self = this;
 		if (typeof update == "undefined")
 		{
 			update = true;
@@ -836,7 +837,7 @@ Reader.prototype = {
 		scroller.scrollTop(Math.round(length * this.progress));
 		if (update)
 		{
-			this.updateStatus();
+			self.updateStatus();
 		}
 	},
 	// Code responsible for blinking the screen on eink display

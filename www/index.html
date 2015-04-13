@@ -76,7 +76,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="screen main menu active">
+		<div class="screen main menu">
 			<div class="header">Menu</div>
 			<div class="item openFile">Load file
 				<input type="file"/>
@@ -99,7 +99,7 @@
 			<div class="files">
 			</div>
 		</div>
-		<div class="screen loading">
+		<div class="screen loading active">
 			<div class="message">
 				<span>Loading please wait...</span>
 			</div>
@@ -155,6 +155,10 @@
 					{
 						reader.openFile(lastFile);
 						//console.log("Open: " + lastFile);
+					}
+					else
+					{
+						reader.selectScreen('main.menu');
 					}
 					//fpsCount.go();
 				});
