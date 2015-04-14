@@ -14,7 +14,7 @@ Settings.prototype = {
 		self.screen = $('.screen.settings.menu');
 		document.addEventListener("backbutton", function(e)
 		{
-			if (settings.is(':visible'))
+			if (self.screen.is(':visible'))
 			{
 				self.reader.selectScreen('main.menu');
 				e.stop();
