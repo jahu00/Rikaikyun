@@ -46,7 +46,7 @@ body
 	color:gray;
 }
 
-.menu .item input/*, .menu .item select*/
+.menu .item input
 {
 	display:none;
 }
@@ -59,6 +59,20 @@ body
 	top:0;
 	left:0;
 	opacity:0;
+}
+
+.menu .item.slider input
+{
+	width:100%;
+	display: block;
+	margin-left:0;
+	margin-right:0;
+	
+}
+
+.menu .item.slider .value
+{
+	float:right;
 }
 
 .menu .item.checkbox, .menu .item.select
@@ -121,7 +135,7 @@ body
 	vertical-align:middle;
 }
 
-.screen.reader.gpu
+.gpu
 {
 	-webkit-transform: translateZ(0);
 }
@@ -136,11 +150,12 @@ body
 }
 .container
 {
-	padding:10px;
+	/*padding:10px;*/
+	padding:5%;
 	word-wrap:break-word;
 	/*line-height:1.5em;*/
 }
-.container p,
+/*.container p,
 .container h1,
 .container h2,
 .container h3,
@@ -149,7 +164,7 @@ body
 .container h6
 {
 	line-height:1.5em;
-}
+}*/
 
 .container p
 {

@@ -54,6 +54,12 @@ Settings.prototype = {
 			}
 		}
 		
+		function updateSliderValue(control, value)
+		{
+			var control = $(control);
+			control.closest('.slider').find('.value').text(value);
+		}
+		
 		function setGpu(value)
 		{
 			var control = self.screen.find('.useGpu');
@@ -72,10 +78,67 @@ Settings.prototype = {
 			}
 		}
 		
+		function setGpuHack(value)
+		{
+			var control = self.screen.find('.useGpuHack');
+			setControl(control, value);
+			localStorage['useGpuHack'] = value;
+			if (value)
+			{
+				$('.screen.loading:not(.gpu)').addClass('gpu');
+			}
+			else
+			{
+				$('.screen.loading').removeClass('gpu');
+			}
+		}
+		
+		self.screen.find('.padding input').on("input", function()
+		{
+			updateSliderValue(this, this.value + '%');
+		});
+		
+		self.screen.find('.padding input').change(function()
+		{
+			updateSliderValue(this, this.value + '%');
+			localStorage['padding'] = this.value;
+			self.reader.screen.find('.container').css('padding', this.value + '%');
+		});
+		
+		self.screen.find('.readerZoom input').on("input", function()
+		{
+			updateSliderValue(this, this.value + '%');
+		});
+		
+		self.screen.find('.readerZoom input').change(function()
+		{
+			updateSliderValue(this, this.value + '%');
+			localStorage['readerZoom'] = this.value;
+			self.reader.screen.find('.container').css('zoom', this.value + '%');
+		});
+		
+		self.screen.find('.lineHeight input').on("input", function()
+		{
+			updateSliderValue(this, this.value);
+		});
+		
+		self.screen.find('.lineHeight input').change(function()
+		{
+			updateSliderValue(this, this.value);
+			localStorage['lineHeight'] = this.value;
+			$('.dynamicStyle').cssRule('.container, .container *').css('line-height', this.value + "em");
+		});
+		
 		self.screen.find('.useGpu').click(function()
 		{
 			var value = !readControlValueBool(this);
 			setGpu(value);
+		});
+		
+		self.screen.find('.useGpuHack').click(function()
+		{
+			var value = !readControlValueBool(this);
+			setGpuHack(value);
 		});
 		
 		self.screen.find('.openMethod select').change(function(e)
@@ -84,7 +147,23 @@ Settings.prototype = {
 		});
 		
 		setGpu((localStorage['useGpu'] || "false") == "true");
+		//setGpuHack((localStorage['useGpuHack'] || "false") == "true");
+		setGpuHack(false);
+		
 		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
 		self.screen.find('.openMethod select').val(localStorage['openMethod']);
+		self.screen.find('.padding input').val(parseFloat(localStorage['padding'] || self.reader.screen.find('.container').css('padding'))).change();
+		self.screen.find('.readerZoom input').val(parseInt(localStorage['readerZoom'] || (self.reader.screen.find('.container').css('zoom') * 100))).change();
+		self.screen.find('.lineHeight input').val
+		(
+			parseFloat
+			(
+				localStorage['lineHeight'] ||
+				(
+					parseInt(self.reader.screen.find('.container').css('line-height')) / 
+					parseInt(self.reader.screen.find('.container').css('font-size'))
+				)
+			)
+		).change();
 	}
 }

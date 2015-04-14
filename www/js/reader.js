@@ -244,6 +244,18 @@ Reader.prototype = {
 		newHeight = parseInt(newHeight);
 		dictionaryContainer.css('height', newHeight + "px");
 	},
+	forceRefresh: function(elem)
+	{
+		if (!elem.hasClass('gpu'))
+		{
+			elem.addClass('gpu');
+			//activeScreen.removeClass('gpu');
+			setTimeout(function()
+			{
+				elem.removeClass('gpu');
+			}, 1);
+		}
+	},
 	selectScreen: function(name)
 	{
 		if(this.screen.is(":visible"))
@@ -251,7 +263,12 @@ Reader.prototype = {
 			this.updateStatus();
 		}
 		$('.screen').removeClass('active');
-		$('.screen.' + name).addClass('active');
+		var activeScreen = $('.screen.' + name);
+		activeScreen.addClass('active');
+		if (localStorage['useGpuHack'] == "true")
+		{
+			this.forceRefresh(activeScreen);
+		}
 	},
 	prepareLoad: function(name)
 	{
@@ -670,11 +687,12 @@ Reader.prototype = {
 			var statusBarHeight = $('.statusBar').outerHeight();
 			var windowHeight = $(window).height();
 			var scrollerHeight = (windowHeight/zoom - statusBarHeight*statusBarZoom/zoom);
+			var dynamicStyle = $('.dynamicStyle');
 			$('.reader .scroller').css('height', scrollerHeight + "px");
-			$('.dynamicStyle').cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
-			$('.dynamicStyle').cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
-			$('.dynamicStyle').cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
-			$('.dynamicStyle').cssRule('.img-frame').css({'width': this.screen.find('.container').width() + 'px', 'height': parseInt(scrollerHeight * zoom/containerZoom) + 'px'});
+			dynamicStyle.cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
+			dynamicStyle.cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
+			dynamicStyle.cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
+			dynamicStyle.cssRule('.img-frame').css({'width': this.screen.find('.container').width() + 'px', 'height': parseInt(scrollerHeight * zoom/containerZoom) + 'px'});
 			if (preserveProgress)
 			{
 				this.scrollTo(this.progress, false);
