@@ -826,7 +826,7 @@ Reader.prototype = {
 		function remove()
 		{
 			clearTimeout(self.anchorTimer);
-			$(a).off('touchend', end);
+			$(a).off('touchend touchcancel', end);
 			$(a).off('touchmove', move);
 		}
 		
@@ -856,7 +856,7 @@ Reader.prototype = {
 			lastY = touchMove.pageY;
 		}
 		
-		$(a).on('touchend', end);
+		$(a).on('touchend touchcancel', end);
 		$(a).on('touchmove', move);
 		setTimer();
 	},

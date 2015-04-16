@@ -165,5 +165,6 @@ Settings.prototype = {
 				)
 			)
 		).change();
+		self.screen.find('.fontSize .slider').slider();
 	}
 }

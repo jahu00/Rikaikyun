@@ -80,7 +80,7 @@
 		});
 		$(this).on('touchstart', fakeScroll.onTouchStart);
 		$(this).on('touchmove', fakeScroll.onTouchMove);
-		$(this).on('touchend', fakeScroll.onTouchEnd);
+		$(this).on('touchend touchcancel', fakeScroll.onTouchEnd);
 	};
 	$.fn.fakeScrollOff = function()
 	{
@@ -88,7 +88,7 @@
 		delete myJSONObject.fakeScroll;
 		$(this).off('touchstart', fakeScroll.onTouchStart);
 		$(this).off('touchmove', fakeScroll.onTouchMove);
-		$(this).off('touchend', fakeScroll.onTouchEnd);
+		$(this).off('touchend touchcancel', fakeScroll.onTouchEnd);
 	};
 	$.fn.fakeScrollReset = function() {
 		this.each(function()
