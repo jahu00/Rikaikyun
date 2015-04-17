@@ -114,7 +114,7 @@ Settings.prototype = {
 		{
 			updateSliderValue(this, this.value + '%');
 			localStorage['readerZoom'] = this.value;
-			self.reader.screen.find('.container').css('zoom', this.value + '%');
+			//self.reader.screen.find('.container').css('zoom', this.value + '%');
 		});
 		
 		self.screen.find('.lineHeight input').on("input", function()
@@ -126,7 +126,7 @@ Settings.prototype = {
 		{
 			updateSliderValue(this, this.value);
 			localStorage['lineHeight'] = this.value;
-			$('.dynamicStyle').cssRule('.container, .container *').css('line-height', this.value + "em");
+			$('.dynamicStyle').cssRule('.container').css('line-height', this.value);
 		});
 		
 		self.screen.find('.useGpu').click(function()

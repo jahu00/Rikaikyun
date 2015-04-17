@@ -1,9 +1,6 @@
 @media only screen and (min-device-width : 720px)
 {
-	/*body
-	{
-		zoom:300%;
-	}*/
+	/*
 	.container
 	{
 		zoom:300.0001%;
@@ -28,5 +25,10 @@
 	.screen.file
 	{
 		zoom:300%;
+	}
+	*/
+	.gui
+	{
+		font-size:3em;
 	}
 }

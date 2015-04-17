@@ -162,16 +162,18 @@
 				}
 				function up(e)
 				{
-					knob.off('touchmove', move);
-					knob.off('touchend touchcancel', up);
+					$self.off('touchmove', move);
+					$self.off('touchend touchcancel', up);
 					if (typeof self.sliderData.change != "undefined")
 					{
 						self.sliderData.change.apply(self);
 					}
 				}
 
-				knob.on('touchmove', move);
-				knob.on('touchend touchcancel', up);
+				//knob.on('touchmove', move);
+				//knob.on('touchend touchcancel', up);
+				$self.on('touchmove', move);
+				$self.on('touchend touchcancel', up);
 			});
 		}
 		return self.sliderData;

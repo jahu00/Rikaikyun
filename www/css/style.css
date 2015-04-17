@@ -35,9 +35,11 @@ body
 .menu .item
 {
 	width:100%;
-	padding:5px;
-	/*text-align:center;*/
-	border-bottom:1px solid black;
+	/*padding:5px;*/
+	padding:0.3125em;
+	/*border-bottom:1px solid black;*/
+	box-shadow: 0 0.0625em 0 0 black;
+	margin-bottom:0.0625em;
 	font-family:sans-serif;
 	box-sizing:border-box;
 }
@@ -77,19 +79,24 @@ body
 
 .menu .item.checkbox, .menu .item.select
 {
-	padding-right:30px;
+	/*padding-right:30px;*/
+	padding-right:1.875em;
 	position:relative;
 }
 
 /* Not using plain image background, because there positioning issues on android */
 .menu .item.checkbox i, .menu .item.select i
 {
-	width:20px;
-	height:20px;
+	/*width:20px;*/
+	width:1.25em;
+	/*height:20px;*/
+	height:1.25em;
 	background-size: 100% 100%;
 	position:absolute;
-	top:5px;
-	right:5px;
+	/*top:5px;*/
+	top:0.3125em;
+	/*right:5px;*/
+	right:0.3125em;
 }
 
 .menu .item.checkbox i
@@ -112,11 +119,15 @@ body
 	background:black;
 	color:white;
 	overflow:hidden;
-	border-bottom:1px solid black;
+	/*font-size:10px;*/
+	font-size:0.625em;
+	/*border-bottom:1px solid black;*/
+	box-shadow: 0 0.1em 0 0 black;
+	margin-bottom:0.1em;
 	box-sizing:border-box;
 	width:100%;
-	padding:2px;
-	font-size:10px;
+	/*padding:2px;*/
+	padding:0.2em;
 	display:block;
 }
 
@@ -126,7 +137,8 @@ body
 	margin-top:0.125em;
     padding-right:1em;
     height:0.5em;
-    border-bottom: 2px solid black;
+    /*border-bottom: 2px solid black;*/
+	box-shadow: 0 0.0625em 0 0 black;
 	margin-bottom:0.625em;
 }
 
@@ -141,8 +153,10 @@ body
     height:1em;
     width:1em;
     background:white;
-    border:1px solid black;
-    margin-top:-1px;
+    /*border:1px solid black;*/
+	box-shadow: 0 0 0 0.0625em black;
+	/*border:0.0625em solid black;*/
+    top:0.0625em;
 }
 
 .screen.loading .message
