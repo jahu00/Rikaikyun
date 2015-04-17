@@ -120,6 +120,31 @@ body
 	display:block;
 }
 
+.slider-control
+{
+    box-sizing: border-box;
+	margin-top:0.125em;
+    padding-right:1em;
+    height:0.5em;
+    border-bottom: 2px solid black;
+	margin-bottom:0.625em;
+}
+
+.slider-control > div
+{
+	position:relative;
+}
+
+.slider-control .knob
+{
+    position:absolute;
+    height:1em;
+    width:1em;
+    background:white;
+    border:1px solid black;
+    margin-top:-1px;
+}
+
 .screen.loading .message
 {
 	display:table;
@@ -465,21 +490,3 @@ body
 	display: inline-block;
 	font-size:inherit;
 }*/
-
-.slider:not(.item)
-{
-    box-sizing: border-box;
-    padding-right:1em;
-    height:0.5em;
-    border-bottom: 2px solid black;
-    position:relative;
-}
-.slider > .knob
-{
-    position:absolute;
-    height:1em;
-    width:1em;
-    background:white;
-    border:1px solid black;
-    margin-top:-1px;
-}

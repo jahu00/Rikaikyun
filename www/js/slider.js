@@ -5,7 +5,7 @@
 			var min = parseFloat(elem.attr('data-min'));
 			var max = parseFloat(elem.attr('data-max'));
 			var range = max - min;
-			var step = elem.attr('step');
+			var step = elem.attr('data-step');
 			if (typeof value == "undefined")
 			{
 				value = elem.attr('data-value');
@@ -77,11 +77,11 @@
 		var $self = $(self);
 		if (typeof self.sliderData == "undefined")
 		{
-			if (!$self.hasClass('slider'))
+			if (!$self.hasClass('slider-control'))
 			{
-				$self.addClass('slider');
+				$self.addClass('slider-control');
 			}
-			$self.html('<div class="knob"></div>');
+			$self.html('<div><div class="knob"></div></div>');
 			var knob = $self.find('.knob');
 			self.sliderData = {
 				input: input,
