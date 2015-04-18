@@ -71,10 +71,14 @@
 		}
 	}
 	
-	$.fn.slider = function(input, change)
+	$.fn.slider = function()
 	{
 		var self = this;
 		var $self = $(self);
+		var input = undefined;
+		var change = undefined;
+		var context = undefined;
+		
 		if (typeof self.sliderData == "undefined")
 		{
 			if (!$self.hasClass('slider-control'))
@@ -83,6 +87,41 @@
 			}
 			$self.html('<div><div class="knob"></div></div>');
 			var knob = $self.find('.knob');
+			
+			if (arguments.length)
+			{
+				if (typeof arguments[0] == 'object')
+				{
+					input = arguments[0]['input'];
+					change = arguments[0]['change'];
+					if (typeof arguments[0]['context'] != "undefined")
+					{
+						context = $(arguments[0]['context']);
+					}
+					else
+					{
+						context = $self;
+					}
+				}
+				else
+				{
+					input = arguments[0];
+					change = arguments[1];
+					if (typeof arguments[2] != "undefined")
+					{
+						context = $(arguments[2]);
+					}
+					else
+					{
+						context = $self;
+					}
+				}
+			}
+			else
+			{
+				context = knob;
+			}
+			
 			self.sliderData = {
 				input: input,
 				change: change,
@@ -149,10 +188,11 @@
 			{
 				slider.setValue($self, knob);
 			}
-			knob.on('touchstart', function(e)
+			context.on('touchstart', function(e)
 			{
 				function move(e)
 				{
+					e.preventDefault();
 					var zoom = $self.absoluteZoom();
 					slider.setValue($self, knob, e.originalEvent.touches[0].pageX / zoom, true);
 					if (typeof self.sliderData.input != "undefined")
@@ -162,8 +202,9 @@
 				}
 				function up(e)
 				{
-					$self.off('touchmove', move);
-					$self.off('touchend touchcancel', up);
+					e.preventDefault();
+					context.off('touchmove', move);
+					context.off('touchend touchcancel', up);
 					if (typeof self.sliderData.change != "undefined")
 					{
 						self.sliderData.change.apply(self);
@@ -172,8 +213,11 @@
 
 				//knob.on('touchmove', move);
 				//knob.on('touchend touchcancel', up);
-				$self.on('touchmove', move);
-				$self.on('touchend touchcancel', up);
+				if (e.target == knob[0])
+				{
+					context.on('touchmove', move);
+					context.on('touchend touchcancel', up);
+				}
 			});
 		}
 		return self.sliderData;
