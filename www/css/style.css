@@ -19,9 +19,13 @@ body
 .screen
 {
 	height:100%;
-	width:100%
+	width:100%;
 	overflow:hidden;
 	display:none;
+}
+.screen.scrollable
+{
+	overflow-y:scroll;
 }
 .screen.active
 {
@@ -74,7 +78,7 @@ body
 
 .menu .item.slider .value
 {
-	float:right;
+	/*float:right;*/
 }
 
 .menu .item.checkbox, .menu .item.select
@@ -497,6 +501,11 @@ body
 .blink.white
 {
 	background-color: white;
+}
+
+.right
+{
+	float: right;
 }
 
 /*ruby, rb, rp, rt

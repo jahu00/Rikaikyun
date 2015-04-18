@@ -105,18 +105,6 @@ Settings.prototype = {
 			self.reader.screen.find('.container').css('padding', this.value + '%');
 		});
 		
-		self.screen.find('.readerZoom input').on("input", function()
-		{
-			updateSliderValue(this, this.value + '%');
-		});
-		
-		self.screen.find('.readerZoom input').change(function()
-		{
-			updateSliderValue(this, this.value + '%');
-			localStorage['readerZoom'] = this.value;
-			//self.reader.screen.find('.container').css('zoom', this.value + '%');
-		});
-		
 		self.screen.find('.lineHeight input').on("input", function()
 		{
 			updateSliderValue(this, this.value);
@@ -153,7 +141,6 @@ Settings.prototype = {
 		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
 		self.screen.find('.openMethod select').val(localStorage['openMethod']);
 		self.screen.find('.padding input').val(parseFloat(localStorage['padding'] || self.reader.screen.find('.container').css('padding'))).change();
-		self.screen.find('.readerZoom input').val(parseInt(localStorage['readerZoom'] || (self.reader.screen.find('.container').css('zoom') * 100))).change();
 		self.screen.find('.lineHeight input').val
 		(
 			parseFloat
@@ -165,6 +152,27 @@ Settings.prototype = {
 				)
 			)
 		).change();
-		self.screen.find('.fontSize .slider-control').slider();
+		self.screen.find('.fontSize .slider-control').slider(
+		{
+			oninput: function()
+			{
+				self.screen.find('.fontSize .value').text($(this).attr('data-value'));
+			},
+			onchange: function()
+			{
+				var value = parseFloat($(this).attr('data-value'));
+				self.screen.find('.fontSize .value').text(value);
+				localStorage['fontSize'] = value;
+				self.reader.screen.find('.container').css('font-size', value + "px");
+			}
+		}).val(parseFloat(localStorage['fontSize'] || self.reader.screen.find('.container').css('font-size'))).change();
+		self.screen.find('.fontSize .value').click(function()
+		{
+			var value = parseFloat(prompt("Font size", self.screen.find('.fontSize .slider-control').slider().val()));
+			if (!isNaN(value))
+			{
+				self.screen.find('.fontSize .slider-control').slider().val(value).change();
+			}
+		});
 	}
 }

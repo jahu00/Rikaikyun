@@ -84,14 +84,18 @@
 	};
 	$.fn.fakeScrollOff = function()
 	{
-		$(this).fakeScrollReset();
-		delete myJSONObject.fakeScroll;
-		$(this).off('touchstart', fakeScroll.onTouchStart);
-		$(this).off('touchmove', fakeScroll.onTouchMove);
-		$(this).off('touchend touchcancel', fakeScroll.onTouchEnd);
+		
+			$(this).fakeScrollReset();
+			$(this).each(function()
+			{
+				delete this.fakeScroll;
+			});
+			$(this).off('touchstart', fakeScroll.onTouchStart);
+			$(this).off('touchmove', fakeScroll.onTouchMove);
+			$(this).off('touchend touchcancel', fakeScroll.onTouchEnd);
 	};
 	$.fn.fakeScrollReset = function() {
-		this.each(function()
+		$(this).each(function()
 		{
 			$(this).css("margin-top", "");
 		});

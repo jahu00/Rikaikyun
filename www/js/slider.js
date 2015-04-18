@@ -73,153 +73,170 @@
 	
 	$.fn.slider = function()
 	{
-		var self = this;
-		var $self = $(self);
-		var input = undefined;
-		var change = undefined;
-		var context = undefined;
-		
-		if (typeof self.sliderData == "undefined")
+		var args = arguments;
+		$(this).each(function()
 		{
-			if (!$self.hasClass('slider-control'))
+			var self = this;
+			var $self = $(self);
+			var input = undefined;
+			var change = undefined;
+			var context = undefined;
+			if (typeof self.sliderData == "undefined")
 			{
-				$self.addClass('slider-control');
-			}
-			$self.html('<div><div class="knob"></div></div>');
-			var knob = $self.find('.knob');
-			
-			if (arguments.length)
-			{
-				if (typeof arguments[0] == 'object')
+				if (!$self.hasClass('slider-control'))
 				{
-					input = arguments[0]['input'];
-					change = arguments[0]['change'];
-					if (typeof arguments[0]['context'] != "undefined")
+					$self.addClass('slider-control');
+				}
+				$self.html('<div><div class="knob"></div></div>');
+				var knob = $self.find('.knob');
+				
+				if (args.length)
+				{
+					if (typeof args[0] == 'object')
 					{
-						context = $(arguments[0]['context']);
+						input = args[0]['oninput'];
+						change = args[0]['onchange'];
+						if (typeof args[0]['context'] != "undefined")
+						{
+							context = $(args[0]['context']);
+						}
+						else
+						{
+							context = $self;
+						}
 					}
 					else
 					{
-						context = $self;
+						input = args[0];
+						change = args[1];
+						if (typeof args[2] != "undefined")
+						{
+							context = $(args[2]);
+						}
+						else
+						{
+							context = $self;
+						}
 					}
 				}
 				else
 				{
-					input = arguments[0];
-					change = arguments[1];
-					if (typeof arguments[2] != "undefined")
-					{
-						context = $(arguments[2]);
-					}
-					else
-					{
-						context = $self;
-					}
+					context = knob;
 				}
-			}
-			else
-			{
-				context = knob;
-			}
-			
-			self.sliderData = {
-				input: input,
-				change: change,
-				val: function(value)
-				{
-					if (typeof value != "undefined")
+				
+				self.sliderData = {
+					oninput: input,
+					onchange: change,
+					input: function()
 					{
-						return slider.setValue($self, knob, value);
-					}
-					return parseFloat($self.attr('data-value'))
-				},
-				min: function(value)
-				{
-					if (typeof value != "undefined")
-					{
-						$self.attr('data-min', value);
-						slider.setValue($self, knob);
-						return value;
-					}
-					return parseFloat($self.attr('data-min'));
-				},
-				max: function(value)
-				{
-					if (typeof value != "undefined")
-					{
-						$self.attr('data-max', value);
-						slider.setValue($self, knob);
-						return value;
-					}
-					return parseFloat($self.attr('data-max'));
-				},
-				range: function(value)
-				{
-					if (typeof value != "undefined")
-					{
-						$self.attr('data-max', this.min() + value);
-						slider.setValue($self, knob);
-						return value;
-					}
-					return this.max() - this.min();
-				},
-				step: function(value)
-				{
-					if (typeof value != "undefined")
-					{
-						if (value == null)
+						if (typeof this.oninput != "undefined")
 						{
-							$self.removeAttr('data-step');
-							return undefined;
+							this.oninput.apply(self);
 						}
-						$self.attr('data-step', value);
-						slider.setValue($self, knob);
-						return value;
-					}
-					var step = $self.attr('data-step');
-					if (typeof step == "undefined")
+					},
+					change: function()
 					{
-						return step;
+						if (typeof this.onchange != "undefined")
+						{
+							this.onchange.apply(self);
+						}
+					},
+					val: function(value)
+					{
+						if (typeof value != "undefined")
+						{
+							//return slider.setValue($self, knob, value);
+							slider.setValue($self, knob, value);
+							return this;
+						}
+						return parseFloat($self.attr('data-value'))
+					},
+					min: function(value)
+					{
+						if (typeof value != "undefined")
+						{
+							$self.attr('data-min', value);
+							slider.setValue($self, knob);
+							//return value;
+							return this;
+						}
+						return parseFloat($self.attr('data-min'));
+					},
+					max: function(value)
+					{
+						if (typeof value != "undefined")
+						{
+							$self.attr('data-max', value);
+							slider.setValue($self, knob);
+							//return value;
+							return this;
+						}
+						return parseFloat($self.attr('data-max'));
+					},
+					range: function(value)
+					{
+						if (typeof value != "undefined")
+						{
+							$self.attr('data-max', this.min() + value);
+							slider.setValue($self, knob);
+							//return value;
+							return this;
+						}
+						return this.max() - this.min();
+					},
+					step: function(value)
+					{
+						if (typeof value != "undefined")
+						{
+							if (value == null)
+							{
+								$self.removeAttr('data-step');
+								return undefined;
+							}
+							$self.attr('data-step', value);
+							slider.setValue($self, knob);
+							//return value;
+							return this;
+						}
+						var step = $self.attr('data-step');
+						if (typeof step == "undefined")
+						{
+							return step;
+						}
+						return parseFloat(step);
 					}
-					return parseFloat(step);
-				}
-			};
-			if ($self.attr('data-value') == "undefined")
-			{
-				slider.setValue($self, knob);
-			}
-			context.on('touchstart', function(e)
-			{
-				function move(e)
+				};
+				if ($self.attr('data-value') == "undefined")
 				{
-					e.preventDefault();
-					var zoom = $self.absoluteZoom();
-					slider.setValue($self, knob, e.originalEvent.touches[0].pageX / zoom, true);
-					if (typeof self.sliderData.input != "undefined")
-					{
-						self.sliderData.input.apply(self);
-					}
+					slider.setValue($self, knob);
 				}
-				function up(e)
+				context.on('touchstart', function(e)
 				{
-					e.preventDefault();
-					context.off('touchmove', move);
-					context.off('touchend touchcancel', up);
-					if (typeof self.sliderData.change != "undefined")
+					function move(e)
 					{
-						self.sliderData.change.apply(self);
+						e.preventDefault();
+						var zoom = $self.absoluteZoom();
+						slider.setValue($self, knob, e.originalEvent.touches[0].pageX / zoom, true);
+						self.sliderData.input();
 					}
-				}
+					function up(e)
+					{
+						e.preventDefault();
+						context.off('touchmove', move);
+						context.off('touchend touchcancel', up);
+						self.sliderData.change();
+					}
 
-				//knob.on('touchmove', move);
-				//knob.on('touchend touchcancel', up);
-				if (e.target == knob[0])
-				{
-					context.on('touchmove', move);
-					context.on('touchend touchcancel', up);
-				}
-			});
-		}
-		return self.sliderData;
+					//knob.on('touchmove', move);
+					//knob.on('touchend touchcancel', up);
+					if (e.target == knob[0])
+					{
+						context.on('touchmove', move);
+						context.on('touchend touchcancel', up);
+					}
+				});
+			}
+		});
+		return $(this)[0].sliderData;
 	};
 })(jQuery);
