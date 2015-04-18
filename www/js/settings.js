@@ -93,30 +93,6 @@ Settings.prototype = {
 			}
 		}
 		
-		self.screen.find('.padding input').on("input", function()
-		{
-			updateSliderValue(this, this.value + '%');
-		});
-		
-		self.screen.find('.padding input').change(function()
-		{
-			updateSliderValue(this, this.value + '%');
-			localStorage['padding'] = this.value;
-			self.reader.screen.find('.container').css('padding', this.value + '%');
-		});
-		
-		self.screen.find('.lineHeight input').on("input", function()
-		{
-			updateSliderValue(this, this.value);
-		});
-		
-		self.screen.find('.lineHeight input').change(function()
-		{
-			updateSliderValue(this, this.value);
-			localStorage['lineHeight'] = this.value;
-			$('.dynamicStyle').cssRule('.container').css('line-height', this.value);
-		});
-		
 		self.screen.find('.useGpu').click(function()
 		{
 			var value = !readControlValueBool(this);
@@ -140,39 +116,23 @@ Settings.prototype = {
 		
 		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
 		self.screen.find('.openMethod select').val(localStorage['openMethod']);
-		self.screen.find('.padding input').val(parseFloat(localStorage['padding'] || self.reader.screen.find('.container').css('padding'))).change();
-		self.screen.find('.lineHeight input').val
-		(
-			parseFloat
-			(
-				localStorage['lineHeight'] ||
-				(
-					parseInt(self.reader.screen.find('.container').css('line-height')) / 
-					parseInt(self.reader.screen.find('.container').css('font-size'))
-				)
-			)
-		).change();
-		self.screen.find('.fontSize .slider-control').slider(
+
+		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
-			oninput: function()
-			{
-				self.screen.find('.fontSize .value').text($(this).attr('data-value'));
-			},
-			onchange: function()
-			{
-				var value = parseFloat($(this).attr('data-value'));
-				self.screen.find('.fontSize .value').text(value);
-				localStorage['fontSize'] = value;
-				self.reader.screen.find('.container').css('font-size', value + "px");
-			}
-		}).val(parseFloat(localStorage['fontSize'] || self.reader.screen.find('.container').css('font-size'))).change();
-		self.screen.find('.fontSize .value').click(function()
+			self.reader.screen.find('.container').css('font-size', value + "px");
+		},
+		self.reader.screen.find('.container').css('font-size'));
+		
+		var paddingControl = new SliderControl(self.screen.find('.padding'), function(value)
 		{
-			var value = parseFloat(prompt("Font size", self.screen.find('.fontSize .slider-control').slider().val()));
-			if (!isNaN(value))
-			{
-				self.screen.find('.fontSize .slider-control').slider().val(value).change();
-			}
-		});
+			self.reader.screen.find('.container').css('padding', value + '%');
+		},
+		self.reader.screen.find('.container').css('padding'));
+		
+		var lineHeightControl = new SliderControl(self.screen.find('.lineHeight'), function(value)
+		{
+			self.reader.screen.find('.container').css('line-height', value);
+		},
+		self.reader.screen.find('.container').css('line-height'));
 	}
 }

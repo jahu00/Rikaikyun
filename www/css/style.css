@@ -67,16 +67,15 @@ body
 	opacity:0;
 }
 
-.menu .item.slider input
+.menu .item.slider-control input
 {
 	width:100%;
 	display: block;
 	margin-left:0;
 	margin-right:0;
-	
 }
 
-.menu .item.slider .value
+.menu .item.slider-control .value
 {
 	/*float:right;*/
 }
@@ -135,7 +134,7 @@ body
 	display:block;
 }
 
-.slider-control
+.slider
 {
     box-sizing: border-box;
 	margin-top:0.125em;
@@ -146,12 +145,12 @@ body
 	margin-bottom:0.625em;
 }
 
-.slider-control > div
+.slider > div
 {
 	position:relative;
 }
 
-.slider-control .knob
+.slider .knob
 {
     position:absolute;
     height:1em;

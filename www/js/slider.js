@@ -38,6 +38,7 @@
 				if (typeof step != "undefined")
 				{
 					value = Math.round(value / step) * step;
+					value = ExtendedMath.round(value, ExtendedMath.getDecimalPlaces(step));
 					position = value / range;
 				}
 				value = min + value;
@@ -57,11 +58,13 @@
 				{
 					value = value - min;
 					value = Math.round(value / step) * step;
+					value = ExtendedMath.round(value, ExtendedMath.getDecimalPlaces(step));
 					position = value / range;
 					value = min + value;
 				}
 				else
 				{
+					value = Math.round(value);
 					position = (value - min) / range;
 				}
 			}
