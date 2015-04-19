@@ -133,6 +133,49 @@ Settings.prototype = {
 		{
 			self.reader.screen.find('.container').css('line-height', value);
 		},
-		self.reader.screen.find('.container').css('line-height'));
+		parseFloat(self.reader.screen.find('.container').css('line-height')) / parseFloat(self.reader.screen.find('.container').css('font-size')));
+		
+		var guiSizeControl = {
+			init: function(control, defaultValue, min, max, step)
+			{
+				var self = this;
+				self.control = $(control);
+				self.systemName = self.control.attr('data-system-name') || "guiSize";
+				self.min = min;
+				self.max = max;
+				self.step = step;
+				var value = parseFloat(localStorage[self.systemName] || defaultValue);
+				self.lastValue = value;
+				self.setValue(value);
+				self.control.find('.value').click(function()
+				{
+					var value = parseFloat(prompt(self.control.find('.name').text(), self.lastValue));
+					if (!isNaN(value) && value != self.LastValue)
+					{
+						self.setValue(value);
+						if(confirm("Do you want to keep the new GUI size?"))
+						{
+							self.lastValue = value;
+						}
+						else
+						{
+							self.setValue(self.LastValue);
+						}
+					}
+				});
+			},
+			setValue: function(value)
+			{
+				value = ExtendedMath.valueFromRange(value, null, this.min, this.max, this.step).value;
+				localStorage[this.systemName] = value;
+				$('.dynamicStyle').cssRule('.gui').css('font-size', value/100 + "em");
+				this.control.find('.value').text(value);
+			}
+		};
+		guiSizeControl.init(
+			self.screen.find('.guiSize'),
+			parseFloat($('.gui').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100,
+			50, 500, 1
+		);
 	}
 }

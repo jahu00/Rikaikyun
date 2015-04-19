@@ -13,6 +13,7 @@ ExtendedMath = {
 	},
 	round: function(x, d)
 	{
+		d = d || 0;
 		/*if (d == 0)
 		{
 			return Math.round(x);
@@ -23,5 +24,42 @@ ExtendedMath = {
 		diff = Math.round(diff * 10) / 10;
 		return x + (diff / q );*/
 		return parseFloat(x.toFixed(d));
+	},
+	valueFromRange: function(value, position, min, max, step)
+	{
+		var range = max - min;
+		var relativeValue = undefined;
+		if (typeof value == "undefined" || value == null)
+		{
+			relativeValue = range * position;
+			value = min + relativeValue;
+		}
+		if (value <= min)
+		{
+			value = min;
+			position = 0;
+		}
+		else if (value >= max)
+		{
+			value = max;
+			position = 1;
+		}
+		else
+		{
+			if (typeof step != "undefined")
+			{
+				relativeValue = relativeValue || (value - min);
+				relativeValue = Math.round(relativeValue / step) * step;
+				relativeValue = ExtendedMath.round(relativeValue, ExtendedMath.getDecimalPlaces(step));
+				position = relativeValue / range;
+				value = min + relativeValue;
+			}
+			else
+			{
+				value = Math.round(value);
+				position = (value - min) / range;
+			}
+		}
+		return { value: value, position: position };
 	}
 };

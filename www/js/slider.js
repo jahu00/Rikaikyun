@@ -23,6 +23,7 @@
 			   step = parseFloat(step);
 			}
 			var position = 0;
+			var rangeValue = null;  
 			if (fromPageX)
 			{
 				position = (value - elem.offset().left - knob.width() / 2) / (elem.width());
@@ -34,42 +35,13 @@
 				{
 					position = 1;
 				}
-				value = range * position;
-				if (typeof step != "undefined")
-				{
-					value = Math.round(value / step) * step;
-					value = ExtendedMath.round(value, ExtendedMath.getDecimalPlaces(step));
-					position = value / range;
-				}
-				value = min + value;
-			} else if (value <= min)
+				rangeValue = ExtendedMath.valueFromRange(null, position, min, max, step);
+			} else
 			{
-				value = min;
-				position = 0;
+				rangeValue = ExtendedMath.valueFromRange(value, null, min, max, step);
 			}
-			else if (value >= max)
-			{
-				value = min;
-				position = 1;
-			}
-			else
-			{
-				if (typeof step != "undefined")
-				{
-					value = value - min;
-					value = Math.round(value / step) * step;
-					value = ExtendedMath.round(value, ExtendedMath.getDecimalPlaces(step));
-					position = value / range;
-					value = min + value;
-				}
-				else
-				{
-					value = Math.round(value);
-					position = (value - min) / range;
-				}
-			}
-			elem.attr('data-value', value);
-			knob.css('left', position * 100 + "%");
+			elem.attr('data-value', rangeValue.value);
+			knob.css('left', rangeValue.position * 100 + "%");
 			return value;
 		}
 	}

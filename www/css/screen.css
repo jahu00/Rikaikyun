@@ -1,34 +1,16 @@
 @media only screen and (min-device-width : 720px)
 {
-	/*
-	.container
-	{
-		zoom:300.0001%;
-	}
-	
-	.floater,
-	.statusBar
-	{
-		zoom:200%;
-	}
-	
-	.menu
-	{
-		zoom:300%;
-	}
-	
-	.screen.loading
-	{
-		zoom:300%;
-	}
-	
-	.screen.file
-	{
-		zoom:300%;
-	}
-	*/
 	.gui
 	{
 		font-size:3em;
+	}
+	.reader .container
+	{
+		font-size:3em;
+	}
+	.reader .floater,
+	.reader .statusBar
+	{
+		font-size:2.5em;
 	}
 }

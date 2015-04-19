@@ -190,12 +190,12 @@ body
 	overflow-y:hidden;
 	/*overflow-y:scroll;*/
 }
-.container
+.reader .container
 {
 	/*padding:10px;*/
 	padding:5%;
 	word-wrap:break-word;
-	/*line-height:1.5em;*/
+	line-height:1.5;
 }
 /*.container p,
 .container h1,
@@ -208,10 +208,10 @@ body
 	line-height:1.5em;
 }*/
 
-.container p
+.reader .container p
 {
 	/*word-wrap:break-word;*/
-	/*text-indent: 16px;*/
+	text-indent: 0;
 }
 
 /*.container p *:not(p)
@@ -219,7 +219,7 @@ body
 	text-indent: initial;
 }*/
 
-.container img
+.reader .container img
 {
 	/*margin:0 auto;*/
 	/*width: auto;*/
