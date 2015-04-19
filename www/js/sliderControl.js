@@ -25,7 +25,7 @@ SliderControl.prototype = {
 				var value = parseFloat(self.slider.val());
 				self.updateValue(value);
 				localStorage[self.systemName] = value;
-				self.onchange.apply(self.slider[0], [value]);
+				self.onchange.call(self.slider[0], value);
 			}
 		}).val(parseFloat(localStorage[self.systemName] || defaultValue));
 		self.slider.change();

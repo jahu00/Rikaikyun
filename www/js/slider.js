@@ -106,14 +106,14 @@
 					{
 						if (typeof this.oninput != "undefined")
 						{
-							this.oninput.apply(self);
+							this.oninput.call(self);
 						}
 					},
 					change: function()
 					{
 						if (typeof this.onchange != "undefined")
 						{
-							this.onchange.apply(self);
+							this.onchange.call(self);
 						}
 					},
 					val: function(value)

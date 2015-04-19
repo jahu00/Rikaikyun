@@ -54,12 +54,6 @@ Settings.prototype = {
 			}
 		}
 		
-		function updateSliderValue(control, value)
-		{
-			var control = $(control);
-			control.closest('.slider').find('.value').text(value);
-		}
-		
 		function setGpu(value)
 		{
 			var control = self.screen.find('.useGpu');
@@ -114,8 +108,8 @@ Settings.prototype = {
 		//setGpuHack((localStorage['useGpuHack'] || "false") == "true");
 		setGpuHack(false);
 		
-		localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
-		self.screen.find('.openMethod select').val(localStorage['openMethod']);
+		//localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
+		self.screen.find('.openMethod select').val(localStorage['openMethod'] || "FileSystem").change();
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{

@@ -52,6 +52,12 @@ body
 	color:gray;
 }
 
+.menu .item .description
+{
+	color: gray;
+	font-size:0.5em;
+}
+
 .menu .item input
 {
 	display:none;

@@ -90,17 +90,23 @@
 		</div>
 		<div class="screen scrollable settings menu gui">
 			<div class="header">General setting</div>
-			<div class="item checkbox useGpu">Use GPU <i></i></div>
+			<div class="item checkbox useGpu">
+				Use GPU <i></i>
+				<div class="description">Using GPU can improve app rendering speed at the cost of battery life.</div>
+			</div>
 			<div class="item select openMethod">File opening method
 				<i></i>
 				<select>
-					<option value="AJAX">AJAX</option>
-					<option value="FileSystem">File system</option>
+					<option value="AJAX" data-description="Using file system shortens startup time on some devices, but it can't handle big files (few MB).">AJAX</option>
+					<option value="FileSystem" data-description="AJAX can handle big files, but itmight not work on some devices and it might increase startup time.">File system</option>
 				</select>
+				<div class="description">
+				</div>
 			</div>
 			<div class="header">Display setting</div>
 			<div class="item guiSize" data-system-name="guiSize">
 				<span class="name">GUI size:</span><span class="right"><span class="value"></span>%</span>
+				<div class="description">Size of graphical user interface (includes all menus). Does not affect dictionary popup and font size in reading mode.</div>
 			</div>
 			<div class="item slider-control padding" data-system-name="padding">
 				<span class="name">Margins:</span><span class="right"><span class="value"></span>%</span><br/>
@@ -113,6 +119,18 @@
 			<div class="item slider-control lineHeight" data-system-name="lineHeight">
 				<span class="name">Line height:</span><span class="right"><span class="value"></span></span><br/>
 				<div class="slider" data-min="1" data-max="3" data-step="0.1"></div>
+			</div>
+			<div class="item select furiganaMode">Furigana rendering mode
+				<i></i>
+				<select>
+					<option value="disabled">No firugana</option>
+					<option value="inline">Inline</option>
+					<option value="above">Above</option>
+				</select>
+				<div class="description">
+					Using file system shortens startup time on some devices, but it can't handle big files (few MB).<br/>
+					AJAX can handle big files, but itmight not work on some devices and it might increase startup time.
+				</div>
 			</div>
 			<!--<div class="header">Hacks</div>
 			<div class="item checkbox useGpuHack">Use GPU to force refresh <i></i></div>-->
@@ -143,6 +161,7 @@
 		<script src="./js/fastclick/fastclick.js"></script>
 		<!-- <script src="./js/getWordAtPoint.js"></script> -->
 		<script src="./js/extendedMath.js"></script>
+		<script src="./js/oop.js"></script>
 		<script src="./js/getCharacterAtPoint.js"></script>
 		<script src="./js/textCrawler.js"></script>
 		<script src="./js/flatterer.js"></script>
@@ -152,6 +171,8 @@
 		<script src="./js/htmlHelpers.js"></script>
 		<script src="./js/fpsCount.js"></script>
 		<script src="./js/xxhash/xxhash.lmd.js"></script>
+		<script src="./js/control.js"></script>
+		<script src="./js/dropdownControl.js"></script>
 		<script src="./js/sliderControl.js"></script>
 		<script src="./js/settings.js"></script>
 		<script src="./js/reader.js"></script>
