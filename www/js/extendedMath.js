@@ -50,9 +50,9 @@ ExtendedMath = {
 			{
 				relativeValue = relativeValue || (value - min);
 				relativeValue = Math.round(relativeValue / step) * step;
-				relativeValue = ExtendedMath.round(relativeValue, ExtendedMath.getDecimalPlaces(step));
+				relativeValue = relativeValue;
 				position = relativeValue / range;
-				value = min + relativeValue;
+				value = ExtendedMath.round(min + relativeValue, ExtendedMath.getDecimalPlaces(step));
 			}
 			else
 			{

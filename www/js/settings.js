@@ -99,17 +99,11 @@ Settings.prototype = {
 			setGpuHack(value);
 		});
 		
-		self.screen.find('.openMethod select').change(function(e)
-		{
-			localStorage['openMethod'] = this.value;
-		});
-		
 		setGpu((localStorage['useGpu'] || "false") == "true");
 		//setGpuHack((localStorage['useGpuHack'] || "false") == "true");
 		setGpuHack(false);
 		
-		//localStorage['openMethod'] = localStorage['openMethod'] || "FileSystem";
-		self.screen.find('.openMethod select').val(localStorage['openMethod'] || "FileSystem").change();
+		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
@@ -147,14 +141,17 @@ Settings.prototype = {
 					if (!isNaN(value) && value != self.LastValue)
 					{
 						self.setValue(value);
-						if(confirm("Do you want to keep the new GUI size?"))
+						setTimeout(function()
 						{
-							self.lastValue = value;
-						}
-						else
-						{
-							self.setValue(self.LastValue);
-						}
+							if(confirm("Do you want to keep the new GUI size?"))
+							{
+								self.lastValue = value;
+							}
+							else
+							{
+								self.setValue(self.lastValue);
+							}
+						}, 50);
 					}
 				});
 			},
@@ -171,5 +168,31 @@ Settings.prototype = {
 			parseFloat($('.gui').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100,
 			50, 500, 1
 		);
+		
+		var furiganaModeControl = new DropdownControl(self.screen.find('.furiganaMode'), function(value)
+		{
+			//console.log("everything is broken");
+			var options = "";
+			$(this).find('select option').each(function()
+			{
+				
+				options += " furigana-" + this.value;
+			});
+			var container = self.reader.screen.find('.container');
+			container.removeClass(options.trim());
+			container.addClass("furigana-" + value);
+		}, "default");//, "above");
+		
+		var furiganaSizeControl = new SliderControl(self.screen.find('.furiganaSize'), function(value)
+		{
+			$('.dynamicStyle').cssRule('ruby > rt').css('font-size', value + "%");
+		},
+		"50");
+		
+		var furiganaSizeControl = new SliderControl(self.screen.find('.furiganaHeight'), function(value)
+		{
+			$('.dynamicStyle').cssRule('ruby > rt').css('line-height', value + "em");
+		},
+		"1.5");
 	}
 }

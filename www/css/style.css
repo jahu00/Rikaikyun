@@ -58,12 +58,12 @@ body
 	font-size:0.5em;
 }
 
-.menu .item input
+.menu .item input, .menu .item select
 {
 	display:none;
 }
 
-.menu .item select
+/*.menu .item select
 {
 	height:100%;
 	width:100%;
@@ -71,7 +71,7 @@ body
 	top:0;
 	left:0;
 	opacity:0;
-}
+}*/
 
 .menu .item.slider-control input
 {
@@ -86,7 +86,7 @@ body
 	/*float:right;*/
 }
 
-.menu .item.checkbox, .menu .item.select
+.menu .item.checkbox, .menu .item.select, .menu .item.radio
 {
 	/*padding-right:30px;*/
 	padding-right:1.875em;
@@ -94,7 +94,7 @@ body
 }
 
 /* Not using plain image background, because there positioning issues on android */
-.menu .item.checkbox i, .menu .item.select i
+.menu .item.checkbox i, .menu .item.select i, .menu .item.radio i
 {
 	/*width:20px;*/
 	width:1.25em;
@@ -121,6 +121,16 @@ body
 .menu .item.select i
 {
 	background-image: url("select.png");
+}
+
+.menu .item.radio i
+{
+	background-image: url("radio.png");
+}
+
+.menu .item.radio.checked i
+{
+	background-image: url("radio-checked.png");
 }
 
 .menu .header

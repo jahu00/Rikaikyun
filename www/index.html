@@ -32,9 +32,20 @@
 				width:0;
 				height:0;
 			}
+			
 			.gui
 			{
 			}
+			
+			ruby
+			{
+			}
+			
+			ruby > rt
+			{
+			}
+			
+			
 		</style>
 		<div class="screen reader">
 			<div class="scroller">
@@ -88,17 +99,17 @@
 			<div class="item settings">Settings</div>
 			<div class="item exit">Exit</div>
 		</div>
-		<div class="screen scrollable settings menu gui">
+		<div class="screen scrollable settings menu gui" data-screen="settings">
 			<div class="header">General setting</div>
 			<div class="item checkbox useGpu">
 				Use GPU <i></i>
 				<div class="description">Using GPU can improve app rendering speed at the cost of battery life.</div>
 			</div>
-			<div class="item select openMethod">File opening method
-				<i></i>
+			<div class="item select openMethod" data-system-name="openMethod">
+				<span class="name">File opening method</span><i></i>
 				<select>
-					<option value="AJAX" data-description="Using file system shortens startup time on some devices, but it can't handle big files (few MB).">AJAX</option>
-					<option value="FileSystem" data-description="AJAX can handle big files, but itmight not work on some devices and it might increase startup time.">File system</option>
+					<option value="AJAX" data-description="AJAX can handle big files, but it might not work on some devices and it might increase startup time.">AJAX</option>
+					<option value="FileSystem" data-description="Using file system shortens startup time on some devices, but it can't handle big files (few MB).">File system</option>
 				</select>
 				<div class="description">
 				</div>
@@ -120,17 +131,24 @@
 				<span class="name">Line height:</span><span class="right"><span class="value"></span></span><br/>
 				<div class="slider" data-min="1" data-max="3" data-step="0.1"></div>
 			</div>
-			<div class="item select furiganaMode">Furigana rendering mode
-				<i></i>
+			<div class="item select furiganaMode" data-system-name="furiganaMode">
+				<span class="name">Furigana mode</span><i></i>
 				<select>
-					<option value="disabled">No firugana</option>
-					<option value="inline">Inline</option>
-					<option value="above">Above</option>
+					<option value="disabled" data-description="Hides furigana. might increase app's rendering speed.">Disabled</option>
+					<option value="inline" data-description="Displays furigana in brackets next to kanji.">Inline</option>
+					<option value="default" data-description="Uses viewport's default style for Ruby. Usually renders above, but might resist being styled.">Default</option>
+					<option value="above" data-description="Forces furigana to render above, try this option if default rendering fails to achieve the result.">Above</option>
 				</select>
 				<div class="description">
-					Using file system shortens startup time on some devices, but it can't handle big files (few MB).<br/>
-					AJAX can handle big files, but itmight not work on some devices and it might increase startup time.
 				</div>
+			</div>
+			<div class="item slider-control furiganaSize" data-system-name="furiganaSize">
+				<span class="name">Furigana size:</span><span class="right"><span class="value"></span>%</span><br/>
+				<div class="slider" data-min="10" data-max="100" data-step="1"></div>
+			</div>
+			<div class="item slider-control furiganaHeight" data-system-name="furiganaHeight">
+				<span class="name">Furigana height:</span><span class="right"><span class="value"></span></span><br/>
+				<div class="slider" data-min="0.1" data-max="2" data-step="0.1"></div>
 			</div>
 			<!--<div class="header">Hacks</div>
 			<div class="item checkbox useGpuHack">Use GPU to force refresh <i></i></div>-->
@@ -171,6 +189,7 @@
 		<script src="./js/htmlHelpers.js"></script>
 		<script src="./js/fpsCount.js"></script>
 		<script src="./js/xxhash/xxhash.lmd.js"></script>
+		<script src="./js/app.js"></script>
 		<script src="./js/control.js"></script>
 		<script src="./js/dropdownControl.js"></script>
 		<script src="./js/sliderControl.js"></script>

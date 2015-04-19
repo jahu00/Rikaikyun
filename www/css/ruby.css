@@ -1,41 +1,58 @@
-/*ruby
+ruby.dot rt
+{
+	vertical-align:justify;
+}
+
+.furigana-above ruby
 {
 	display:inline-block;
 	text-align:center;
-	padding-top:0.2em;
+	/*padding-top:0.2em;*/
 	word-wrap:normal;
 	vertical-align: bottom;
 }
 
-ruby rp
+.furigana-above ruby > rp
 {
 	display:none;
 }
 
-ruby rb, ruby rt
+.furigana-above ruby > rb,
+.furigana-above ruby > rt
 {
 	display:block;
 	text-align:center;
 	vertical-align:bottom;
 }
 
-ruby rt
+.furigana-above ruby > rt
 {
 	display: table-header-group;
 	font-size:0.5em;
 	line-height:1.5em;
 }
 
-ruby rt.dot
-{
-	vertical-align:justify;
-}
-
-ruby rb
+.furigana-above ruby > rb
 {
 	display: table-row-group;
 	vertical-align:bottom;
-}*/
+}
+
+.furigana-inline ruby,
+.furigana-inline ruby > rb,
+.furigana-inline ruby > rp,
+.furigana-inline ruby > rt
+{
+	display: inline;
+	font-size: 1em !important;
+	line-height: inherit;
+}
+
+.furigana-disabled ruby > rp,
+.furigana-disabled ruby > rt
+{
+	display: none;
+}
 
 .ruby
 {
