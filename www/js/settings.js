@@ -151,7 +151,7 @@ Settings.prototype = {
 							{
 								self.setValue(self.lastValue);
 							}
-						}, 50);
+						}, 300);
 					}
 				});
 			},
@@ -194,5 +194,8 @@ Settings.prototype = {
 			$('.dynamicStyle').cssRule('ruby > rt').css('line-height', value + "em");
 		},
 		1.5);
+		
+		$('.userAgent .description').text(navigator.userAgent);
+		$('.userAgent').click(function(){ alert($(this).find('.description').text()); })
 	}
 }

@@ -1,12 +1,17 @@
 function SliderControl(control, change, defaultValue, systemName)
 {
-	this.control = $(control);
-	this.onchange = change;
-	this.systemName = systemName || this.control.attr('data-system-name');
-	this.init(defaultValue);
+	Control.call(this, control, change, defaultValue, systemName);
 }
 
-SliderControl.prototype = {
+OOP.inherit(SliderControl, Control,
+{
+	change: function(value)
+	{
+		if (typeof this.onchange != "undefined")
+		{
+			this.onchange.call(this.slider, value);
+		}
+	},
 	updateValue: function(value)
 	{
 		this.control.find('.value').text(value || this.slider.val());
@@ -14,6 +19,7 @@ SliderControl.prototype = {
 	init: function(defaultValue)
 	{
 		var self = this;
+		console.log(self.control);
 		self.slider = self.control.find('.slider').slider(
 		{
 			oninput: function()
@@ -25,7 +31,7 @@ SliderControl.prototype = {
 				var value = parseFloat(self.slider.val());
 				self.updateValue(value);
 				localStorage[self.systemName] = value;
-				self.onchange.call(self.slider[0], value);
+				self.change(value);
 			}
 		}).val(parseFloat(localStorage[self.systemName] || defaultValue));
 		self.slider.change();
@@ -38,4 +44,4 @@ SliderControl.prototype = {
 			}
 		});
 	}
-}
+});
