@@ -115,14 +115,14 @@ Settings.prototype = {
 		{
 			self.reader.screen.find('.container').css('padding', value + '%');
 		},
-		self.reader.screen.find('.container').css('padding'));
+		5);
 		
 		var lineHeightControl = new SliderControl(self.screen.find('.lineHeight'), function(value)
 		{
 			self.reader.screen.find('.container').css('line-height', value);
 		},
-		parseFloat(self.reader.screen.find('.container').css('line-height')) / parseFloat(self.reader.screen.find('.container').css('font-size')));
-		
+		1.5);
+		//alert(parseFloat($('.gui').css('font-size')) + " " + parseFloat($(document.body).css('font-size')));
 		var guiSizeControl = {
 			init: function(control, defaultValue, min, max, step)
 			{
@@ -181,18 +181,18 @@ Settings.prototype = {
 			var container = self.reader.screen.find('.container');
 			container.removeClass(options.trim());
 			container.addClass("furigana-" + value);
-		}, "default");//, "above");
+		}, "default");
 		
 		var furiganaSizeControl = new SliderControl(self.screen.find('.furiganaSize'), function(value)
 		{
 			$('.dynamicStyle').cssRule('ruby > rt').css('font-size', value + "%");
 		},
-		"50");
+		50);
 		
 		var furiganaSizeControl = new SliderControl(self.screen.find('.furiganaHeight'), function(value)
 		{
 			$('.dynamicStyle').cssRule('ruby > rt').css('line-height', value + "em");
 		},
-		"1.5");
+		1.5);
 	}
 }

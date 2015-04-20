@@ -210,15 +210,12 @@
 				{
 					preloadStyleImages.preload();
 					FastClick.attach(document.body);
-					//localStorage['edictPath'] = 'file:///storage/extSdCard/EDICT_Data/';
-					//console.log(localStorage['edictPath']);
 					var reader = new Reader();//dict);
-					// Moved dictionary init to the end of reader init, to prevent it from blocking requests
-					
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
 					//reader.openFile('genji-01utf.html');
 					//reader.openFile('test8.html');
+					
 					var lastFile = localStorage["lastFile"] || '';
 					if (lastFile != '')
 					{

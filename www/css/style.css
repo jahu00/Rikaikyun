@@ -208,8 +208,8 @@ body
 }
 .reader .container
 {
-	/*padding:10px;*/
-	padding:5%;
+	/*padding:10px;
+	padding:5%;*/
 	word-wrap:break-word;
 	line-height:1.5;
 }
