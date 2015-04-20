@@ -37,19 +37,6 @@ Settings.prototype = {
 		},
 		"false");
 		
-		var useGpuHackControl = new CheckboxControl(self.screen.find('.useGpuHack'), function(value)
-		{
-			/*if (value)
-			{
-				$('.screen.loading:not(.gpu)').addClass('gpu');
-			}
-			else
-			{
-				$('.screen.loading').removeClass('gpu');
-			}*/
-		},
-		"false");
-
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
@@ -144,6 +131,50 @@ Settings.prototype = {
 		1.5);
 		
 		$('.userAgent .description').text(navigator.userAgent);
-		$('.userAgent').click(function(){ alert($(this).find('.description').text()); })
+		$('.userAgent').click(function(){ alert($(this).find('.description').text()); });
+		
+		var useGpuHackControl = new CheckboxControl(self.screen.find('.useGpuHack'), function(value)
+		{
+			/*if (value)
+			{
+				$('.screen.loading:not(.gpu)').addClass('gpu');
+			}
+			else
+			{
+				$('.screen.loading').removeClass('gpu');
+			}*/
+		},
+		"false");
+		
+		function pushDummy()
+		{
+			history.pushState({}, null, window.location.href);
+		}
+		function backButtonDummy(e)
+		{
+			var event = new Event('backbutton');
+			event.stop = function()
+			{
+				console.log('test');
+				this.stopImmediatePropagation();
+			};
+			document.dispatchEvent(event);
+			pushDummy();
+		}
+		
+		var chromeHackControl = new CheckboxControl(self.screen.find('.chromeHack'), function(value)
+		{
+			pushDummy();
+			if (value)
+			{
+				//pushDummy();
+				$(window).on("popstate", backButtonDummy);
+			}
+			else
+			{
+				$(window).off("popstate", backButtonDummy);
+			}
+		},
+		"false");
 	}
 }

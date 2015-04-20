@@ -161,6 +161,10 @@
 				Use GPU to force refresh <i></i>
 				<div class="description">Temporarily uses GPU to render some elements. Might help with e-Ink screen failing to refresh on some devices.</div>
 			</div>
+			<div class="item checkbox chromeHack" data-system-name="chromeHack">
+				Chrome hack <i></i>
+				<div class="description">Emulates back and menu buttons on PC Chrome.</div>
+			</div>
 		</div>
 		<div class="screen file gui">
 			<div class="files">
@@ -222,7 +226,19 @@
 					FastClick.attach(document.body);
 					var reader = new Reader();//dict);
 					// Block context menu (makes the app run less buggy on chrome on desktop)
-					$(document.body).on('contextmenu', function(e) { e.preventDefault(); });
+					$(document.body).on('contextmenu', function(e)
+					{
+						e.preventDefault();
+						if (localStorage["chromeHack"] == "true")
+						{
+							var event = new Event('menubutton');
+							event.stop = function()
+							{
+								this.stopImmediatePropagation();
+							};
+							document.dispatchEvent(event);
+						}
+					});
 					//reader.openFile('genji-01utf.html');
 					//reader.openFile('test8.html');
 					

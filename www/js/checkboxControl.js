@@ -34,7 +34,6 @@ OOP.inherit(CheckboxControl, Control,
 		self.control.click(function()
 		{
 			var value = !self.getValue();
-			console.log(value);
 			self.setValue(value);
 			self.change(value);
 		});
