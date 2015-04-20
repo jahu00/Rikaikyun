@@ -21,44 +21,8 @@ Settings.prototype = {
 			}
 		}, false);
 		
-		function readControlValueBool(control)
+		var useGpuControl = new CheckboxControl(self.screen.find('.useGpu'), function(value)
 		{
-			var control = $(control);
-			var value = (control.attr('data-value') || "false") == "true";
-			return value;
-		}
-		
-		function flipControl(control)
-		{
-			var control = $(control);
-			var value = (control.attr('data-value') || "false") == "true";
-			control.attr('data-value', value);
-			return value;
-		}
-		
-		function setControl(control, value)
-		{
-			var control = $(control);
-			control.attr('data-value', value);
-			// Using class because data attributes are wonky on android browser
-			if (value)
-			{
-				if (!control.hasClass('checked'))
-				{
-					control.addClass('checked');
-				}
-			}
-			else
-			{
-				control.removeClass('checked');
-			}
-		}
-		
-		function setGpu(value)
-		{
-			var control = self.screen.find('.useGpu');
-			setControl(control, value);
-			localStorage['useGpu'] = value;
 			if (value)
 			{
 				if (!self.reader.screen.hasClass('gpu'))
@@ -70,46 +34,30 @@ Settings.prototype = {
 			{
 				self.reader.screen.removeClass('gpu');
 			}
-		}
+		},
+		"false");
 		
-		function setGpuHack(value)
+		var useGpuHackControl = new CheckboxControl(self.screen.find('.useGpuHack'), function(value)
 		{
-			var control = self.screen.find('.useGpuHack');
-			setControl(control, value);
-			localStorage['useGpuHack'] = value;
-			if (value)
+			/*if (value)
 			{
 				$('.screen.loading:not(.gpu)').addClass('gpu');
 			}
 			else
 			{
 				$('.screen.loading').removeClass('gpu');
-			}
-		}
-		
-		self.screen.find('.useGpu').click(function()
-		{
-			var value = !readControlValueBool(this);
-			setGpu(value);
-		});
-		
-		self.screen.find('.useGpuHack').click(function()
-		{
-			var value = !readControlValueBool(this);
-			setGpuHack(value);
-		});
-		
-		setGpu((localStorage['useGpu'] || "false") == "true");
-		//setGpuHack((localStorage['useGpuHack'] || "false") == "true");
-		setGpuHack(false);
-		
+			}*/
+		},
+		"false");
+
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
-			self.reader.screen.find('.container').css('font-size', value + "px");
+			self.reader.screen.find('.container').css('font-size', value/100 + "em");
 		},
-		self.reader.screen.find('.container').css('font-size'));
+		parseFloat($('.container').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
+		//self.reader.screen.find('.container').css('font-size'));
 		
 		var paddingControl = new SliderControl(self.screen.find('.padding'), function(value)
 		{

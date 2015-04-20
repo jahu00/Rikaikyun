@@ -101,7 +101,7 @@
 		</div>
 		<div class="screen scrollable settings menu gui" data-screen="settings">
 			<div class="header">General setting</div>
-			<div class="item checkbox useGpu">
+			<div class="item checkbox useGpu" data-system-name="useGpu">
 				Use GPU <i></i>
 				<div class="description">Using GPU can improve app rendering speed at the cost of battery life.</div>
 			</div>
@@ -124,8 +124,8 @@
 				<div class="slider" data-min="0" data-max="10" data-step="0.5"></div>
 			</div>
 			<div class="item slider-control fontSize" data-system-name="fontSize">
-				<span class="name">Font size:</span><span class="right"><span class="value"></span>px</span><br/>
-				<div class="slider" data-min="5" data-max="80" data-step="1"></div>
+				<span class="name">Font size:</span><span class="right"><span class="value"></span>%</span><br/>
+				<div class="slider" data-min="50" data-max="800" data-step="1"></div>
 			</div>
 			<div class="item slider-control lineHeight" data-system-name="lineHeight">
 				<span class="name">Line height:</span><span class="right"><span class="value"></span></span><br/>
@@ -156,8 +156,11 @@
 				<div class="description">
 				</div>
 			</div>
-			<!--<div class="header">Hacks</div>
-			<div class="item checkbox useGpuHack">Use GPU to force refresh <i></i></div>-->
+			<div class="header">Hacks</div>
+			<div class="item checkbox useGpuHack" data-system-name="useGpuHack">
+				Use GPU to force refresh <i></i>
+				<div class="description">Temporarily uses GPU to render some elements. Might help with e-Ink screen failing to refresh on some devices.</div>
+			</div>
 		</div>
 		<div class="screen file gui">
 			<div class="files">
@@ -197,6 +200,7 @@
 		<script src="./js/xxhash/xxhash.lmd.js"></script>
 		<script src="./js/app.js"></script>
 		<script src="./js/control.js"></script>
+		<script src="./js/checkboxControl.js"></script>
 		<script src="./js/dropdownControl.js"></script>
 		<script src="./js/sliderControl.js"></script>
 		<script src="./js/settings.js"></script>

@@ -244,31 +244,14 @@ Reader.prototype = {
 		newHeight = parseInt(newHeight);
 		dictionaryContainer.css('height', newHeight + "px");
 	},
-	forceRefresh: function(elem)
-	{
-		if (!elem.hasClass('gpu'))
-		{
-			elem.addClass('gpu');
-			//activeScreen.removeClass('gpu');
-			setTimeout(function()
-			{
-				elem.removeClass('gpu');
-			}, 1);
-		}
-	},
 	selectScreen: function(name)
 	{
 		if(this.screen.is(":visible"))
 		{
 			this.updateStatus();
 		}
-		$('.screen').removeClass('active');
 		var activeScreen = $('.screen.' + name);
-		activeScreen.addClass('active');
-		if (localStorage['useGpuHack'] == "true")
-		{
-			this.forceRefresh(activeScreen);
-		}
+		App.selectScreen(activeScreen);
 	},
 	prepareLoad: function(name)
 	{

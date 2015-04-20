@@ -19,7 +19,6 @@ OOP.inherit(SliderControl, Control,
 	init: function(defaultValue)
 	{
 		var self = this;
-		console.log(self.control);
 		self.slider = self.control.find('.slider').slider(
 		{
 			oninput: function()

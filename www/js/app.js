@@ -1,14 +1,20 @@
 var App = {
+	forceRefresh: function(elem)
+	{
+		if (!elem.hasClass('gpu'))
+		{
+			elem.addClass('gpu');
+			//activeScreen.removeClass('gpu');
+			setTimeout(function()
+			{
+				elem.removeClass('gpu');
+			}, 10);
+		}
+	},
 	selectScreen: function(elem)
 	{
-		/*if($('.screen.reader').is(":visible"))
-		{
-			this.updateStatus();
-		}*/
 		$('.screen').removeClass('active');
 		$(elem).addClass('active');
-		/*var activeScreen = $('.screen.' + name);
-		activeScreen.addClass('active');*/
 		/*if (localStorage['useGpuHack'] == "true")
 		{
 			this.forceRefresh(activeScreen);
