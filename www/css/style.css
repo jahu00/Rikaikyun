@@ -204,12 +204,9 @@ body
 	width:100%;
 	overflow-x:hidden;
 	overflow-y:hidden;
-	/*overflow-y:scroll;*/
 }
 .reader .container
 {
-	/*padding:10px;
-	padding:5%;*/
 	word-wrap:break-word;
 	line-height:1.5;
 }
@@ -283,13 +280,19 @@ body
 .floater.top
 {
 	top:0;
-	border-bottom:2px solid black;
+	/*border-bottom:2px solid black;*/
+	box-shadow: 0 0.125em 0 0 black;
+	margin-bottom: 0.125em;
 }
 .floater.bottom
 {
 	/*bottom:0;*/
-	border-bottom:1px solid black;
-	border-top:2px solid black;
+	/*border-bottom:1px solid black;*/
+	margin-bottom: 0.0625em;
+	/*border-top:2px solid black;*/
+	margin-top: 0.125em;
+	box-shadow: 0 -0.125em 0 0 black,
+		0 0.0625em 0 0 black;
 }
 .floater .bar
 {
@@ -301,12 +304,16 @@ body
 .floater.bottom .bar.top
 {
 	display:table;
-	border-bottom:1px solid black;
+	/*border-bottom:1px solid black;*/
+	box-shadow: 0 0.0625em 0 0 black;
+	margin-bottom: 0.0625em;
 }
 .floater.top .bar.bottom
 {
 	display:table;
-	border-top:1px solid black;
+	/*border-top:1px solid black;*/
+	box-shadow: 0 -0.0625em 0 0 black;
+	margin-top: 0.0625em;
 }
 .floater .bar .resizer
 {
@@ -321,14 +328,18 @@ body
 }
 .floater .bar .close
 {
-	width:40px;
-	height:40px;
+	/*width:40px;
+	height:40px;*/
+	width: 2.5em;
+	height: 2.5em;
 	display:table-cell;
 	vertical-align:middle;
 	text-align:center;
 	font-weight:bold;
 	font-family:sans-serif;
-	border-left:1px solid black;
+	/*border-left:1px solid black;*/
+	box-shadow: -0.0625em 0 0 0 black;
+	margin-left: 0.0625em;
 	cursor:pointer;
 }
 .floater .bar .close:before
@@ -339,13 +350,17 @@ body
 {
 	display:table-cell;
 	position:relative;
-	width:40px;
-	height:40px;
+	/*width:40px;
+	height:40px;*/
+	width: 2.5em;
+	height: 2.5em;
 	vertical-align:middle;
 	text-align:center;
 	/*font-weight:bold;*/
 	font-family:sans-serif;
-	border-right:1px solid black;
+	/*border-right:1px solid black;*/
+	box-shadow: inset -0.0625em 0 0 0 black;
+	padding-right: 0.0625em;
 	cursor:pointer;
 	/*background-color:C7C7C7;*/
 	/*display:inline-block;*/
@@ -367,7 +382,9 @@ body
 	display:none;
 	position:absolute;
 	background-color:white;
-	height: 2px;
+	/*height: 2px;*/
+	height: 0.125em;
+	box-shadow: inset -0.0625em 0 0 0 black;
 	width:100%;
 }
 .floater .bar .tab.active .pad
@@ -376,11 +393,13 @@ body
 }
 .floater.top .bar .tab .pad
 {
-	top:-1px;
+	/*top:-1px;*/
+	top: -0.0625em;
 }
 .floater.bottom .bar .tab .pad
 {
-	bottom:-1px;
+	/*bottom:-1px;*/
+	bottom: -0.0625em;
 }
 
 .dictionary
@@ -398,15 +417,19 @@ body
 .dictionary-container
 {
 	width:100%;
-	height:150px;
+	/*height:150px;*/
+	height:9.375em;
 	overflow:hidden;
 }
 .dictionary .dictionary-entry
 {
 	box-sizing:border-box;
 	width:100%;
-	padding:5px;
+	/*padding:5px;*/
+	padding:0.3125em;
 	border-top: 1px dashed black;
+	/*box-shadow: 0 -0.0625em 0 0 black;*/
+	/*margin-top: 0.0625em;*/
 }
 .dictionary .dictionary-entry:first-child
 {
@@ -414,22 +437,26 @@ body
 }
 .dictionary .dictionary-entry .kanji
 {
-	font-size:16px;
+	/*font-size:16px;*/
+	font-size:1em;
 }
 .dictionary .dictionary-entry .grammar
 {
-	font-size:10px;
+	/*font-size:10px;*/
+	font-size:0.625em;
 }
 
 .dictionary .dictionary-entry .description
 {
-	font-size:12px;
+	/*font-size:12px;*/
+	font-size:0.75em;
 }
 .dictionary .empty
 {
 	box-sizing:border-box;
 	width:100%;
-	padding:5px;
+	/*padding:5px;*/
+	padding:0.3125em;
 	text-align:center;
 }
 .dictionary .dictionary-entry ~ .empty
@@ -466,7 +493,8 @@ body
 	bottom:0;
 	position:fixed;
 	width: 100%;
-	padding:5px;
+	/*padding:5px;*/
+	padding:0.3125em;
 	background-color:white;
 }
 .statusBar .grid
@@ -483,8 +511,11 @@ body
 .statusBar .grid .progress
 {
 	background:white;
-	border: 1px solid black;
-	height: 10px;
+	/*border: 1px solid black;*/
+	box-shadow: 0 0 0 0.0625em black;
+	margin: 0.0625em;
+	/*height: 10px;*/
+	height: 0.625em;
 	line-height:0;
 }
 .statusBar .grid .progress .bar
@@ -495,7 +526,8 @@ body
 }
 .statusBar .grid .col.break
 {
-	width:5px;
+	/*width:5px;*/
+	width:0.3125em;
 }
 .statusBar .grid .col.status
 {

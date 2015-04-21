@@ -16,11 +16,14 @@
 	background:black;
 	color:white;
 	overflow:hidden;
-	border-bottom:1px solid black;
+	/*border-bottom:1px solid black;*/
 	box-sizing:border-box;
 	width:100%;
-	padding:2px;
-	font-size:10px;
+	/*padding:2px;*/
+	padding:0.2em;
+	padding-bottom:0.3em;
+	/*font-size:10px;*/
+	font-size:0.625em;
 	display:block;
 	position:absolute;
 	left:0;
@@ -35,10 +38,12 @@
 .file-selector .options.show
 {
 	display: block;
-	border-bottom:1px solid black;
+	/*border-bottom:1px solid black;*/
 	box-sizing:border-box;
 	width:100%;
-	padding:2px;
+	/*padding:2px;*/
+	padding:0.125em;
+	padding-bottom:0.1875em;
 	position:absolute;
 	left:0;
 	bottom:0;
@@ -61,10 +66,12 @@
 
 .file-selector .file-container .item
 {
-	width:100%;
+	/*width:100%;
 	padding:5px;
 	border-bottom:1px solid black;
-	box-sizing:border-box;
+	box-sizing:border-box;*/
+	position:relative;
+	padding-left:1.875em;
 	word-wrap:break-word;
 }
 .file-selector .file-container .item.hidden
@@ -78,12 +85,17 @@
 }
 .file-selector .file-container .item i
 {
-	width:20px;
-	height:20px;
+	/*width:20px;
+	height:20px;*/
+	height:1.25em;
+	width:1.25em;
 	/*background-size: 20px 20px;*/
 	background-size: 100% 100%;
-	display:inline-block;
-	vertical-align: top;
+	/*display:inline-block;
+	vertical-align: top;*/
+	position:absolute;
+	top:0.3125em;
+	left:0.3125em;
 }
 .file-selector .file-container .item.file i
 {
