@@ -15,36 +15,25 @@
 		},
 		"onTouchMove" : function(event)
 		{
-			var element = this;
-			var zoom = $(element).absoluteZoom();
-			var newScroll = element.fakeScrollData.startScroll + parseInt((element.fakeScrollData.startPosition - event.originalEvent.touches[0].pageY) / zoom);
-			if (newScroll < 0 || element.clientHeight < element.parentNode.clientHeight)
-			{
-				newScroll = 0;
-				fakeScroll.startScroll(element, event);
-			} else if (newScroll >  element.clientHeight - element.parentNode.clientHeight)
-			{
-				newScroll = element.clientHeight - element.parentNode.clientHeight;
-				fakeScroll.startScroll(element, event);
-			}
-			element.fakeScrollData.lastMove = parseInt($(element).css("margin-top")) + newScroll;
-			element.fakeScrollData.distance += Math.abs(element.fakeScrollData.lastMove);
-			$(element).css("margin-top", (newScroll * -1) + "px");
 			event.preventDefault();
+			var element = this;
+			clearTimeout(element.fakeScrollData.clearScroll);
+			var newScroll = element.fakeScrollData.startScroll + parseInt((element.fakeScrollData.startPosition - event.originalEvent.touches[0].pageY));// / zoom);
+
+			$(element).fakeScroll(newScroll, event);
+			element.fakeScrollData.clearScroll = setTimeout(function()
+			{
+				element.fakeScrollData.lastMove = 0;
+			}, 100);
+			
 		},
 		"onTouchEnd" : function(event)
 		{
 			var element = this;
-			var zoom = $(element).absoluteZoom();
-			var newScroll = parseInt($(element).css("margin-top")) * -1 + element.fakeScrollData.lastMove;
-			if (newScroll < 0 || element.clientHeight < element.parentNode.clientHeight)
-			{
-				newScroll = 0;
-			} else if (newScroll >  element.clientHeight - element.parentNode.clientHeight)
-			{
-				newScroll = element.clientHeight - element.parentNode.clientHeight;
-			}
-			$(element).css("margin-top", (newScroll * -1) + "px");
+			clearTimeout(element.fakeScrollData.clearScroll);
+			var newScroll = $(element).fakeScroll() + element.fakeScrollData.lastMove;
+
+			$(element).fakeScroll(newScroll, event);
 			if (element.fakeScrollData.distance > element.fakeScrollData.distanceThreshold)
 			{
 				event.preventDefault();
@@ -53,10 +42,28 @@
 		}
 	};
 	
-	$.fn.fakeScroll = function(val)
+	$.fn.fakeScroll = function(val, event)
 	{
 		if (typeof val != "undefined")
 		{
+			var element = this[0];
+			if (val < 0 || element.clientHeight < element.parentNode.clientHeight)
+			{
+				val = 0;
+				if (typeof event != "undefined")
+				{
+					fakeScroll.startScroll(element, event);
+				}
+			} else if (val >  element.clientHeight - element.parentNode.clientHeight)
+			{
+				val = element.clientHeight - element.parentNode.clientHeight;
+				if (typeof event != "undefined")
+				{
+					fakeScroll.startScroll(element, event);
+				}
+			}
+			element.fakeScrollData.lastMove = parseInt($(element).css("margin-top")) + val;
+			element.fakeScrollData.distance += Math.abs(element.fakeScrollData.lastMove);
 			$(this).css("margin-top", (val * -1) + "px");
 		}
 		return parseInt($(this).css("margin-top") || "0") * -1;
@@ -75,7 +82,7 @@
 				"startPosition" : 0,
 				"lastMove" : 0,
 				"distance": 0,
-				"distanceThreshold": threshold
+				"distanceThreshold": threshold,
 			};
 		});
 		$(this).on('touchstart', fakeScroll.onTouchStart);

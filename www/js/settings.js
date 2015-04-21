@@ -57,6 +57,12 @@ Settings.prototype = {
 			self.reader.screen.find('.container').css('line-height', value);
 		},
 		1.5);
+		var dictionarySizeControl = new SliderControl(self.screen.find('.dictionarySize'), function(value)
+		{
+			self.reader.screen.find('.floater').css('font-size', value/100 + "em");
+		},
+		parseFloat($('.floater').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
+		
 		//alert(parseFloat($('.gui').css('font-size')) + " " + parseFloat($(document.body).css('font-size')));
 		var guiSizeControl = {
 			init: function(control, defaultValue, min, max, step)
@@ -149,14 +155,12 @@ Settings.prototype = {
 		function pushDummy()
 		{
 			history.pushState({}, null, window.location.href);
-			console.log("add to history: " + window.location.href);
 		}
 		function backButtonDummy(e)
 		{
 			var event = new Event('backbutton');
 			event.stop = function()
 			{
-				console.log('test');
 				this.stopImmediatePropagation();
 			};
 			document.dispatchEvent(event);
@@ -165,7 +169,6 @@ Settings.prototype = {
 		
 		var chromeHackControl = new CheckboxControl(self.screen.find('.chromeHack'), function(value)
 		{
-			console.log("missing");
 			if (value)
 			{
 				pushDummy();
