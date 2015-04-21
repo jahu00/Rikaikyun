@@ -12,8 +12,12 @@ var OOP = {
 	},
 	extend: function(base, ext)
 	{
-		for(var propName in ext) {
-			base[propName] = ext[propName];
+		for(var propName in ext)
+		{
+			if (ext.hasOwnProperty(propName))
+			{
+				base[propName] = ext[propName];
+			};
 		}
 	}
 };

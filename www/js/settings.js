@@ -149,6 +149,7 @@ Settings.prototype = {
 		function pushDummy()
 		{
 			history.pushState({}, null, window.location.href);
+			console.log("add to history: " + window.location.href);
 		}
 		function backButtonDummy(e)
 		{
@@ -164,10 +165,10 @@ Settings.prototype = {
 		
 		var chromeHackControl = new CheckboxControl(self.screen.find('.chromeHack'), function(value)
 		{
-			pushDummy();
+			console.log("missing");
 			if (value)
 			{
-				//pushDummy();
+				pushDummy();
 				$(window).on("popstate", backButtonDummy);
 			}
 			else

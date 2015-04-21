@@ -31,6 +31,7 @@ OOP.inherit(CheckboxControl, Control,
 		var self = this;
 		var value = (localStorage[self.systemName] || defaultValue) == "true";
 		self.setValue(value);
+		self.change(value);
 		self.control.click(function()
 		{
 			var value = !self.getValue();
