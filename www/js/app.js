@@ -1,23 +1,31 @@
 var App = {
+	init: function()
+	{
+		this.reader = new Reader();
+	},
 	forceRefresh: function(elem)
 	{
-		if (!elem.hasClass('gpu'))
+		if (localStorage['useGpuHack'] == "true")
 		{
-			elem.addClass('gpu');
-			//activeScreen.removeClass('gpu');
-			setTimeout(function()
+			if (!elem.hasClass('gpu'))
 			{
-				elem.removeClass('gpu');
-			}, 10);
+				elem.addClass('gpu');
+				//activeScreen.removeClass('gpu');
+				setTimeout(function()
+				{
+					elem.removeClass('gpu');
+				}, 10);
+			}
 		}
 	},
 	selectScreen: function(elem)
 	{
-		$('.screen').removeClass('active');
-		$(elem).addClass('active');
-		/*if (localStorage['useGpuHack'] == "true")
+		if(this.reader.screen.is(":visible"))
 		{
-			this.forceRefresh(activeScreen);
-		}*/
+			this.reader.updateStatus();
+		}
+		$('.screen').removeClass('active');
+		this.forceRefresh(elem);
+		$(elem).addClass('active');
 	}
 }

@@ -156,6 +156,11 @@ Reader.prototype = {
 			self.selectScreen('settings');
 		});
 		
+		menu.find('.history').click(function()
+		{
+			ReadingHistory.open();
+		});
+		
 		menu.find('.exit').click(function()
 		{
 			if (confirm('Close app?'))
@@ -218,11 +223,6 @@ Reader.prototype = {
 			localStorage['lastPath'] = 'file:///';
 		};
 	},
-	/*onDeviceReady: function()
-	{
-		this.deviceReady = true;
-		$('.screen.menu .item.file').removeClass('disabled');
-	},*/
 	// Sets the size of dictionary popup (part of the popup events)
 	resizeFloater: function(e)
 	{
@@ -246,10 +246,6 @@ Reader.prototype = {
 	},
 	selectScreen: function(name)
 	{
-		if(this.screen.is(":visible"))
-		{
-			this.updateStatus();
-		}
 		var activeScreen = $('.screen.' + name);
 		App.selectScreen(activeScreen);
 	},
@@ -402,6 +398,7 @@ Reader.prototype = {
 		function openCallback(path, data)
 		{
 			localStorage["lastFile"] = path;
+			ReadingHistory.push(path);
 			self.currentFile = path;
 			self.currentHash = XXH(path, 0).toString(16);
 			self.progress = parseFloat(localStorage["progress-" + self.currentHash] || '0');
@@ -651,6 +648,7 @@ Reader.prototype = {
 			}
 		}
 		$('.floater').show();
+		App.forceRefresh($('.reader > .floater'));
 	},
 	resizeScreen: function(preserveProgress)
 	{

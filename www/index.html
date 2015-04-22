@@ -44,8 +44,7 @@
 			ruby > rt
 			{
 			}
-			
-			
+
 		</style>
 		<div class="screen reader">
 			<div class="scroller">
@@ -97,7 +96,12 @@
 				<input type="file"/>
 			</div>
 			<div class="item settings">Settings</div>
+			<div class="item history">History</div>
 			<div class="item exit">Exit</div>
+		</div>
+		<div class="screen scrollable history menu gui" data-screen="settings">
+			<div class="header">History</div>
+			<div class="item clear">Clear</div>
 		</div>
 		<div class="screen scrollable settings menu gui" data-screen="settings">
 			<div class="header">General setting</div>
@@ -212,10 +216,11 @@
 		<script src="./js/dropdownControl.js"></script>
 		<script src="./js/sliderControl.js"></script>
 		<script src="./js/settings.js"></script>
+		<script src="./js/history.js"></script>
 		<script src="./js/reader.js"></script>
 		<!-- <script src="./js/encoding.js"></script> -->
         <script type="text/javascript">
-			var deviceReady = false;
+			//var deviceReady = false;
 			function openExternalLink(a)
 			{
 				// this should prevent PhoneGap from opening external link in its WebView
@@ -228,7 +233,8 @@
 				{
 					preloadStyleImages.preload();
 					FastClick.attach(document.body);
-					var reader = new Reader();//dict);
+					App.init();
+					//var reader = new Reader();//dict);
 					// Block context menu (makes the app run less buggy on chrome on desktop)
 					$(document.body).on('contextmenu', function(e)
 					{
@@ -246,21 +252,22 @@
 					var lastFile = localStorage["lastFile"] || '';
 					if (lastFile != '')
 					{
-						reader.openFile(lastFile);
+						App.reader.openFile(lastFile);
 						//console.log("Open: " + lastFile);
 					}
 					else
 					{
-						reader.selectScreen('main.menu');
+						App.reader.selectScreen('main.menu');
 					}
 					//fpsCount.go();
 				});
 			}
+			
 			if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
 			{
 				document.addEventListener("deviceready", function()
 				{
-					deviceReady = true;
+					//deviceReady = true;
 					run();
 				}, false);
 			}
