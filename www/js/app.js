@@ -31,6 +31,7 @@ var App = {
 	},
 	forceRefresh: function(elem)
 	{
+		elem = $(elem);
 		if (localStorage['useGpuHack'] == "true")
 		{
 			if (!elem.hasClass('gpu'))
