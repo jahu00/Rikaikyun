@@ -193,12 +193,10 @@
 		<script src="./js/jquery/jquery-1.8.3.min.js"></script>
 		<script src="./js/jquery-ext/jquery-stylesheet.js"></script>
 		<script src="./js/jquery-ext/jquery-absolutezoom.js"></script>
-		<!-- <script src="./jquery-privatescroll.js"></script> -->
 		<script src="./js/jquery-ext/jquery-fakescroll.js"></script>
 		<script src="./js/jquery-ext/jquery-hasattributes.js"></script>
 		<script src="./js/jquery-ext/jquery-removeattributes.js"></script>
 		<script src="./js/fastclick/fastclick.js"></script>
-		<!-- <script src="./js/getWordAtPoint.js"></script> -->
 		<script src="./js/extendedMath.js"></script>
 		<script src="./js/oop.js"></script>
 		<script src="./js/getCharacterAtPoint.js"></script>
@@ -210,7 +208,6 @@
 		<script src="./js/htmlHelpers.js"></script>
 		<script src="./js/fpsCount.js"></script>
 		<script src="./js/xxhash/xxhash.lmd.js"></script>
-		<script src="./js/app.js"></script>
 		<script src="./js/control.js"></script>
 		<script src="./js/checkboxControl.js"></script>
 		<script src="./js/dropdownControl.js"></script>
@@ -218,46 +215,26 @@
 		<script src="./js/settings.js"></script>
 		<script src="./js/history.js"></script>
 		<script src="./js/reader.js"></script>
-		<!-- <script src="./js/encoding.js"></script> -->
+		<script src="./js/app.js"></script>
         <script type="text/javascript">
-			//var deviceReady = false;
-			function openExternalLink(a)
-			{
-				// this should prevent PhoneGap from opening external link in its WebView
-				window.open(a.href);
-				return false;
-			}
 			function run()
 			{
 				$(function()
 				{
-					preloadStyleImages.preload();
-					FastClick.attach(document.body);
-					App.init();
-					//var reader = new Reader();//dict);
-					// Block context menu (makes the app run less buggy on chrome on desktop)
-					$(document.body).on('contextmenu', function(e)
+					try
 					{
-						e.preventDefault();
-						if (localStorage["chromeHack"] == "true")
-						{
-							var event = new Event('menubutton');
-							event.stop = function()
-							{
-								this.stopImmediatePropagation();
-							};
-							document.dispatchEvent(event);
-						}
-					});
-					var lastFile = localStorage["lastFile"] || '';
-					if (lastFile != '')
-					{
-						App.reader.openFile(lastFile);
-						//console.log("Open: " + lastFile);
+						App.init();
 					}
-					else
+					catch(e)
 					{
-						App.reader.selectScreen('main.menu');
+						/*if (typeof e.message != "undefined")
+						{
+							alert(e.message);
+						}
+						else
+						{*/
+							alert(JSON.stringify(e));
+						//}
 					}
 					//fpsCount.go();
 				});

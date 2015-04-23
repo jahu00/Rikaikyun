@@ -8,9 +8,6 @@ Settings.prototype = {
 	init: function()
 	{
 		var self = this;
-		//words = JSON.parse(localStorage["words"]);
-		//localStorage["words"] = JSON.stringify(words);
-		//this.lastFile = localStorage["lastFile"] || '';
 		self.screen = $('.screen.settings.menu');
 		document.addEventListener("backbutton", function(e)
 		{

@@ -1,7 +1,33 @@
 var App = {
 	init: function()
 	{
-		this.reader = new Reader();
+		preloadStyleImages.preload();
+		FastClick.attach(document.body);
+		this.reader = new Reader();//dict);
+		// Block context menu (makes the app run less buggy on chrome on desktop)
+		$(document.body).on('contextmenu', function(e)
+		{
+			e.preventDefault();
+			if (localStorage["chromeHack"] == "true")
+			{
+				var event = new Event('menubutton');
+				event.stop = function()
+				{
+					this.stopImmediatePropagation();
+				};
+				document.dispatchEvent(event);
+			}
+		});
+		var lastFile = localStorage["lastFile"] || '';
+		if (lastFile != '')
+		{
+			this.reader.openFile(lastFile);
+			//console.log("Open: " + lastFile);
+		}
+		else
+		{
+			this.reader.selectScreen('main.menu');
+		}
 	},
 	forceRefresh: function(elem)
 	{
