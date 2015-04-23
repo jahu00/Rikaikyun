@@ -15,6 +15,63 @@ var ReadingHistory = {
 		{
 			App.reader.openFile($(this).attr('data-name'));
 		});
+		var anchorTimer = null;
+		self.screen.on('touchstart', '.item.entry', function(e)
+		{
+			var self = this;
+			var touchStart = e.originalEvent.touches[0];
+			var lastX = touchStart.pageX;
+			var lastY = touchStart.pageY;
+			var trigger = false;
+			var distanceThreshold = 10;
+			function setTimer()
+			{
+				anchorTimer = setTimeout(function() { e.preventDefault(); trigger = true; }, 1000);
+			}
+			function remove()
+			{
+				clearTimeout(anchorTimer);
+				$(self).off('touchend touchcancel', end);
+				$(self).off('touchmove', move);
+			}
+			
+			function end()
+			{
+				remove();
+				if (trigger)
+				{
+					e.preventDefault();
+					var path = fileHelpers.getParentPath($(self).attr('data-name'));
+					if(confirm("Browse " + decodeURI(path) + "?"))
+					{
+						App.selectScreen($('.screen.file'));
+						App.reader.fileSelector.open(path);
+					}
+				}
+			}
+			
+			function move(em)
+			{
+				var touchMove = em.originalEvent.touches[0];
+				if
+				(
+					Math.abs(lastX - touchMove.pageX) > distanceThreshold ||
+					Math.abs(lastY - touchMove.pageY) > distanceThreshold
+				)
+				{
+					clearTimeout(anchorTimer);
+					trigger = false;
+					setTimer();
+				}
+				lastX = touchMove.pageX;
+				lastY = touchMove.pageY;
+			}
+			
+			$(self).on('touchend touchcancel', end);
+			$(self).on('touchmove', move);
+			setTimer();
+		});
+		
 		self.screen.on('click', '.item.clear', function()
 		{
 			//self.clear();

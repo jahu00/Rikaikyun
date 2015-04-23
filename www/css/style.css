@@ -555,8 +555,17 @@ body
 	float: right;
 }
 
-/*ruby, rb, rp, rt
+/* History */
+.history .item.entry
 {
-	display: inline-block;
-	font-size:inherit;
-}*/
+	padding-right: 4.5em;
+	position:relative;
+}
+
+.history .item.entry .right
+{
+	float:none;
+	position:absolute;
+	right:0.3125em;
+	top:0.3125em;
+}

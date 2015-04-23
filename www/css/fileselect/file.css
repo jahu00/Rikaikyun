@@ -53,6 +53,7 @@
 .file-selector .options select
 {
 	width: 100%;
+	font-size: 1em;
 }
 
 .file-selector .file-container

@@ -41,7 +41,7 @@ var App = {
 				setTimeout(function()
 				{
 					elem.removeClass('gpu');
-				}, 10);
+				}, 100);
 			}
 		}
 	},
