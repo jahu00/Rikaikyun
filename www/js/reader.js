@@ -97,20 +97,27 @@ Reader.prototype = {
 			}
 		});*/
 		
-		document.addEventListener("menubutton", function(e)
+		/*document.addEventListener("menubutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{
 				self.selectScreen('main.menu');
 				e.stop();
 			}
-		}, false);
+		}, false);*/
 		
 		document.addEventListener("backbutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{
-				$('.floater').css("display", "");
+				if (self.screen.find('.floater').is(':visible'))
+				{
+					$('.floater').css("display", "");
+				}
+				else
+				{
+					self.selectScreen('main.menu');
+				}
 				e.stop();
 			}
 		}, false);

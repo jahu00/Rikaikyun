@@ -7,7 +7,8 @@ var App = {
 		// Block context menu (makes the app run less buggy on chrome on desktop)
 		$(document.body).on('contextmenu', function(e)
 		{
-			e.preventDefault();
+			//e.preventDefault();
+			/*console.log('menu');
 			if (localStorage["chromeHack"] == "true")
 			{
 				var event = new Event('menubutton');
@@ -16,7 +17,8 @@ var App = {
 					this.stopImmediatePropagation();
 				};
 				document.dispatchEvent(event);
-			}
+			}*/
+			return false;
 		});
 		var lastFile = localStorage["lastFile"] || '';
 		if (lastFile != '')
