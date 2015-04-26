@@ -340,7 +340,7 @@ Reader.prototype = {
 				var node = this.childNodes[i];
 				if (node.nodeType === 3 && node.nodeValue.trim().length > 0)
 				{
-					node.nodeValue = node.nodeValue.replace(/([\S])\n+([\S])/, '$1$2');
+					node.nodeValue = node.nodeValue.replace(/([\S])\n+([\S])/g, '$1$2');
 				}
 			}
 		});

@@ -1,6 +1,13 @@
 getCharacterAtPoint = {
+	whitespace: "\n\r 	",
+	isWhitepsace: function(c)
+	{
+		return this.whitespace.indexOf(c) > -1;
+	},
 	find: function(element, x, y)
 	{
+		console.log("x: " + x);
+		console.log("y: " + y);
 		//Returns text node and character position based on provided coordinates
 		for (var i = 0; i < element.childNodes.length; i++)
 		{
@@ -33,16 +40,63 @@ getCharacterAtPoint = {
 				{
 					var range = node.ownerDocument.createRange();
 					var currentPosition = firstPosition;
+					var lastBottom = null;
+					var lastTop = null;
 					while(currentPosition < lastPosition) {
-						if ('\n\r'.indexOf(node.nodeValue[currentPosition]) == -1 )
+						if (!this.isWhitepsace(node.nodeValue[currentPosition]))
 						{
 							range.setStart(node, currentPosition);
 							range.setEnd(node, currentPosition + 1);
 							var boundingBox = range.getBoundingClientRect();
+							/*console.log(node.nodeValue[currentPosition]);
+							console.log(boundingBox.left, boundingBox.top);*/
+							if
+							(
+								lastBottom != null &&
+								boundingBox.bottom > lastBottom &&
+								boundingBox.top == lastTop
+							)
+							{
+								//console.log('current: ' + currentPosition);
+								var nextPosition = currentPosition + 1;
+								while (nextPosition < lastPosition && this.isWhitepsace(node.nodeValue[nextPosition]))
+								{
+									nextPosition++;
+								}
+								//console.log('next: ' + nextPosition);
+								if (!this.isWhitepsace(node.nodeValue[nextPosition]))
+								{
+									var nextCharacterBoundingBox = this.getBoundingBox(node, nextPosition);
+									console.log(nextCharacterBoundingBox);
+									if (nextCharacterBoundingBox.bottom == boundingBox.bottom)
+									{
+										boundingBox = {
+											left: boundingBox.left,
+											top: nextCharacterBoundingBox.top,
+											right: nextCharacterBoundingBox.left,
+											bottom: boundingBox.bottom
+										};
+									}
+									else
+									{
+										boundingBox = {
+											left: boundingBox.left,
+											top: lastBottom,
+											right: boundingBox.right,
+											bottom: boundingBox.bottom
+										};
+									}
+								}
+							}
+							lastBottom = boundingBox.bottom;
+							lastTop = boundingBox.top;
 							if(
 								boundingBox.left <= x && boundingBox.right >= x &&
 								boundingBox.top  <= y && boundingBox.bottom >= y) {
-								
+								/*console.log(currentPosition);*/
+								console.log("match x: " + boundingBox.left + "-" + boundingBox.right);
+								console.log("match y: " + boundingBox.top + "-" + boundingBox.bottom);
+								//console.log(boundingBox);
 								range.detach();
 								return { "node": node, "position": currentPosition };
 							}
