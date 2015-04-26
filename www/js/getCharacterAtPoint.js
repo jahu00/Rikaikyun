@@ -6,8 +6,6 @@ getCharacterAtPoint = {
 	},
 	find: function(element, x, y)
 	{
-		console.log("x: " + x);
-		console.log("y: " + y);
 		//Returns text node and character position based on provided coordinates
 		for (var i = 0; i < element.childNodes.length; i++)
 		{
@@ -48,8 +46,6 @@ getCharacterAtPoint = {
 							range.setStart(node, currentPosition);
 							range.setEnd(node, currentPosition + 1);
 							var boundingBox = range.getBoundingClientRect();
-							/*console.log(node.nodeValue[currentPosition]);
-							console.log(boundingBox.left, boundingBox.top);*/
 							if
 							(
 								lastBottom != null &&
@@ -57,13 +53,11 @@ getCharacterAtPoint = {
 								boundingBox.top == lastTop
 							)
 							{
-								//console.log('current: ' + currentPosition);
 								var nextPosition = currentPosition + 1;
 								while (nextPosition < lastPosition && this.isWhitepsace(node.nodeValue[nextPosition]))
 								{
 									nextPosition++;
 								}
-								//console.log('next: ' + nextPosition);
 								if (!this.isWhitepsace(node.nodeValue[nextPosition]))
 								{
 									var nextCharacterBoundingBox = this.getBoundingBox(node, nextPosition);
@@ -93,10 +87,6 @@ getCharacterAtPoint = {
 							if(
 								boundingBox.left <= x && boundingBox.right >= x &&
 								boundingBox.top  <= y && boundingBox.bottom >= y) {
-								/*console.log(currentPosition);*/
-								console.log("match x: " + boundingBox.left + "-" + boundingBox.right);
-								console.log("match y: " + boundingBox.top + "-" + boundingBox.bottom);
-								//console.log(boundingBox);
 								range.detach();
 								return { "node": node, "position": currentPosition };
 							}

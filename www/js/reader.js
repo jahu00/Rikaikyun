@@ -331,7 +331,8 @@ Reader.prototype = {
 				elem.removeAttributes(null, ['id']);
 			}
 		});
-
+		var japCharacters = "[一-龠ぁ-ゔァ-ヴー々〆〤]";
+		var reg = new RegExp("(" + japCharacters + ")\n+(" + japCharacters + ")", "g");
 		// Remove redundant new line characters from all text
 		$temp.find('*').each(function()
 		{
@@ -340,7 +341,8 @@ Reader.prototype = {
 				var node = this.childNodes[i];
 				if (node.nodeType === 3 && node.nodeValue.trim().length > 0)
 				{
-					node.nodeValue = node.nodeValue.replace(/([\S])\n+([\S])/g, '$1$2');
+					//node.nodeValue = node.nodeValue.replace(/([\S])\n+([\S])/g, '$1$2');
+					node.nodeValue = node.nodeValue.replace(reg, '$1$2');
 				}
 			}
 		});
