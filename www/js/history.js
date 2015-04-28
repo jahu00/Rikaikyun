@@ -91,7 +91,7 @@ var ReadingHistory = {
 		{
 			var entry = entries[i];
 			var hash = XXH(entry, 0).toString(16);
-			var position = parseFloat(localStorage["progress-" + hash] || '0').toFixed(2);
+			var position = (parseFloat(localStorage["progress-" + hash] || '0') * 100).toFixed(2);
 			this.screen.append(
 			'<div class="item entry" data-name="' + entry + '">' +
 			'<span class="name">' + decodeURI(entry) + '</span>' +

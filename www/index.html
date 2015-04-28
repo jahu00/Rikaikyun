@@ -33,6 +33,10 @@
 				height:0;
 			}
 			
+			.img-frame img
+			{
+			}
+			
 			.gui
 			{
 			}
@@ -109,8 +113,12 @@
 				Use GPU <i></i>
 				<div class="description">Using GPU can improve app rendering speed at the cost of battery life.</div>
 			</div>
+			<div class="item checkbox useFastClick" data-system-name="useFastClick">
+				Fast click <i></i>
+				<div class="description">Improves click response time. Might cause problems on some devices and might be unnecessary on other.</div>
+			</div>
 			<div class="item select openMethod" data-system-name="openMethod">
-				<span class="name">File opening method</span><i></i>
+				<span class="name">File opening method</span><span class="right"><span class="value"></span></span><i></i>
 				<select>
 					<option value="AJAX" data-description="AJAX can handle big files, but it might not work on some devices and it might increase startup time.">AJAX</option>
 					<option value="FileSystem" data-description="Using file system shortens startup time on some devices, but it can't handle big files (few MB).">File system</option>
@@ -139,8 +147,15 @@
 				<span class="name">Dictionary size:</span><span class="right"><span class="value"></span>%</span><br/>
 				<div class="slider" data-min="50" data-max="800" data-step="1"></div>
 			</div>
+			<div class="item slider-control statusSize" data-system-name="statusSize">
+				<span class="name">Status bar size:</span><span class="right"><span class="value"></span>%</span><br/>
+				<div class="slider" data-min="50" data-max="800" data-step="1"></div>
+			</div>
+			<div class="item checkbox statusPaged" data-system-name="statusPaged">
+				Show progress as pages <i></i>
+			</div>
 			<div class="item select furiganaMode" data-system-name="furiganaMode">
-				<span class="name">Furigana mode</span><i></i>
+				<span class="name">Furigana mode</span><span class="right"><span class="value"></span></span><i></i>
 				<select>
 					<option value="disabled" data-description="Hides furigana. might increase app's rendering speed.">Disabled</option>
 					<option value="inline" data-description="Displays furigana in brackets next to kanji.">Inline</option>

@@ -18,6 +18,23 @@ Settings.prototype = {
 			}
 		}, false);
 		
+		var useFastClickControl = new CheckboxControl(self.screen.find('.useFastClick'), function(value)
+		{
+			if (value)
+			{
+				App.fastClick = FastClick.attach(document.body);
+			}
+			else
+			{
+				if (App.fastClick != null)
+				{
+					App.fastClick.destroy();
+					App.fastClick = null;
+				}
+			}
+		},
+		"true");
+		
 		var useGpuControl = new CheckboxControl(self.screen.find('.useGpu'), function(value)
 		{
 			if (value)
@@ -34,11 +51,14 @@ Settings.prototype = {
 		},
 		"false");
 		
+		FastClick.attach(document.body);
+		
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
 			self.reader.screen.find('.container').css('font-size', value/100 + "em");
+			$('.img-frame img').cssRule('.gui').css('zoom', value + "%");
 		},
 		parseFloat($('.container').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
 		//self.reader.screen.find('.container').css('font-size'));
@@ -59,6 +79,18 @@ Settings.prototype = {
 			self.reader.screen.find('.floater').css('font-size', value/100 + "em");
 		},
 		parseFloat($('.floater').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
+		
+		var statusSizeControl = new SliderControl(self.screen.find('.statusSize'), function(value)
+		{
+			self.reader.screen.find('.statusBar').css('font-size', value/100 + "em");
+		},
+		parseFloat($('.statusBar').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
+		
+		var statusPagedControl = new CheckboxControl(self.screen.find('.statusPaged'), function(value)
+		{
+			//reader.updateStatus();
+		},
+		"true");
 		
 		//alert(parseFloat($('.gui').css('font-size')) + " " + parseFloat($(document.body).css('font-size')));
 		var guiSizeControl = {

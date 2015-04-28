@@ -722,17 +722,25 @@ Reader.prototype = {
 		// TODO: Optimize the element lookups
 		var statusBar = reader.children('.statusBar');
 		
+		var percentage = (this.progress * 100).toFixed(2)+"%";
+		
 		//var statusBar = reader.find('> .statusBar');
 		// using > selector with find was causing infinite executions of scroll event for some reason
-		
-		statusBar.find('> .grid  .progress > .bar').css('width', (this.progress * 100).toFixed(2)+"%");
+		statusBar.find('> .grid  .progress > .bar').css('width', percentage);
 		var pages = Math.ceil(documentHeight / windowHeight);
 		//var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
 		var page = parseInt((container.fakeScroll() / documentHeight) * pages  + 1.5);
 		var status = statusBar.find('.status');
 		var pagesSpan = status.children('span');
 		// Update the page count
-		pagesSpan.html(page+"/"+pages);
+		if (localStorage['statusPaged'] == "true")
+		{
+			pagesSpan.html(page+"/"+pages);
+		}
+		else
+		{
+			pagesSpan.html(percentage);
+		}
 		// After updating the page count measure it's width and adjust the size of the container holding the page count
 		status.css('width', pagesSpan.width() + "px");
 		// This part is responsible for measuring how many pages we have traveled and if we should do an eink blink
