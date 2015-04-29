@@ -65,7 +65,8 @@ Settings.prototype = {
 		
 		var paddingControl = new SliderControl(self.screen.find('.padding'), function(value)
 		{
-			self.reader.screen.find('.container').css('padding', value + '%');
+			self.reader.screen.find('.container').css({'padding-top': value + '%', 'padding-bottom': value + '%'});
+			self.reader.screen.find('.scroller').css({'padding-right': value + '%', 'padding-left': value + '%'});
 		},
 		5);
 		
