@@ -16,6 +16,12 @@ body
 	-webkit-touch-callout: none;
     /*-webkit-user-select: none;*/
 }
+
+.gui *
+{
+	-webkit-touch-callout: none;
+}
+
 .screen
 {
 	height:100%;
@@ -220,6 +226,11 @@ body
 .container h6
 {
 	line-height:1.5em;
+}*/
+
+/*.reader .container *
+{
+	-webkit-user-select: none;
 }*/
 
 .reader .container p

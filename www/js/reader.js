@@ -381,7 +381,12 @@ Reader.prototype = {
 		container.find('p').each(function()
 		{
 			this.outerHTML = flatterer.divide(this);
-		});	
+		});
+		
+		/*container.find('*').each(function()
+		{
+			this.unselectable = "on";
+		});*/
 	},
 	openHtmlDocument: function(path)
 	{
