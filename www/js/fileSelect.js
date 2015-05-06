@@ -195,13 +195,13 @@ FileSelector.prototype = {
 		var $elem = $(this.elem);
 		$elem.find('.path').text(decodeURI(this.path) + (this.masks.length == 1 ? this.masks[this.currentMask].rule.trim() : ''));
 		$elem.find('.file-container').css('padding-top', $elem.find('.path').outerHeight() + 'px');
+		$elem.find('.file-container').css('padding-bottom', $elem.find('.options').outerHeight() + 'px');		
 		var backUrl = fileHelpers.getParentPath(this.path);
 		$elem.find('.file-container .item.back').attr('data-url', backUrl);
 	},
 	updateMask: function()
 	{
 		var $elem = $(this.elem);
-		$elem.find('.file-container').css('padding-bottom', $elem.find('.options').outerHeight() + 'px');
 		this.updatePath();
 	},
 	finalizeOpenning: function()
