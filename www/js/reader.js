@@ -86,6 +86,8 @@ Reader.prototype = {
 			return false;
 		});
 		
+		container.on('touchcancel', function(e) { this.trigger('touchend'); });
+		
 		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
 		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		// Unused: Solved document length changing after image is loaded by forcing images to take a whole page using css

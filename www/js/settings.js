@@ -59,6 +59,7 @@ Settings.prototype = {
 		{
 			self.reader.screen.find('.container').css('font-size', value/100 + "em");
 			$('.dynamicStyle').cssRule('.img-frame img').css('zoom', value + "%");
+			$('.dynamicStyle').cssRule('.spinner').css('zoom', value + "%");
 		},
 		parseFloat($('.container').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
 		//self.reader.screen.find('.container').css('font-size'));
