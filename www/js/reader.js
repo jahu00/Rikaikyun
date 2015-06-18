@@ -86,7 +86,8 @@ Reader.prototype = {
 			return false;
 		});
 		
-		container.on('touchcancel', function(e) { this.trigger('touchend'); });
+		// Triggering touchend on touchcancel doesn't seem to work unfortunately
+		//container.on('touchcancel', '*', function(e) { this.trigger('touchend'); });
 		
 		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
 		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
@@ -766,13 +767,22 @@ Reader.prototype = {
 		//this.lastPosition = scroller.scrollTop();
 		this.lastPosition = container.fakeScroll();
 	},
-	scrollTo: function(progress, update)
+	scrollTo: function(progress, update, procentage)
 	{
 		var self = this;
 		if (typeof update == "undefined")
 		{
 			update = true;
 		}
+		if (typeof procentage == "undefined")
+		{
+			procentage = true;
+		}
+		else
+		{
+			progress = parseInt(progress);
+		}
+		
 		var reader = this.screen;
 		var scroller = reader.children('.scroller');
 		var container = scroller.children('.container');
@@ -781,17 +791,33 @@ Reader.prototype = {
 		var windowHeight = scroller.outerHeight();
 		var length = documentHeight - windowHeight;
 		// Calculate progress percentage
-		if (length < 0)
+		if (procentage)
 		{
-			this.progress = 0;
+			if (length < 0)
+			{
+				this.progress = 0;
+			}
+			else
+			{
+				this.progress = progress;
+			}
+			
+			//scroller.scrollTop(Math.round(length * this.progress));
+			container.fakeScroll(Math.round(length * this.progress));
 		}
 		else
 		{
-			this.progress = progress;
+			if (length < 0)
+			{
+				progress = 0;
+			}
+			else if (progress > length)
+			{
+				progress = length;
+			}
+			this.progress = progress / length;
+			container.fakeScroll(Math.round(progress));
 		}
-		
-		//scroller.scrollTop(Math.round(length * this.progress));
-		container.fakeScroll(Math.round(length * this.progress));
 		if (update)
 		{
 			self.updateStatus();
@@ -835,12 +861,14 @@ Reader.prototype = {
 			$(a).off('touchmove', move);
 		}
 		
-		function end()
+		function end(ende)
 		{
 			remove();
 			if (trigger)
 			{
-				e.preventDefault(); self.anchorClick(a);
+				e.preventDefault();
+				ende.stopPropagation();
+				self.anchorClick(a);
 			}
 		}
 		
@@ -869,7 +897,9 @@ Reader.prototype = {
 	{
 		if (a.getAttribute("href").indexOf('#') == 0)
 		{
-			$(a.getAttribute("href")).each(function() { this.scrollIntoView(true); });
+			container = this.screen.find('.container');
+			var val = $(a.getAttribute("href")).offset().top - this.screen.find('.container').offset().top;//fakeScroll();
+			this.scrollTo(val, true, false);
 		}
 		else
 		{

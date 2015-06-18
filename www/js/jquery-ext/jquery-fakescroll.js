@@ -32,8 +32,10 @@
 			var element = this;
 			clearTimeout(element.fakeScrollData.clearScroll);
 			var newScroll = $(element).fakeScroll() + element.fakeScrollData.lastMove;
-
-			$(element).fakeScroll(newScroll, event);
+			if (element.fakeScrollData.lastMove != 0)
+			{
+				$(element).fakeScroll(newScroll, event);
+			}
 			if (element.fakeScrollData.distance > element.fakeScrollData.distanceThreshold)
 			{
 				event.preventDefault();
