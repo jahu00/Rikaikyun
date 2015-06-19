@@ -51,7 +51,21 @@ Settings.prototype = {
 		},
 		"false");
 		
-		FastClick.attach(document.body);
+		var useKeepScreenOnControl = new CheckboxControl(self.screen.find('.useKeepScreenOn'), function(value)
+		{
+			if (typeof keepscreenon != "undefined")
+			{
+				if (value)
+				{
+					keepscreenon.enable();
+				}
+				else
+				{
+					keepscreenon.disable();
+				}
+			}
+		},
+		"false");
 		
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 

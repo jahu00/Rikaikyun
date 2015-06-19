@@ -24,11 +24,24 @@
                         }
                     ]
                 }
+            },
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"KeepScreenOn\"><param name=\"android-package\" value=\"com.mediamatrixdoo.keepscreenon.KeepScreenOn\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
             }
         }
     },
     "installed_plugins": {
         "org.apache.cordova.file": {
+            "PACKAGE_NAME": "com.phonegap.rikaikyun"
+        },
+        "com.mediamatrixdoo.keepscreenon": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
