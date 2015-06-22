@@ -12,6 +12,7 @@ function Reader()//dict)
 	this.initFileSelector();
 	this.initMenu();
 	this.dict = new rcxDict(true);
+	this.navigation = [];
 }
 
 Reader.prototype = {
@@ -262,6 +263,7 @@ Reader.prototype = {
 	prepareLoad: function(name)
 	{
 		this.selectScreen('loading');
+		this.navigation = [];
 		//$('.screen.loading .message span').text('Loading please wait...');
 	},
 	loadReady: function()
@@ -385,6 +387,22 @@ Reader.prototype = {
 		{
 			this.outerHTML = flatterer.divide(this);
 		});
+		
+		var progressBar = this.screen.find('.progress');
+		progressBar.find('.line').remove();
+		var length = container.outerHeight();
+		container.find('div[id]').each(function()
+		{
+			var line = $('<div class="line"></div>');
+			line.css("left", 100 * ($(this).offset().top + container.fakeScroll()) / length + "%");
+			progressBar.append(line);
+			var anchor = container.find('a[href=#' + this.id + ']');
+			if (anchor.length > 0)
+			{
+				self.navigation.push({ id : this.id, name : anchor.html() });
+			}
+		});
+		console.log(self.navigation);
 		
 		/*container.find('*').each(function()
 		{
@@ -852,7 +870,7 @@ Reader.prototype = {
 		var distanceThreshold = 10;
 		function setTimer()
 		{
-			self.anchorTimer = setTimeout(function() { e.preventDefault(); trigger = true; }, 1000);
+			self.anchorTimer = setTimeout(function() { e.preventDefault(); trigger = true; }, 500);
 		}
 		function remove()
 		{
