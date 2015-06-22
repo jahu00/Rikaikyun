@@ -9,38 +9,49 @@
 		"onTouchStart" : function(event)
 		{
 			var element = this;
-			element.fakeScrollData.lastMove = 0;
-			element.fakeScrollData.distance = 0;
-			fakeScroll.startScroll(element, event);
+			if (element.fakeScrollData.touchId == null)
+			{
+				element.fakeScrollData.lastMove = 0;
+				element.fakeScrollData.distance = 0;
+				element.fakeScrollData.touchId = event.originalEvent.touches[0].identifier;
+				fakeScroll.startScroll(element, event);
+			}
 		},
 		"onTouchMove" : function(event)
 		{
 			event.preventDefault();
 			var element = this;
-			clearTimeout(element.fakeScrollData.clearScroll);
-			var newScroll = element.fakeScrollData.startScroll + parseInt((element.fakeScrollData.startPosition - event.originalEvent.touches[0].pageY));// / zoom);
-
-			$(element).fakeScroll(newScroll, event);
-			element.fakeScrollData.clearScroll = setTimeout(function()
+			if (element.fakeScrollData.touchId == event.originalEvent.touches[0].identifier)
 			{
-				element.fakeScrollData.lastMove = 0;
-			}, 100);
-			
+				clearTimeout(element.fakeScrollData.clearScroll);
+				var newScroll = element.fakeScrollData.startScroll + parseInt((element.fakeScrollData.startPosition - event.originalEvent.touches[0].pageY));// / zoom);
+
+				$(element).fakeScroll(newScroll, event);
+				element.fakeScrollData.clearScroll = setTimeout(function()
+				{
+					element.fakeScrollData.lastMove = 0;
+				}, 100);
+			}
 		},
 		"onTouchEnd" : function(event)
 		{
 			var element = this;
-			clearTimeout(element.fakeScrollData.clearScroll);
-			var newScroll = $(element).fakeScroll() + element.fakeScrollData.lastMove;
-			if (element.fakeScrollData.lastMove != 0)
-			{
-				$(element).fakeScroll(newScroll, event);
-			}
-			if (element.fakeScrollData.distance > element.fakeScrollData.distanceThreshold)
-			{
-				event.preventDefault();
-				$(element).scroll();
-			}
+			// At this point we know nothing about the touch that ended, so we have to settle for stopping scroll on any ending touch
+			//if (element.fakeScrollData.touchId == event.originalEvent.touches[0].identifier)
+			//{
+				clearTimeout(element.fakeScrollData.clearScroll);
+				var newScroll = $(element).fakeScroll() + element.fakeScrollData.lastMove;
+				if (element.fakeScrollData.lastMove != 0)
+				{
+					$(element).fakeScroll(newScroll, event);
+				}
+				if (element.fakeScrollData.distance > element.fakeScrollData.distanceThreshold)
+				{
+					event.preventDefault();
+					$(element).scroll();
+				}
+				element.fakeScrollData.touchId = null;
+			//}
 		}
 	};
 	
@@ -85,6 +96,7 @@
 				"lastMove" : 0,
 				"distance": 0,
 				"distanceThreshold": threshold,
+				"touchId": null,
 			};
 		});
 		$(this).on('touchstart', fakeScroll.onTouchStart);
