@@ -886,6 +886,8 @@ Reader.prototype = {
 			{
 				e.preventDefault();
 				ende.stopPropagation();
+				// Cancel touch to prevent accidential scrolling
+				self.screen.find('.container')[0].fakeScrollData.touchId = null;
 				self.anchorClick(a);
 			}
 		}
