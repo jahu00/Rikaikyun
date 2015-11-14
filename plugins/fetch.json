@@ -1,0 +1,28 @@
+{
+    "cordova-plugin-file": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-file"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.mediamatrixdoo.keepscreenon": {
+        "source": {
+            "type": "git",
+            "url": "git://github.com/zoxxx/PhoneGap-KeepScreenOn-plugin.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.phonegap.plugins.OrientationLock": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/cogitor/PhoneGap-OrientationLock.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    }
+}
