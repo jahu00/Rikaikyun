@@ -18,18 +18,32 @@ Settings.prototype = {
 			}
 		}, false);
 		
+		var fastClickDestructionTimeout = null;
 		var useFastClickControl = new CheckboxControl(self.screen.find('.useFastClick'), function(value)
 		{
 			if (value)
 			{
-				App.fastClick = FastClick.attach(document.body);
+				if (fastClickDestructionTimeout == null)
+				{
+					App.fastClick = FastClick.attach(document.body);
+				}
+				else
+				{
+					clearTimeout(fastClickDestructionTimeout);
+				}
 			}
 			else
 			{
 				if (App.fastClick != null)
 				{
-					App.fastClick.destroy();
-					App.fastClick = null;
+					// Adding delay to turning off fast click (should prevent it from reenabling itself).
+					// This is probably caused by regular delayed click that happens after after fast click is killed.
+					fastClickDestructionTimeout = setTimeout(function()
+					{
+						App.fastClick.destroy();
+						App.fastClick = null;
+						fastClickDestructionTimeout = null;
+					}, 350);
 				}
 			}
 		},
@@ -69,7 +83,7 @@ Settings.prototype = {
 		
 		var screenOrientation = new DropdownControl(self.screen.find('.screenOrientation'), function(value)
 		{
-			if (typeof window.plugins != "undefined" && window.plugins.orientationLock != "undefined")
+			if (typeof window.plugins != "undefined" && window.plugins.orientationLock != "undefined" && window.plugins.orientationLock != null)
 			{
 				if (value == "auto")
 				{
@@ -81,14 +95,14 @@ Settings.prototype = {
 				}
 			}
 		}, "auto");
-		
+
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
 			self.reader.screen.find('.container').css('font-size', value/100 + "em");
 			$('.dynamicStyle').cssRule('.img-frame img').css('zoom', value + "%");
-			$('.dynamicStyle').cssRule('.spinner').css('zoom', value + "%");
+			/*$('.dynamicStyle').cssRule('.spinner').css('zoom', value + "%");*/
 		},
 		parseFloat($('.container').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
 		//self.reader.screen.find('.container').css('font-size'));

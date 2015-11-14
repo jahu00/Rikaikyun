@@ -125,7 +125,6 @@ Reader.prototype = {
 				e.stop();
 			}
 		}, false);
-		
 		// Setup screen dependant elements that can't be handled by css alone
 		//$(window).resize();
 		self.resizeScreen();
