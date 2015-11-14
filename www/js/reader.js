@@ -267,6 +267,7 @@ Reader.prototype = {
 	},
 	loadReady: function()
 	{
+		this.tempData = null;
 		this.selectScreen('reader');
 		$('.container').html('');
 	},
