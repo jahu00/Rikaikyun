@@ -67,6 +67,21 @@ Settings.prototype = {
 		},
 		"false");
 		
+		var screenOrientation = new DropdownControl(self.screen.find('.screenOrientation'), function(value)
+		{
+			if (typeof window.plugins != "undefined" && window.plugins.orientationLock != "undefined")
+			{
+				if (value == "auto")
+				{
+					window.plugins.orientationLock.unlock();
+				}
+				else
+				{
+					window.plugins.orientationLock.lock(value);
+				}
+			}
+		}, "auto");
+		
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
@@ -157,11 +172,9 @@ Settings.prototype = {
 		
 		var furiganaModeControl = new DropdownControl(self.screen.find('.furiganaMode'), function(value)
 		{
-			//console.log("everything is broken");
 			var options = "";
 			$(this).find('select option').each(function()
 			{
-				
 				options += " furigana-" + this.value;
 			});
 			var container = self.reader.screen.find('.container');
@@ -186,17 +199,11 @@ Settings.prototype = {
 		
 		var useGpuHackControl = new CheckboxControl(self.screen.find('.useGpuHack'), function(value)
 		{
-			/*if (value)
-			{
-				$('.screen.loading:not(.gpu)').addClass('gpu');
-			}
-			else
-			{
-				$('.screen.loading').removeClass('gpu');
-			}*/
+			// This hack is applied directly in reader code, so there is nothing to do here
 		},
 		"false");
 		
+		// Back button emulation on Chrome
 		function pushDummy()
 		{
 			history.pushState({}, null, window.location.href);
