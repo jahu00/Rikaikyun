@@ -1,6 +1,14 @@
 function Settings(reader)
 {
 	this.reader = reader;
+	if (typeof cordova != "undefined")
+	{
+		this.brightness = cordova.require("cordova.plugin.Brightness.Brightness");
+	}
+	else
+	{
+		this.brightness = null;
+	}
 	this.init();
 }
 
@@ -96,6 +104,15 @@ Settings.prototype = {
 			}
 		}, "auto");
 
+		var brightnessControl = new SliderControl(self.screen.find('.brightness'), function(value)
+		{
+			if (self.brightness != null)
+			{
+				self.brightness.setBrightness(value/100, function(){}, function(error){ alert(error); });
+			}
+		},
+		50);		
+		
 		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)

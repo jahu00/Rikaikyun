@@ -24,5 +24,14 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova.plugin.Brightness": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/fiscal-cliff/phonegap-plugin-brightness.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

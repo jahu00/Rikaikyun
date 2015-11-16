@@ -15,6 +15,9 @@
         },
         "com.phonegap.plugins.OrientationLock": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
+        },
+        "cordova.plugin.Brightness": {
+            "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
     "dependent_plugins": {}
