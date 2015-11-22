@@ -18,6 +18,9 @@
         },
         "cordova.plugin.Brightness": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
+        },
+        "cordova-plugin-battery-status": {
+            "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
     "dependent_plugins": {}

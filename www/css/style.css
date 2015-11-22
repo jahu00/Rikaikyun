@@ -522,7 +522,7 @@ body
 	display:table-cell;
 	vertical-align:middle;
 }
-.statusBar .grid .progress
+.statusBar .grid .col > .progress
 {
 	background:white;
 	/*border: 1px solid black;*/
@@ -533,13 +533,13 @@ body
 	line-height:0;
 	position:relative;
 }
-.statusBar .grid .progress .bar
+.statusBar .grid .col > .progress .bar
 {
 	display:block;
 	height:100%;
 	background-color:gray;
 }
-.statusBar .grid .progress .line
+.statusBar .grid .col > .progress .line
 {
 	top:0;
 	height:100%;
@@ -562,6 +562,12 @@ body
 {
 	white-space: nowrap;
 }
+
+.statusBar .grid .col.status > span > div
+{
+	display:inline-block;
+}
+
 .blink
 {
 	position:fixed;
@@ -575,7 +581,7 @@ body
 	background-color: white;
 }
 
-.right
+.menu .item > .right
 {
 	float: right;
 }

@@ -61,16 +61,29 @@
 			</div>
 			<div class="statusBar">
 				<div class="grid">
+					<div class="col break left"></div>
+					<div class="col status left">
+						<span>
+							<div class="progress">1/1</div>
+							<div class="time">12:00</div>
+							<div class="battery">??</div>
+						</span>
+					</div>
+					<div class="col break left"></div>
 					<div class="col">
 						<div class="progress">
 							<div class="bar" style="width:0%"></div>
 						</div>
 					</div>
-					<div class="col break"></div>
-					<div class="col status">
-						<span>1/1</span>
+					<div class="col break right"></div>
+					<div class="col status right">
+						<span>
+							<div class="progress">1/1</div>
+							<div class="time">12:00</div>
+							<div class="battery">??</div>
+						</span>
 					</div>
-					<div class="col break"></div>
+					<div class="col break right"></div>
 				</div>
 			</div>
 			<div class="floater top">
@@ -173,6 +186,24 @@
 			<div class="item slider-control statusSize" data-system-name="statusSize">
 				<span class="name">Status bar size:</span><span class="right"><span class="value"></span>%</span><br/>
 				<div class="slider" data-min="50" data-max="800" data-step="1"></div>
+			</div>
+			<div class="item select statusLeft" data-system-name="statusLeft">
+				<span class="name">Left status</span><span class="right"><span class="value"></span></span><i></i>
+				<select>
+					<option value="none">None</option>
+					<option value="progress">Progress</option>
+					<option value="time">Time</option>
+					<!--<option value="battery">Battery</option>-->
+				</select>
+			</div>
+			<div class="item select statusRight" data-system-name="statusRight">
+				<span class="name">Right status</span><span class="right"><span class="value"></span></span><i></i>
+				<select>
+					<option value="none">None</option>
+					<option value="progress">Progress</option>
+					<option value="time">Time</option>
+					<!--<option value="battery">Battery</option>-->
+				</select>
 			</div>
 			<div class="item checkbox statusPaged" data-system-name="statusPaged">
 				Show progress as pages <i></i>

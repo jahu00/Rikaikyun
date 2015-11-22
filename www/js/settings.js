@@ -89,7 +89,7 @@ Settings.prototype = {
 		},
 		"false");
 		
-		var screenOrientation = new DropdownControl(self.screen.find('.screenOrientation'), function(value)
+		var screenOrientationControl = new DropdownControl(self.screen.find('.screenOrientation'), function(value)
 		{
 			if (typeof window.plugins != "undefined" && window.plugins.orientationLock != "undefined" && window.plugins.orientationLock != null)
 			{
@@ -147,6 +147,52 @@ Settings.prototype = {
 			self.reader.screen.find('.statusBar').css('font-size', value/100 + "em");
 		},
 		parseFloat($('.statusBar').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
+		
+		var timeTimer = null;
+		window.addEventListener("batterystatus", function(info)
+		{
+			self.reader.screen.find('.statusBar .battery').text(info.level + "%");
+			self.reader.adjustStatusWidth();
+		}, false);
+		
+		function changeStatusControl(value, side)
+		{
+			var statusBar = self.reader.screen.find('.statusBar');
+			statusBar.find('.col.status.' + side + ' > span > *').hide();
+			if (value == "none")
+			{
+				statusBar.find('.col.' + side).hide();
+			}
+			else
+			{
+				statusBar.find('.col.' + side).show();
+				statusBar.find('.col.status.' + side + ' > span > .' + value).show();
+			}
+			if (statusBar.find('.time:visible'))
+			{
+				timeTimer = setInterval(function()
+				{
+					var now = new Date();
+					self.reader.screen.find('.statusBar .time').text((now.getHours() < 10 ? "0" : "") + now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes());
+					self.reader.adjustStatusWidth();
+				}, 30000);
+			}
+			else if (timeTimer != null)
+			{
+				clearInterval(timeTimer);
+				timeTimer = null;
+			}
+		}
+		
+		var statusLeftController = new DropdownControl(self.screen.find('.statusLeft'), function(value)
+		{
+			changeStatusControl(value, "left");
+		}, "none");
+		
+		var statusRightController = new DropdownControl(self.screen.find('.statusRight'), function(value)
+		{
+			changeStatusControl(value, "right");
+		}, "progress");
 		
 		var statusPagedControl = new CheckboxControl(self.screen.find('.statusPaged'), function(value)
 		{
