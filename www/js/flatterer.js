@@ -22,7 +22,11 @@ var flatterer = {
 		for (var i = 0; i < elem.childNodes.length ; i++)
 		{
 			var node = elem.childNodes[i];
-			if (node.nodeType === 3)
+			if (node.nodeType === 8)
+			{
+				//ignore comments
+			}
+			else if (node.nodeType === 3)
 			{
 				if (node.nodeValue.trim().length > 0)
 				{

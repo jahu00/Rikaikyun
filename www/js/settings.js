@@ -45,7 +45,7 @@ Settings.prototype = {
 				if (App.fastClick != null)
 				{
 					// Adding delay to turning off fast click (should prevent it from reenabling itself).
-					// This is probably caused by regular delayed click that happens after after fast click is killed.
+					// This is probably caused by regular delayed click that happens after fast click is killed.
 					fastClickDestructionTimeout = setTimeout(function()
 					{
 						App.fastClick.destroy();
@@ -155,6 +155,13 @@ Settings.prototype = {
 			self.reader.adjustStatusWidth();
 		}, false);
 		
+		function updateTime()
+		{
+			var now = new Date();
+			self.reader.screen.find('.statusBar .time').text((now.getHours() < 10 ? "0" : "") + now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes());
+			self.reader.adjustStatusWidth();
+		}
+		
 		function changeStatusControl(value, side)
 		{
 			var statusBar = self.reader.screen.find('.statusBar');
@@ -170,12 +177,8 @@ Settings.prototype = {
 			}
 			if (statusBar.find('.time:visible'))
 			{
-				timeTimer = setInterval(function()
-				{
-					var now = new Date();
-					self.reader.screen.find('.statusBar .time').text((now.getHours() < 10 ? "0" : "") + now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes());
-					self.reader.adjustStatusWidth();
-				}, 30000);
+				updateTime();
+				timeTimer = setInterval(updateTime, 30000);
 			}
 			else if (timeTimer != null)
 			{
