@@ -21,6 +21,9 @@
         },
         "cordova-plugin-battery-status": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
     "dependent_plugins": {}

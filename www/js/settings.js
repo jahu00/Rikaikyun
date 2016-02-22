@@ -104,6 +104,22 @@ Settings.prototype = {
 			}
 		}, "auto");
 
+		var enableNativeStatusBarControl = new CheckboxControl(self.screen.find('.enableNativeStatusBar'), function(value)
+		{
+			if (typeof StatusBar != "undefined")
+			{
+				if (value)
+				{
+					StatusBar.show();
+				}
+				else
+				{
+					StatusBar.hide();
+				}
+			}
+		},
+		"false");
+		
 		var brightnessControl = new SliderControl(self.screen.find('.brightness'), function(value)
 		{
 			if (self.brightness != null)
