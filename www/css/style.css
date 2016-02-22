@@ -92,7 +92,7 @@ body
 	/*float:right;*/
 }
 
-.menu .item.checkbox, .menu .item.select, .menu .item.radio
+.menu .item.checkbox, .menu .item.select, .menu .item.radio, .menu .item.back
 {
 	/*padding-right:30px;*/
 	padding-right:1.875em;
@@ -100,7 +100,7 @@ body
 }
 
 /* Not using plain image background, because there positioning issues on android */
-.menu .item.checkbox i, .menu .item.select i, .menu .item.radio i
+.menu .item.checkbox i, .menu .item.select i, .menu .item.radio i, .menu .item.back i
 {
 	/*width:20px;*/
 	width:1.25em;
@@ -139,6 +139,11 @@ body
 	background-image: url("radio-checked.png");
 }
 
+.menu .item.back i
+{
+	background-image: url("up.png");
+}
+
 .menu .header
 {
 	background:black;
@@ -163,7 +168,8 @@ body
     padding-right:1em;
     height:0.5em;
     /*border-bottom: 2px solid black;*/
-	box-shadow: 0 0.0625em 0 0 black;
+	/*box-shadow: 0 0.0625em 0 0 black;*/
+	box-shadow: 0 0.0825em 0 -0.02em black;
 	margin-bottom:0.625em;
 }
 
@@ -600,3 +606,15 @@ body
 	right:0.3125em;
 	top:0.3125em;
 }
+
+/* Global back */
+/*.globalBack
+{
+	position:fixed;
+	height:4em;
+	width:4em;
+	top:2em;
+	left:2em;
+	background-size: 100% 100%;
+	background-image: url("back.png");
+}*/

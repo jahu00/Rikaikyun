@@ -8,7 +8,7 @@ var ReadingHistory = {
 			if (self.screen.is(':visible'))
 			{
 				App.selectScreen('.screen.main.menu');
-				e.stop();
+				e.stopImmediatePropagation();
 			}
 		}, false);
 		self.screen.on('click', '.item.entry', function()

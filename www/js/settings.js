@@ -22,7 +22,7 @@ Settings.prototype = {
 			if (self.screen.is(':visible'))
 			{
 				self.reader.selectScreen('main.menu');
-				e.stop();
+				e.stopImmediatePropagation();
 			}
 		}, false);
 		
@@ -307,10 +307,7 @@ Settings.prototype = {
 		function backButtonDummy(e)
 		{
 			var event = new Event('backbutton');
-			event.stop = function()
-			{
-				this.stopImmediatePropagation();
-			};
+			e.stopImmediatePropagation();
 			document.dispatchEvent(event);
 			pushDummy();
 		}

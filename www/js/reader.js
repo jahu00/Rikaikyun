@@ -122,7 +122,7 @@ Reader.prototype = {
 				{
 					self.selectScreen('main.menu');
 				}
-				e.stop();
+				e.stopImmediatePropagation();
 			}
 		}, false);
 		// Setup screen dependant elements that can't be handled by css alone
@@ -186,13 +186,18 @@ Reader.prototype = {
 			}
 		});
 		
+		$(document.body).on('click', '.menu > .item.back', function()
+		{
+			document.dispatchEvent(new Event('backbutton'));
+		});
+		
 		document.addEventListener("backbutton", function(e)
 		{
 			if (menu.is(':visible'))
 			{
 				self.selectScreen('reader');
 				self.resizeScreen(true);
-				e.stop();
+				e.stopImmediatePropagation();
 			}
 		}, false);
 	},
@@ -204,7 +209,7 @@ Reader.prototype = {
 		self.fileSelector.onCancel = function(e)
 		{
 			self.selectScreen('main.menu');
-			e.stop();
+			e.stopImmediatePropagation();
 		};
 		self.fileSelector.onSuccess = function(path)
 		{
@@ -402,7 +407,7 @@ Reader.prototype = {
 				self.navigation.push({ id : this.id, name : anchor.html() });
 			}
 		});
-		console.log(self.navigation);
+		//console.log(self.navigation);
 		
 		/*container.find('*').each(function()
 		{

@@ -22,7 +22,7 @@ OOP.inherit(DropdownControl, Control,
 		}).val(value).change();
 		self.control.click(function()
 		{
-			var screen = $('<div class="screen menu select gui"><div class="header"></div></div>');
+			var screen = $('<div class="screen menu select gui"><div class="item back">Back<i></i></div><div class="header"></div></div>');
 			$(document.body).append(screen);
 			screen.find('.header').text(self.control.find('.name').text());
 			var value = self.control.find('select').val();
@@ -43,7 +43,7 @@ OOP.inherit(DropdownControl, Control,
 				App.selectScreen(screen);
 				screen.remove();
 				App.selectScreen(previousScreen);
-				e.stop();
+				e.stopImmediatePropagation();
 			}
 			document.addEventListener("backbutton", suicide, false);
 			screen.find('.item.radio').click(function()
