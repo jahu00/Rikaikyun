@@ -73,6 +73,11 @@ Reader.prototype = {
 			$('.floater').css("display", "");
 		});
 		
+		$('.reader > .floater > .bar > .back').click(function()
+		{
+			self.selectScreen('main.menu');
+		});
+		
 		$('.reader > .floater .bar .resizer').on("touchstart", function(ev)
 		{
 			var e = ev.originalEvent.touches[0];
