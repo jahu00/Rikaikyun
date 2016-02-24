@@ -3,7 +3,7 @@ var ReadingHistory = {
 	{
 		var self = this;
 		self.screen = $('.screen.history');
-		document.addEventListener("backbutton", function(e)
+		document.addEventListener("softbackbutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{

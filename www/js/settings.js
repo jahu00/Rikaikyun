@@ -17,7 +17,7 @@ Settings.prototype = {
 	{
 		var self = this;
 		self.screen = $('.screen.settings.menu');
-		document.addEventListener("backbutton", function(e)
+		document.addEventListener("softbackbutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{
@@ -310,6 +310,7 @@ Settings.prototype = {
 			e.stopImmediatePropagation();
 			document.dispatchEvent(event);
 			pushDummy();
+			//return false;
 		}
 		
 		var chromeHackControl = new CheckboxControl(self.screen.find('.chromeHack'), function(value)

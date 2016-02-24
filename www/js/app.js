@@ -22,6 +22,12 @@ var App = {
 			}*/
 			return false;
 		});
+		
+		document.addEventListener("backbutton", function(e)
+		{
+			document.dispatchEvent(new CustomEvent('softbackbutton'))
+		}, false);
+		
 		var lastFile = localStorage["lastFile"] || '';
 		if (lastFile != '')
 		{
@@ -66,5 +72,10 @@ var App = {
 			this.tempData = null;
 		}
 		$(elem).addClass('active');
+	},
+	log: function(msg)
+	{
+		var date = new Date();
+		console.log(date.getTime() / 1000, msg);
 	}
 }

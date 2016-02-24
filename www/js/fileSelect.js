@@ -127,7 +127,7 @@ FileSelector.prototype = {
 				self.updatePath();//self.path);
 			}
 		});
-		document.addEventListener("backbutton", function(e)
+		document.addEventListener("softbackbutton", function(e)
 		{
 			if ($elem.is(':visible') && typeof self.onCancel !== 'undefined')
 			{

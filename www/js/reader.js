@@ -114,8 +114,7 @@ Reader.prototype = {
 				e.stop();
 			}
 		}, false);*/
-		
-		document.addEventListener("backbutton", function(e)
+		document.addEventListener("softbackbutton", function(e)
 		{
 			if (self.screen.is(':visible'))
 			{
@@ -193,10 +192,15 @@ Reader.prototype = {
 		
 		$(document.body).on('click', '.menu > .item.back', function()
 		{
-			document.dispatchEvent(new Event('backbutton'));
+			//var event = new Event('backbutton');
+			//var event = new CustomEvent('backbutton');
+			var event = new CustomEvent('softbackbutton');
+			document.dispatchEvent(event);
+			//document.dispatchEvent(new CustomEvent('softbackbutton'));
+			//document.dispatchEvent(new CustomEvent('backbutton'));
 		});
 		
-		document.addEventListener("backbutton", function(e)
+		document.addEventListener("softbackbutton", function(e)
 		{
 			if (menu.is(':visible'))
 			{
@@ -204,7 +208,7 @@ Reader.prototype = {
 				self.resizeScreen(true);
 				e.stopImmediatePropagation();
 			}
-		}, false);
+		}, false);		
 	},
 	initFileSelector: function()
 	{
@@ -215,6 +219,7 @@ Reader.prototype = {
 		{
 			self.selectScreen('main.menu');
 			e.stopImmediatePropagation();
+			//return false;
 		};
 		self.fileSelector.onSuccess = function(path)
 		{
@@ -304,22 +309,28 @@ Reader.prototype = {
 		var self = this;
 		this.loadReady();
 		// extract body of the html file
+		App.log('Extract html body');
 		var body = htmlHelpers.extractBody(data);
 		data = null;
 		// trim excess whitespace in all lines of the body
+		App.log('Trim all lines');
 		body = htmlHelpers.trimAllLines(body);
 		
 		// prevent images from loading at this time (images with absolute path will be unaffected)
+		App.log('Prevent images from loading');
 		body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>]*)"|'([^>]*)')[^>]*>)/img, "$1data-temp$2$3");
 		
 		// Create temporary element for storing the body (allows modifying the elements)
+		App.log('Create temp element');
 		var temp = document.createElement('div');
 		temp.innerHTML = body;
 		body = null;
 		var $temp = $(temp);
 		// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
+		App.log('Remove script style and link');
 		$temp.find('script, style, link').remove();
 		// Rename ids to avoid collision
+		App.log('Rename ids');
 		var idCount = 0;
 		$temp.find('*[id]').each(function()
 		{
@@ -330,6 +341,7 @@ Reader.prototype = {
 			idCount++;
 		});
 		// Remove all unnecessary attributes (the only ones we spare are id on all elements, href on anchors and src on images)
+		App.log('Remove attributes');
 		$temp.find('*:hasAttributes').each(function()
 		{
 			var elem = $(this);
@@ -346,6 +358,7 @@ Reader.prototype = {
 				elem.removeAttributes(null, ['id']);
 			}
 		});
+		App.log('Remove redundant new line characters');
 		var japCharacters = "[一-龠ぁ-ゔァ-ヴー々〆〤]";
 		var reg = new RegExp("(" + japCharacters + ")\n+(" + japCharacters + ")", "g");
 		// Remove redundant new line characters from all text
@@ -370,16 +383,19 @@ Reader.prototype = {
 
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
+		App.log('Insert the text into reader');
 		var container = $('.container');
 		
 		container.html(temp);
 		
+		App.log('Flatten text');
 		container.find('> div').each(function()
 		{
 			this.outerHTML = flatterer.flatten(this);
 		});
 		
 		// Put imgaes in containers and adjust image path
+		App.log('Process images');
 		var filePath = fileHelpers.getParentPath(self.currentFile)
 		container.find('img').each(function()
 		{
@@ -393,18 +409,20 @@ Reader.prototype = {
 			img.removeAttr('data-tempsrc');
 		});
 		
+		App.log('Split paragraphs');
 		container.find('p').each(function()
 		{
 			this.outerHTML = flatterer.divide(this);
 		});
-		
+		App.log('Add chapters to progress bar');
 		var progressBar = this.screen.find('.progress');
 		progressBar.find('.line').remove();
 		var length = container.outerHeight();
+		var fakeScroll = container.fakeScroll();
 		container.find('div[id]').each(function()
 		{
 			var line = $('<div class="line"></div>');
-			line.css("left", 100 * ($(this).offset().top + container.fakeScroll()) / length + "%");
+			line.css("left", 100 * ($(this).offset().top + fakeScroll) / length + "%");
 			progressBar.append(line);
 			var anchor = container.find('a[href=#' + this.id + ']');
 			if (anchor.length > 0)
@@ -412,6 +430,7 @@ Reader.prototype = {
 				self.navigation.push({ id : this.id, name : anchor.html() });
 			}
 		});
+		App.log('Loading html complete');
 		//console.log(self.navigation);
 		
 		/*container.find('*').each(function()

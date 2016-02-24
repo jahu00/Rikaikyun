@@ -39,13 +39,13 @@ OOP.inherit(DropdownControl, Control,
 			var previousScreen = $('.screen.active');
 			function suicide(e)
 			{
-				document.removeEventListener("backbutton", suicide);
+				document.removeEventListener("softbackbutton", suicide);
 				App.selectScreen(screen);
 				screen.remove();
 				App.selectScreen(previousScreen);
 				e.stopImmediatePropagation();
 			}
-			document.addEventListener("backbutton", suicide, false);
+			document.addEventListener("softbackbutton", suicide, false);
 			screen.find('.item.radio').click(function()
 			{
 				var $this = $(this);
