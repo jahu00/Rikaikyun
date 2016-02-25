@@ -309,28 +309,30 @@ Reader.prototype = {
 		var self = this;
 		this.loadReady();
 		// extract body of the html file
-		App.log('Extract html body');
-		var body = htmlHelpers.extractBody(data);
+		App.log("Extract html body");
+		//var body = htmlHelpers.extractBody(data);
+		var doc = (new DOMParser()).parseFromString(data, 'text/html');
 		data = null;
 		// trim excess whitespace in all lines of the body
-		App.log('Trim all lines');
-		body = htmlHelpers.trimAllLines(body);
+		//App.log('Trim all lines');
+		//body = htmlHelpers.trimAllLines(body);
 		
 		// prevent images from loading at this time (images with absolute path will be unaffected)
-		App.log('Prevent images from loading');
-		body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>]*)"|'([^>]*)')[^>]*>)/img, "$1data-temp$2$3");
+		//App.log('Prevent images from loading');
+		//body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>]*)"|'([^>]*)')[^>]*>)/img, "$1data-temp$2$3");
 		
 		// Create temporary element for storing the body (allows modifying the elements)
-		App.log('Create temp element');
-		var temp = document.createElement('div');
-		temp.innerHTML = body;
+		App.log("Create temp element");
+		//var temp = document.createElement('div');
+		//temp.innerHTML = body;
+		var temp = doc.body;
 		body = null;
 		var $temp = $(temp);
 		// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
-		App.log('Remove script style and link');
+		App.log("Remove script style and link");
 		$temp.find('script, style, link').remove();
 		// Rename ids to avoid collision
-		App.log('Rename ids');
+		App.log("Rename ids");
 		var idCount = 0;
 		$temp.find('*[id]').each(function()
 		{
@@ -341,7 +343,7 @@ Reader.prototype = {
 			idCount++;
 		});
 		// Remove all unnecessary attributes (the only ones we spare are id on all elements, href on anchors and src on images)
-		App.log('Remove attributes');
+		App.log("Remove attributes");
 		$temp.find('*:hasAttributes').each(function()
 		{
 			var elem = $(this);
@@ -358,7 +360,7 @@ Reader.prototype = {
 				elem.removeAttributes(null, ['id']);
 			}
 		});
-		App.log('Remove redundant new line characters');
+		App.log("Remove redundant new line characters");
 		var japCharacters = "[一-龠ぁ-ゔァ-ヴー々〆〤]";
 		var reg = new RegExp("(" + japCharacters + ")\n+(" + japCharacters + ")", "g");
 		// Remove redundant new line characters from all text
@@ -383,38 +385,70 @@ Reader.prototype = {
 
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
-		App.log('Insert the text into reader');
-		var container = $('.container');
 		
-		container.html(temp);
-		
-		App.log('Flatten text');
-		container.find('> div').each(function()
+		App.log("Flatten text");
+		//container.find('> div').each(function()
+		$temp.children('div').each(function()
 		{
 			this.outerHTML = flatterer.flatten(this);
 		});
 		
 		// Put imgaes in containers and adjust image path
-		App.log('Process images');
+		App.log("Process images");
 		var filePath = fileHelpers.getParentPath(self.currentFile)
-		container.find('img').each(function()
+		//container.find('img').each(function()
+		$temp.find('img').each(function()
 		{
 			this.outerHTML = '<div class="img-frame"><div class="img-container">' + this.outerHTML + '</div></div>';
 		});
-		container.find('img[data-tempsrc]').each(function()
+		//container.find('img[data-tempsrc]').each(function()
+		$temp.find('img').each(function()
 		{
 			var img = $(this);
-			var tempSrc = img.attr('data-tempsrc');
+			//var tempSrc = img.attr('data-tempsrc');
+			var tempSrc = img.attr('src');
 			img.attr('src', (tempSrc.indexOf(':') > -1 ? tempSrc : filePath + tempSrc));
-			img.removeAttr('data-tempsrc');
+			//img.removeAttr('data-tempsrc');
 		});
 		
-		App.log('Split paragraphs');
-		container.find('p').each(function()
+		App.log("Split paragraphs");
+		//container.find('p').each(function()
+		$temp.find('p').each(function()
 		{
 			this.outerHTML = flatterer.divide(this);
 		});
-		App.log('Add chapters to progress bar');
+		App.log("Compute position");
+		var total = 0;
+		$temp.children().each(function()
+		{
+			var elem = $(this);
+			var text = elem.text().trim();
+			elem.attr('data-position', total);
+			var length = text.length;
+			elem.attr('data-length', length);
+			total += length;
+		});
+		
+		App.log("Add chapters to progress bar");
+		var progressBar = this.screen.find('.progress');
+		progressBar.find('.line').remove();
+		$temp.find('div[id]').each(function()
+		{
+			var line = $('<div class="line"></div>');
+			line.css("left", 100 * parseInt($(this).attr('data-position')) / total + "%");
+			progressBar.append(line);
+			var anchor = $temp.find('a[href=#' + this.id + ']');
+			if (anchor.length > 0)
+			{
+				self.navigation.push({ id : this.id, name : anchor.html() });
+			}
+		});
+		
+		App.log('Insert the text into reader');
+		var container = $('.container');
+		container.html(temp.innerHTML);
+		
+		/*App.log('Add chapters to progress bar');
 		var progressBar = this.screen.find('.progress');
 		progressBar.find('.line').remove();
 		var length = container.outerHeight();
@@ -429,7 +463,7 @@ Reader.prototype = {
 			{
 				self.navigation.push({ id : this.id, name : anchor.html() });
 			}
-		});
+		});*/
 		App.log('Loading html complete');
 		//console.log(self.navigation);
 		
