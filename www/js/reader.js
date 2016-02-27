@@ -25,17 +25,17 @@ Reader.prototype = {
 	init: function()
 	{
 		var self = this;
-		this.screen = $('.screen.reader');
+		self.screen = $('.screen.reader');
 		// Copy contents of top floater bar to the bottom one (reuse html without having to write it twice)
-		this.screen.find('.floater .bar.bottom').html(this.screen.find('.floater .bar.top').html());
-		this.initDictionarySelection();
-		
-		var container = this.screen.find('.container');
+		self.screen.find('.floater .bar.bottom').html(self.screen.find('.floater .bar.top').html());
+		self.initDictionarySelection();
+		self.container = self.screen.find('.container');
+		//var container = this.screen.find('.container');
 		
 		// Our function for handling the event is inside another to not confuse what 'this' is
 		// clicks on the screen (handles word lookups)
 		
-		container.click(function(e){ self.containerClick(e); });
+		self.container.click(function(e){ self.containerClick(e); });
 		
 		// Handling resizes of the screen
 		$(window).resize(function()
@@ -56,7 +56,7 @@ Reader.prototype = {
 			}
 
 		});
-		$('.reader > .scroller > .container').fakeScrollOn();
+		//$('.reader > .scroller > .container').fakeScrollOn();
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
 		$('.reader > .floater .dictionary').fakeScrollOn();
@@ -95,8 +95,8 @@ Reader.prototype = {
 		// Triggering touchend on touchcancel doesn't seem to work unfortunately
 		//container.on('touchcancel', '*', function(e) { this.trigger('touchend'); });
 		
-		container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		container.on('click', 'a', function(e){ self.containerClick(e); return false; });
+		self.container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
+		self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		// Unused: Solved document length changing after image is loaded by forcing images to take a whole page using css
 		/*container.on('load error', 'img', function()
 		{
@@ -278,6 +278,7 @@ Reader.prototype = {
 	{
 		this.selectScreen('loading');
 		this.navigation = [];
+		this.document = null;
 		//$('.screen.loading .message span').text('Loading please wait...');
 	},
 	loadReady: function()
@@ -310,21 +311,11 @@ Reader.prototype = {
 		this.loadReady();
 		// extract body of the html file
 		App.log("Extract html body");
-		//var body = htmlHelpers.extractBody(data);
 		var doc = (new DOMParser()).parseFromString(data, 'text/html');
 		data = null;
-		// trim excess whitespace in all lines of the body
-		//App.log('Trim all lines');
-		//body = htmlHelpers.trimAllLines(body);
-		
-		// prevent images from loading at this time (images with absolute path will be unaffected)
-		//App.log('Prevent images from loading');
-		//body = body.replace(/(<\s*img\s*[^>]*\s*)(src)(\s*=\s*("([^>]*)"|'([^>]*)')[^>]*>)/img, "$1data-temp$2$3");
 		
 		// Create temporary element for storing the body (allows modifying the elements)
 		App.log("Create temp element");
-		//var temp = document.createElement('div');
-		//temp.innerHTML = body;
 		var temp = doc.body;
 		body = null;
 		var $temp = $(temp);
@@ -387,7 +378,6 @@ Reader.prototype = {
 		// Insert the text into reader
 		
 		App.log("Flatten text");
-		//container.find('> div').each(function()
 		$temp.children('div').each(function()
 		{
 			this.outerHTML = flatterer.flatten(this);
@@ -396,74 +386,44 @@ Reader.prototype = {
 		// Put imgaes in containers and adjust image path
 		App.log("Process images");
 		var filePath = fileHelpers.getParentPath(self.currentFile)
-		//container.find('img').each(function()
 		$temp.find('img').each(function()
 		{
 			this.outerHTML = '<div class="img-frame"><div class="img-container">' + this.outerHTML + '</div></div>';
 		});
-		//container.find('img[data-tempsrc]').each(function()
+
 		$temp.find('img').each(function()
 		{
 			var img = $(this);
-			//var tempSrc = img.attr('data-tempsrc');
 			var tempSrc = img.attr('src');
 			img.attr('src', (tempSrc.indexOf(':') > -1 ? tempSrc : filePath + tempSrc));
-			//img.removeAttr('data-tempsrc');
 		});
 		
 		App.log("Split paragraphs");
-		//container.find('p').each(function()
 		$temp.find('p').each(function()
 		{
 			this.outerHTML = flatterer.divide(this);
 		});
 		App.log("Compute position");
-		var total = 0;
-		$temp.children().each(function()
-		{
-			var elem = $(this);
-			var text = elem.text().trim();
-			elem.attr('data-position', total);
-			var length = text.length;
-			elem.attr('data-length', length);
-			total += length;
-		});
-		
+		self.document = new ReaderDocument(temp);
+		//window.readerDocument = self.document;
+
 		App.log("Add chapters to progress bar");
 		var progressBar = this.screen.find('.progress');
 		progressBar.find('.line').remove();
-		$temp.find('div[id]').each(function()
+		var barPositions = self.document.getChapterPositions();
+		for (var posId in barPositions)
 		{
 			var line = $('<div class="line"></div>');
-			line.css("left", 100 * parseInt($(this).attr('data-position')) / total + "%");
+			line.css("left", 100 * barPositions[posId] + "%");
 			progressBar.append(line);
-			var anchor = $temp.find('a[href=#' + this.id + ']');
-			if (anchor.length > 0)
-			{
-				self.navigation.push({ id : this.id, name : anchor.html() });
-			}
-		});
+		}
 		
 		App.log('Insert the text into reader');
-		var container = $('.container');
-		container.html(temp.innerHTML);
+		//var container = $('.container');
+		//self.container.html(temp.innerHTML);
 		
-		/*App.log('Add chapters to progress bar');
-		var progressBar = this.screen.find('.progress');
-		progressBar.find('.line').remove();
-		var length = container.outerHeight();
-		var fakeScroll = container.fakeScroll();
-		container.find('div[id]').each(function()
-		{
-			var line = $('<div class="line"></div>');
-			line.css("left", 100 * ($(this).offset().top + fakeScroll) / length + "%");
-			progressBar.append(line);
-			var anchor = container.find('a[href=#' + this.id + ']');
-			if (anchor.length > 0)
-			{
-				self.navigation.push({ id : this.id, name : anchor.html() });
-			}
-		});*/
+		self.populateContainer();
+		
 		App.log('Loading html complete');
 		//console.log(self.navigation);
 		
@@ -471,6 +431,26 @@ Reader.prototype = {
 		{
 			this.unselectable = "on";
 		});*/
+	},
+	populateContainer: function()
+	{
+		var elemId = this.document.getElementIdAtPosition(this.progress);
+		var containerOffset = this.container.offset();
+		var containerHeight = this.container.parent().outerHeight();
+		for (i = 0; i < 1000; i++)
+		{
+			if (elemId >= this.document.count)
+			{
+				break;
+			}
+			var newRow = $(this.document.rows[elemId + i].outerHTML)
+			this.container.append(newRow);
+			var offset = newRow.offset();
+			if (offset.top - containerOffset.top + newRow.outerHeight() > containerHeight)
+			{
+				break;
+			}
+		}
 	},
 	openHtmlDocument: function(path)
 	{
@@ -758,7 +738,7 @@ Reader.prototype = {
 		{
 			// Setup some element sizes that are screen dependant
 			// TODO: Needs a lot of cleaning up
-			// TODO: This even should not trigger when on other screens, instead it should trigger when coming back to this one
+			// TODO: This event should not trigger when on other screens, instead it should trigger when coming back to this one
 			var statusBarZoom = $('.reader .statusBar').absoluteZoom();
 			var floaterZoom = $('.reader .floater').absoluteZoom();
 			var containerZoom = $('.reader .scroller .container').absoluteZoom();
@@ -792,6 +772,7 @@ Reader.prototype = {
 	// Updates reading status
 	updateStatus: function()
 	{
+		/*
 		var self = this;
 		clearTimeout(self.scrollTimeout);
 		// TODO: rename local variables to make them less misleading
@@ -856,9 +837,11 @@ Reader.prototype = {
 		}
 		//this.lastPosition = scroller.scrollTop();
 		this.lastPosition = container.fakeScroll();
+		*/
 	},
 	scrollTo: function(progress, update, procentage)
 	{
+		/*
 		var self = this;
 		if (typeof update == "undefined")
 		{
@@ -912,6 +895,7 @@ Reader.prototype = {
 		{
 			self.updateStatus();
 		}
+		*/
 	},
 	// Code responsible for blinking the screen on eink display
 	// TODO: Needs to be optimized or better yet made into a plugin that can be used on any element, so we can blink the dictionary popup without blinking the whole screen

@@ -217,7 +217,7 @@ Settings.prototype = {
 		{
 			//reader.updateStatus();
 		},
-		"true");
+		"false");
 		
 		//alert(parseFloat($('.gui').css('font-size')) + " " + parseFloat($(document.body).css('font-size')));
 		var guiSizeControl = {

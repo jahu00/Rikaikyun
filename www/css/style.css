@@ -222,8 +222,8 @@ body
 {
 	word-wrap:break-word;
 	line-height:1.5;
-	padding-top:50%;
-	padding-bottom:50%;
+	/*padding-top:50%;
+	padding-bottom:50%;*/
 }
 /*.container p,
 .container h1,
