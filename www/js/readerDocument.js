@@ -67,10 +67,12 @@ ReaderDocument.prototype = {
 		}
 		if (this.count == 1 || position == 0)
 		{
-			return this.rows[0];
+			//return this.rows[0];
+			return 0;
 		}
 		var progress = parseInt(this.total * position);
 		//console.log(progress);
+		// TODO: For big documents, instead of iterating through all rows, there should be an option to "guess" the position of a row, by either estimating it or using a "guess a number 1-100" algorithm
 		for (var i = 0; i < this.count; i++)
 		{
 			if (this.index[i] > progress)

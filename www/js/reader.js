@@ -16,7 +16,6 @@ function Reader()//dict)
 }
 
 Reader.prototype = {
-//Reader = {
 	//deviceReady: false,
 	dict: null,
 	settings: null,
@@ -56,7 +55,34 @@ Reader.prototype = {
 			}
 
 		});
-		//$('.reader > .scroller > .container').fakeScrollOn();
+		$('.reader > .scroller > .container').customScrollOn(function(val)
+		{
+			if (typeof self.document == "undefined" || self.document == 0)
+			{
+				return 0;
+			}
+			self.populateContainer(val);
+			var containerOffset = self.container.parent().offset();
+			var containerHeight = self.container.parent().outerHeight();
+			if (val < 0)
+			{
+				var elem = self.container.children().first();
+				//console.log(elem.offset().top - containerOffset.top);
+				if (elem.attr("data-id") == 0 && elem.offset().top - containerOffset.top - val > 0)
+				{
+					return containerOffset.top - elem.offset().top;
+				}
+			}
+			if (val < 0)
+			{
+				var elem = self.container.children().last();
+				if (elem.attr("data-id") == self.document.count - 1 && elem.offset().top - containerOffset.top + elem.outerHeight() - val < containerHeight)
+				{
+					return containerHeight - elem.offset().top + containerOffset.top - elem.outerHeight();
+				}
+			}
+			return val;
+		});
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
 		$('.reader > .floater .dictionary').fakeScrollOn();
@@ -130,7 +156,6 @@ Reader.prototype = {
 			}
 		}, false);
 		// Setup screen dependant elements that can't be handled by css alone
-		//$(window).resize();
 		self.resizeScreen();
 	},
 	initMenu: function()
@@ -192,12 +217,8 @@ Reader.prototype = {
 		
 		$(document.body).on('click', '.menu > .item.back', function()
 		{
-			//var event = new Event('backbutton');
-			//var event = new CustomEvent('backbutton');
 			var event = new CustomEvent('softbackbutton');
 			document.dispatchEvent(event);
-			//document.dispatchEvent(new CustomEvent('softbackbutton'));
-			//document.dispatchEvent(new CustomEvent('backbutton'));
 		});
 		
 		document.addEventListener("softbackbutton", function(e)
@@ -276,7 +297,7 @@ Reader.prototype = {
 	},
 	prepareLoad: function(name)
 	{
-		this.selectScreen('loading');
+		this.selectScreen("loading");
 		this.navigation = [];
 		this.document = null;
 		//$('.screen.loading .message span').text('Loading please wait...');
@@ -284,8 +305,8 @@ Reader.prototype = {
 	loadReady: function()
 	{
 		this.tempData = null;
-		this.selectScreen('reader');
-		$('.container').html('');
+		this.selectScreen("reader");
+		$('.container').html("");
 	},
 	loadDocument: function(text)
 	{
@@ -432,24 +453,65 @@ Reader.prototype = {
 			this.unselectable = "on";
 		});*/
 	},
-	populateContainer: function()
+	populateContainer: function(populationOffset)
 	{
-		var elemId = this.document.getElementIdAtPosition(this.progress);
-		var containerOffset = this.container.offset();
+		if (typeof this.document == "undefined" || this.document.count == 0)
+		{
+			return;
+		}
+		if (typeof populationOffset == "undefined")
+		{
+			populationOffset = 0;
+		}
+		var containerOffset = this.container.parent().offset();
 		var containerHeight = this.container.parent().outerHeight();
+		var elemId = 0;
+		var newRow = '';
+		var elem = null;
+		var offset = null;
+		var margin = 0;
+		if (this.container.children().length > 0)
+		{
+			for (i = 0; i < 1000; i++)
+			{
+				elem = this.container.children().first();
+				offset = elem.offset();
+				if (offset.top - containerOffset.top - populationOffset < 0)
+				{
+					break;
+				}
+				elemId = parseInt(elem.attr('data-id'));
+				if (elemId <= 0)
+				{
+					break;
+				}
+				newRow = $(this.document.rows[elemId - 1].outerHTML)
+				this.container.prepend(newRow);
+				margin = parseInt(this.container.css('margin-top'));
+				this.container.css('margin-top', (margin - elem.offset().top + offset.top) + "px");
+			}
+		}
+		else
+		{
+			elemId = this.document.getElementIdAtPosition(this.progress);
+			newRow = $(this.document.rows[elemId].outerHTML)
+			this.container.append(newRow);
+		}
 		for (i = 0; i < 1000; i++)
 		{
+			elem = this.container.children().last();
+			offset = elem.offset();
+			if (offset.top - containerOffset.top + elem.outerHeight() - populationOffset > containerHeight)
+			{
+				break;
+			}
+			elemId = parseInt(elem.attr('data-id')) + 1;
 			if (elemId >= this.document.count)
 			{
 				break;
 			}
 			var newRow = $(this.document.rows[elemId + i].outerHTML)
 			this.container.append(newRow);
-			var offset = newRow.offset();
-			if (offset.top - containerOffset.top + newRow.outerHeight() > containerHeight)
-			{
-				break;
-			}
 		}
 	},
 	openHtmlDocument: function(path)
