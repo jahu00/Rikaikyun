@@ -88,7 +88,7 @@
 			element.customScrollData.lastMove = val1;//position + val;
 			element.customScrollData.distance += Math.abs(element.customScrollData.lastMove);
 			var position = parseInt($(element).css("margin-top"));
-			$(this).css("margin-top", (position - val1) + "px");
+			$(this).css("margin-top", parseInt(position - val1) + "px");
 		}
 		return parseInt($(this).css("margin-top") || "0") * -1;
 	};

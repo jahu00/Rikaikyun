@@ -279,8 +279,6 @@ Reader.prototype = {
 	{
 		// Here is a simple conversion txt => html
 		// TODO: Add injecting furigana
-		//$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
-		//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
 		var data = (new DOMParser()).parseFromString("<div>" + text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>").trim() + "</div>", 'text/html');
 		this.processHtml(data.body);
 	},
@@ -684,15 +682,15 @@ Reader.prototype = {
 		{
 			var elem = self.container.children().first();
 			//console.log(elem.offset().top - containerOffset.top);
-			if (elem.attr("data-id") == 0 && elem.offset().top - containerOffset.top - val > 0)
+			if (elem.attr("data-id") == 0 && elem.offset().top - containerOffset.top - val - parseInt(elem.css("margin-top") || 0) > 0)
 			{
-				return containerOffset.top - elem.offset().top;
+				return containerOffset.top - elem.offset().top - parseInt(elem.css("margin-top") || 0);
 			}
 		}
-		if (val < 0)
+		if (val > 0)
 		{
 			var elem = self.container.children().last();
-			if (elem.attr("data-id") == self.document.count - 1 && elem.offset().top - containerOffset.top + elem.outerHeight() - val < containerHeight)
+			if (elem.attr("data-id") == self.document.count - 1 && elem.offset().top - containerOffset.top + elem.outerHeight() + parseInt(elem.css("margin-bottom") || 0) - val < containerHeight)
 			{
 				return containerHeight - elem.offset().top + containerOffset.top - elem.outerHeight();
 			}
@@ -849,6 +847,34 @@ Reader.prototype = {
 		
 		var self = this;
 		clearTimeout(self.scrollTimeout);
+		
+		if (typeof self.document == "undefined" || self.document.count == 0 || self.container.children().length == 0)
+		{
+			this.progress = 0;
+		}
+		else
+		{
+			var containerOffset = self.container.parent().offset();
+			var elem = self.container.children().first();
+			var elemId = $(elem).attr('data-id');
+			var elemHeight = $(elem).outerHeight();
+			var position = parseInt($(elem).attr('data-position'));
+			var correction = 0;
+			if (elemHeight > 0)
+			{
+				var length = parseInt($(elem).attr('data-length'));
+				correction = parseInt(length * ((containerOffset.top - elem.offset().top) / elemHeight));
+				if (correction < 0)
+				{
+					correction = 0;
+				}
+				else if (correction > length)
+				{
+					correction = length;
+				}
+			}
+			this.progress = (position + correction) / self.document.total;
+		}
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
 		
@@ -868,49 +894,46 @@ Reader.prototype = {
 		{
 			//this.progress = scroller.scrollTop() / length;
 			this.progress = container.fakeScroll() / length;
-		}
-		if (this.currentFile != null)
+		}*/
+		/*if (this.currentFile != null)
 		{
 			localStorage['progress-' + this.currentHash] = this.progress;
-		}
+		}*/
 		// TODO: Optimize the element lookups
 		var statusBar = reader.children('.statusBar');
-		
 		var percentage = (this.progress * 100).toFixed(2)+"%";
 		
 		//var statusBar = reader.find('> .statusBar');
 		// using > selector with find was causing infinite executions of scroll event for some reason
 		statusBar.find('> .grid  .progress > .bar').css('width', percentage);
-		var pages = Math.ceil(documentHeight / windowHeight);
-		//var page = parseInt((scroller.scrollTop() / documentHeight) * pages  + 1.5);
-		var page = parseInt((container.fakeScroll() / documentHeight) * pages  + 1.5);
+		/*var pages = Math.ceil(documentHeight / windowHeight);
+		var page = parseInt((container.fakeScroll() / documentHeight) * pages  + 1.5);*/
 
 		// Update the page count
-		if (localStorage['statusPaged'] == "true")
+		/*if (localStorage['statusPaged'] == "true")
 		{
 			statusBar.find('.status .progress').html(page+"/"+pages);
 		}
 		else
-		{
+		{*/
 			statusBar.find('.status .progress').html(percentage);
-		}
+		//}
 		// After updating the page count measure it's width and adjust the size of the container holding the page count
 		self.adjustStatusWidth();
 		
 		// This part is responsible for measuring how many pages we have traveled and if we should do an eink blink
 		// TODO: The blink (should we use it or not) as well as the amount of pages after which the blink occurs should be customizable in the settings
+		/*
 		if (this.lastPosition == null)
 		{
-			//lastPosition = scroller.scrollTop();
 			lastPosition = container.fakeScroll();
 		}
-		//this.scrollDistance += Math.abs(scroller.scrollTop() - this.lastPosition);
+
 		this.scrollDistance += Math.abs(container.fakeScroll() - this.lastPosition);
 		if (this.scrollDistance >= windowHeight * 3)
 		{
 			this.blink();
 		}
-		//this.lastPosition = scroller.scrollTop();
 		this.lastPosition = container.fakeScroll();
 		*/
 	},
