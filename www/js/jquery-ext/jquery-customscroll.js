@@ -32,7 +32,7 @@
 				element.customScrollData.clearScroll = setTimeout(function()
 				{
 					element.customScrollData.lastMove = 0;
-				}, 100);
+				}, 50);
 				element.customScrollData.lastPosition = event.originalEvent.touches[0].pageY;
 			}
 		},
@@ -46,7 +46,7 @@
 				var newScroll = /*$(element).customScroll() +*/ element.customScrollData.lastMove;
 				if (element.customScrollData.lastMove != 0)
 				{
-					$(element).customScroll(newScroll, event);
+					$(element).customScroll(newScroll);//, event);
 				}
 				if (element.customScrollData.distance > element.customScrollData.distanceThreshold)
 				{

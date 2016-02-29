@@ -16,6 +16,7 @@ ReaderDocument.prototype = {
 		self.index = [];
 		self.rows = [];
 		self.navigation = [];
+		self.bookmarks = {};
 		var i = 0;
 		$(self.data).children().each(function()
 		{
@@ -32,14 +33,22 @@ ReaderDocument.prototype = {
 			elem.attr('data-length', length);
 			elem.attr('data-id', i);
 			self.total += length;
-			if (elem.is("div[id]"))
+			if (elem.is("[id]"))
 			{
-				var anchor = $(self.data).find('a[href=#' + this.id + ']');
-				if (anchor.length > 0)
+				self.bookmarks[this.id] = i;
+				if (elem.is("div"))
 				{
-					self.navigation.push({ id : this.id, name : anchor.html(), elem: this });
+					var anchor = $(self.data).find('a[href=#' + this.id + ']');
+					if (anchor.length > 0)
+					{
+						self.navigation.push({ id : this.id, name : anchor.html(), elem: this });
+					}
 				}
 			}
+			elem.find("[id]").each(function()
+			{
+				self.bookmarks[this.id] = i;
+			});
 			i++;
 		});
 		self.count = i;

@@ -58,31 +58,7 @@ Reader.prototype = {
 		});
 		$('.reader > .scroller > .container').customScrollOn(function(val)
 		{
-			if (typeof self.document == "undefined" || self.document == 0)
-			{
-				return 0;
-			}
-			self.populateContainer(val);
-			var containerOffset = self.container.parent().offset();
-			var containerHeight = self.container.parent().outerHeight();
-			if (val < 0)
-			{
-				var elem = self.container.children().first();
-				//console.log(elem.offset().top - containerOffset.top);
-				if (elem.attr("data-id") == 0 && elem.offset().top - containerOffset.top - val > 0)
-				{
-					return containerOffset.top - elem.offset().top;
-				}
-			}
-			if (val < 0)
-			{
-				var elem = self.container.children().last();
-				if (elem.attr("data-id") == self.document.count - 1 && elem.offset().top - containerOffset.top + elem.outerHeight() - val < containerHeight)
-				{
-					return containerHeight - elem.offset().top + containerOffset.top - elem.outerHeight();
-				}
-			}
-			return val;
+			return self.onScroll(val);
 		});
 		
 		// Setup scroll behaviour for dictionary popup (Android 4.0.4 doesn't support normal scrolling)
@@ -249,15 +225,6 @@ Reader.prototype = {
 		};
 		self.fileSelector.onOpenFile = function(path, entry)
 		{
-			/*self.prepareLoad();
-			entry.file(function(file)
-			{
-				var reader = new FileReader();
-				reader.onloadend = function(e){
-					self.openFile(path, e.target.result, false);
-				};
-				reader.readAsText(file);
-			});*/
 			self.openFile(path, entry);
 		};
 		self.fileSelector.onPathChanged = function(path)
@@ -453,110 +420,6 @@ Reader.prototype = {
 		{
 			this.unselectable = "on";
 		});*/
-	},
-	populateContainer: function(populationOffset)
-	{
-		if (typeof this.document == "undefined" || this.document.count == 0)
-		{
-			return;
-		}
-		if (typeof populationOffset == "undefined")
-		{
-			populationOffset = 0;
-		}
-		var containerOffset = this.container.parent().offset();
-		var containerHeight = this.container.parent().outerHeight();
-		var elemId = 0;
-		var newRow = '';
-		var elem = null;
-		var offset = null;
-		var margin = 0;
-		if (this.container.children().length > 0)
-		{
-			for (i = 0; i < 1000; i++)
-			{
-				elem = this.container.children().first();
-				offset = elem.offset();
-				if (offset.top - containerOffset.top - populationOffset < 0)
-				{
-					break;
-				}
-				elemId = parseInt(elem.attr('data-id'));
-				if (elemId <= 0)
-				{
-					break;
-				}
-				newRow = $(this.document.rows[elemId - 1].outerHTML)
-				this.container.prepend(newRow);
-				margin = parseInt(this.container.css('margin-top'));
-				this.container.css('margin-top', (margin - elem.offset().top + offset.top) + "px");
-			}
-		}
-		else
-		{
-			elemId = this.document.getElementIdAtPosition(this.progress);
-			newRow = $(this.document.rows[elemId].outerHTML)
-			this.container.append(newRow);
-		}
-		for (i = 0; i < 1000; i++)
-		{
-			elem = this.container.children().last();
-			offset = elem.offset();
-			if (offset.top - containerOffset.top + elem.outerHeight() - populationOffset > containerHeight)
-			{
-				break;
-			}
-			elemId = parseInt(elem.attr('data-id')) + 1;
-			if (elemId >= this.document.count)
-			{
-				break;
-			}
-			var newRow = $(this.document.rows[elemId + i].outerHTML)
-			this.container.append(newRow);
-		}
-	},
-	depopulateContainer: function()
-	{
-		if (this.container.children().length == 0)
-		{
-			return;
-		}
-		var containerOffset = this.container.parent().offset();
-		var containerHeight = this.container.parent().outerHeight();
-		var elem = null;
-		var nextElem = null;
-		var offset = null;
-		var margin = 0;
-
-		for (i = 0; i < 1000; i++)
-		{
-			elem = this.container.children().first();
-			if (elem.offset().top - containerOffset.top + elem.outerHeight() > 0)
-			{
-				break;
-			}
-			nextElem = elem.next();
-			if (nextElem == null)
-			{
-				break;
-			}
-			console.log(nextElem);
-			offset = nextElem.offset();
-			margin = parseInt(this.container.css('margin-top'));
-			elem.remove();
-			this.container.css('margin-top', (margin + (offset.top - nextElem.offset().top)) + "px");
-		}
-
-		for (i = 0; i < 1000; i++)
-		{
-			elem = this.container.children().last();
-			offset = elem.offset();
-			if (offset.top - containerOffset.top < containerHeight)
-			{
-				break;
-			}
-			elem.remove();
-		}
 	},
 	openHtmlDocument: function(path)
 	{
@@ -834,6 +697,138 @@ Reader.prototype = {
 		$('.floater').show();
 		App.forceRefresh($('.reader > .floater'));
 	},
+	onScroll: function(val)
+	{
+		var self = this;
+		if (typeof self.document == "undefined" || self.document == 0)
+		{
+			return 0;
+		}
+		self.populateContainer(val);
+		var containerOffset = self.container.parent().offset();
+		var containerHeight = self.container.parent().outerHeight();
+		if (val < 0)
+		{
+			var elem = self.container.children().first();
+			//console.log(elem.offset().top - containerOffset.top);
+			if (elem.attr("data-id") == 0 && elem.offset().top - containerOffset.top - val > 0)
+			{
+				return containerOffset.top - elem.offset().top;
+			}
+		}
+		if (val < 0)
+		{
+			var elem = self.container.children().last();
+			if (elem.attr("data-id") == self.document.count - 1 && elem.offset().top - containerOffset.top + elem.outerHeight() - val < containerHeight)
+			{
+				return containerHeight - elem.offset().top + containerOffset.top - elem.outerHeight();
+			}
+		}
+		return val;
+	},
+	populateContainer: function(populationOffset)
+	{
+		if (typeof this.document == "undefined" || this.document.count == 0)
+		{
+			return;
+		}
+		if (typeof populationOffset == "undefined")
+		{
+			populationOffset = 0;
+		}
+		var containerOffset = this.container.parent().offset();
+		var containerHeight = this.container.parent().outerHeight();
+		var elemId = 0;
+		var newRow = '';
+		var elem = null;
+		var offset = null;
+		var margin = 0;
+		if (this.container.children().length > 0)
+		{
+			for (i = 0; i < 1000; i++)
+			{
+				elem = this.container.children().first();
+				offset = elem.offset();
+				if (offset.top - containerOffset.top - populationOffset < 0)
+				{
+					break;
+				}
+				elemId = parseInt(elem.attr('data-id'));
+				if (elemId <= 0)
+				{
+					break;
+				}
+				newRow = $(this.document.rows[elemId - 1].outerHTML)
+				this.container.prepend(newRow);
+				margin = parseInt(this.container.css('margin-top'));
+				this.container.css('margin-top', (margin - elem.offset().top + offset.top) + "px");
+			}
+		}
+		else
+		{
+			elemId = this.document.getElementIdAtPosition(this.progress);
+			newRow = $(this.document.rows[elemId].outerHTML)
+			this.container.append(newRow);
+		}
+		for (i = 0; i < 1000; i++)
+		{
+			elem = this.container.children().last();
+			offset = elem.offset();
+			if (offset.top - containerOffset.top + elem.outerHeight() - populationOffset > containerHeight)
+			{
+				break;
+			}
+			elemId = parseInt(elem.attr('data-id')) + 1;
+			if (elemId >= this.document.count)
+			{
+				break;
+			}
+			var newRow = $(this.document.rows[elemId + i].outerHTML)
+			this.container.append(newRow);
+		}
+	},
+	depopulateContainer: function()
+	{
+		if (this.container.children().length == 0)
+		{
+			return;
+		}
+		var containerOffset = this.container.parent().offset();
+		var containerHeight = this.container.parent().outerHeight();
+		var elem = null;
+		var nextElem = null;
+		var offset = null;
+		var margin = 0;
+
+		for (i = 0; i < 1000; i++)
+		{
+			elem = this.container.children().first();
+			if (elem.offset().top - containerOffset.top + elem.outerHeight() > 0)
+			{
+				break;
+			}
+			nextElem = elem.next();
+			if (nextElem == null)
+			{
+				break;
+			}
+			offset = nextElem.offset();
+			margin = parseInt(this.container.css('margin-top'));
+			elem.remove();
+			this.container.css('margin-top', (margin + (offset.top - nextElem.offset().top)) + "px");
+		}
+
+		for (i = 0; i < 1000; i++)
+		{
+			elem = this.container.children().last();
+			offset = elem.offset();
+			if (offset.top - containerOffset.top < containerHeight)
+			{
+				break;
+			}
+			elem.remove();
+		}
+	},
 	resizeScreen: function(preserveProgress)
 	{
 		if (typeof preserveProgress == "undefined")
@@ -878,12 +873,13 @@ Reader.prototype = {
 	// Updates reading status
 	updateStatus: function()
 	{
-		/*
+		
 		var self = this;
 		clearTimeout(self.scrollTimeout);
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
-		var scroller = reader.children('.scroller');
+		
+		/*var scroller = reader.children('.scroller');
 		var container = scroller.children('.container');
 		//var documentHeight = scroller[0].scrollHeight;
 		var documentHeight = container.outerHeight();
@@ -947,7 +943,7 @@ Reader.prototype = {
 	},
 	scrollTo: function(progress, update, procentage)
 	{
-		/*
+		
 		var self = this;
 		if (typeof update == "undefined")
 		{
@@ -962,7 +958,7 @@ Reader.prototype = {
 			progress = parseInt(progress);
 		}
 		
-		var reader = this.screen;
+		/*var reader = this.screen;
 		var scroller = reader.children('.scroller');
 		var container = scroller.children('.container');
 		//var documentHeight = scroller[0].scrollHeight;
