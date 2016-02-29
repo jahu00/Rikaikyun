@@ -272,42 +272,34 @@ Reader.prototype = {
 	},
 	loadReady: function()
 	{
-		this.tempData = null;
 		this.selectScreen("reader");
 		$('.container').html("");
 	},
-	loadDocument: function(text)
+	loadTextDocument: function(text)
 	{
-		this.loadReady();
-		//this.prepareLoad();
 		// Here is a simple conversion txt => html
 		// TODO: Add injecting furigana
-		$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
+		//$('.container').html(text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>"));
 		//$('.container').html(data.replace(/^\s*(.*)?\s*$/gm, "$1<br/>"));
-	},
-	openDocument: function(path)
-	{
-		var self = this;
-		// TODO: This will change a lot later on when I implement selecting files
-		$.get(path, function(data)
-		{
-			self.loadDocument(data);
-		}, 'html');
+		var data = (new DOMParser()).parseFromString("<div>" + text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>").trim() + "</div>", 'text/html');
+		this.processHtml(data.body);
 	},
 	loadHtmlDocument: function(data)
 	{
 		var self = this;
-		this.loadReady();
 		// extract body of the html file
 		App.log("Extract html body");
 		var doc = (new DOMParser()).parseFromString(data, 'text/html');
 		data = null;
-		
 		// Create temporary element for storing the body (allows modifying the elements)
+		
+		this.processHtml(doc.body);
+	},
+	processHtml: function(data)
+	{
+		var self = this;
 		App.log("Create temp element");
-		var temp = doc.body;
-		body = null;
-		var $temp = $(temp);
+		var $temp = $(data);
 		// Remove style, script and link tags to prevent them from breaking the app (we don't need those anyway)
 		App.log("Remove script style and link");
 		$temp.find('script, style, link').remove();
@@ -393,7 +385,7 @@ Reader.prototype = {
 			this.outerHTML = flatterer.divide(this);
 		});
 		App.log("Compute position");
-		self.document = new ReaderDocument(temp);
+		self.document = new ReaderDocument(data);
 		//window.readerDocument = self.document;
 
 		App.log("Add chapters to progress bar");
@@ -408,12 +400,7 @@ Reader.prototype = {
 		}
 		
 		App.log('Insert the text into reader');
-		//var container = $('.container');
-		//self.container.html(temp.innerHTML);
-		
-		self.populateContainer();
-		
-		App.log('Loading html complete');
+
 		//console.log(self.navigation);
 		
 		/*container.find('*').each(function()
@@ -421,26 +408,9 @@ Reader.prototype = {
 			this.unselectable = "on";
 		});*/
 	},
-	openHtmlDocument: function(path)
-	{
-		var self = this;
-		// TODO: The method of opening files is likely to change when file selection is implemented, but the operations on the file itself will stay the same
-		$.get(path, function(data)
-		{
-			self.loadHtmlDocument(data);
-		}, 'html');
-	},
 	openFile: function(path, entry, data)//, preprare)
 	{
-		/*if (typeof prepare == "undefined")
-		{
-			prepare = true;
-		}*/
 		var self = this;
-		/*if (prepare)
-		{
-			self.prepareLoad('path');
-		}*/
 		self.prepareLoad();
 		function openCallback(path, data)
 		{
@@ -451,15 +421,18 @@ Reader.prototype = {
 			self.progress = parseFloat(localStorage["progress-" + self.currentHash] || '0');
 			var split = path.split('.');
 			var ext = split[split.length - 1].toLowerCase();
+			self.loadReady();
 			if (ext == 'htm' || ext == 'html')
 			{
 				self.loadHtmlDocument(data);
 			}
 			else
 			{
-				self.loadDocument(data);
+				self.loadTextDocument(data);
 			}
-					
+			self.populateContainer();
+			App.log('Loading file complete');
+			
 			// Adjust status etc.
 			self.resizeScreen(true);
 			//$(window).resize();

@@ -60,17 +60,9 @@ var App = {
 		if(this.reader.screen.is(":visible"))
 		{
 			this.reader.updateStatus();
-			/*var container = $('.container');
-			this.tempData = container.html();
-			container.html("");*/
 		}
 		$('.screen').removeClass('active');
 		this.forceRefresh(elem);
-		/*if (this.tempData != null && $(elem)[0] == this.reader.screen[0])
-		{
-			$('.container').html(this.tempData);
-			this.tempData = null;
-		}*/
 		$(elem).addClass('active');
 	},
 	log: function(msg)
