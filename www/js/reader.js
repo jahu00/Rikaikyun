@@ -50,6 +50,7 @@ Reader.prototype = {
 			if(self.screen.is(':visible'))
 			{
 				self.scrollTimeout = setTimeout(function(){
+					self.depopulateContainer();
 					self.updateStatus();
 				},scrollDelay);
 			}
@@ -512,6 +513,49 @@ Reader.prototype = {
 			}
 			var newRow = $(this.document.rows[elemId + i].outerHTML)
 			this.container.append(newRow);
+		}
+	},
+	depopulateContainer: function()
+	{
+		if (this.container.children().length == 0)
+		{
+			return;
+		}
+		var containerOffset = this.container.parent().offset();
+		var containerHeight = this.container.parent().outerHeight();
+		var elem = null;
+		var nextElem = null;
+		var offset = null;
+		var margin = 0;
+
+		for (i = 0; i < 1000; i++)
+		{
+			elem = this.container.children().first();
+			if (elem.offset().top - containerOffset.top + elem.outerHeight() > 0)
+			{
+				break;
+			}
+			nextElem = elem.next();
+			if (nextElem == null)
+			{
+				break;
+			}
+			console.log(nextElem);
+			offset = nextElem.offset();
+			margin = parseInt(this.container.css('margin-top'));
+			elem.remove();
+			this.container.css('margin-top', (margin + (offset.top - nextElem.offset().top)) + "px");
+		}
+
+		for (i = 0; i < 1000; i++)
+		{
+			elem = this.container.children().last();
+			offset = elem.offset();
+			if (offset.top - containerOffset.top < containerHeight)
+			{
+				break;
+			}
+			elem.remove();
 		}
 	},
 	openHtmlDocument: function(path)
