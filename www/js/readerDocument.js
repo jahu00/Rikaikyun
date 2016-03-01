@@ -21,7 +21,6 @@ ReaderDocument.prototype = {
 		$(self.data).children().each(function()
 		{
 			self.rows.push(this);
-			self.index.push(self.total);
 			var elem = $(this);
 			var text = elem.text().trim();
 			elem.attr('data-position', self.total);
@@ -30,6 +29,7 @@ ReaderDocument.prototype = {
 			{
 				length = 1;
 			}
+			self.index.push({ position: self.total, length: length });
 			elem.attr('data-length', length);
 			elem.attr('data-id', i);
 			self.total += length;
@@ -82,15 +82,40 @@ ReaderDocument.prototype = {
 		var progress = parseInt(this.total * position);
 		//console.log(progress);
 		// TODO: For big documents, instead of iterating through all rows, there should be an option to "guess" the position of a row, by either estimating it or using a "guess a number 1-100" algorithm
-		for (var i = 0; i < this.count; i++)
+		var start = 0;
+		var end = this.count - 1;
+		/*if (end - start < 101 || progress < 1001)
 		{
-			if (this.index[i] > progress)
+			for (var i = start; i <= end; i++)
 			{
-				break;
+				var temp = this.index[i];
+				if (temp.position >= progress && temp.position + temp.length < progress)
+				{
+					return i;
+				}
 			}
 		}
-		//console.log(i - 1);
-		//return this.rows[i - 1];
-		return i - 1;
+		else
+		{*/
+		//while(true)
+		for (var i = 0; i < 100000; i ++)
+		{
+			var guessId = start + parseInt((end - start) / 2);
+			var guess = this.index[guessId];
+			if (progress >= guess.position && progress < guess.position + guess.length)
+			{
+				App.log('Guess docuemnt position in ' + i + " tries.");
+				return guessId;
+			}
+			if (guess.position < progress)
+			{
+				start = guessId;
+			}
+			else
+			{
+				end = guessId;
+			}
+		}
+		//}
 	}
 }

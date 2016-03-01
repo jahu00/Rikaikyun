@@ -365,10 +365,10 @@ Reader.prototype = {
 		// Put imgaes in containers and adjust image path
 		App.log("Process images");
 		var filePath = fileHelpers.getParentPath(self.currentFile)
-		$temp.find('img').each(function()
+		/*$temp.find('img').each(function()
 		{
 			this.outerHTML = '<div class="img-frame"><div class="img-container">' + this.outerHTML + '</div></div>';
-		});
+		});*/
 
 		$temp.find('img').each(function()
 		{
@@ -823,7 +823,7 @@ Reader.prototype = {
 			dynamicStyle.cssRule('.container img').css('max-height', ($('.reader .scroller').height()*zoom/containerZoom) + "px");
 			dynamicStyle.cssRule('.dictionary-container').css('max-height', parseInt(windowHeight/2/floaterZoom) + "px");
 			dynamicStyle.cssRule('.floater.bottom').css('bottom', (statusBarHeight*statusBarZoom/floaterZoom - 1) + "px");
-			dynamicStyle.cssRule('.img-frame').css({'width': this.screen.find('.container').width() + 'px', 'height': parseInt(scrollerHeight * zoom/containerZoom) + 'px'});
+			//dynamicStyle.cssRule('.img-frame').css({'width': this.screen.find('.container').width() + 'px', 'height': parseInt(scrollerHeight * zoom/containerZoom) + 'px'});
 			if (preserveProgress)
 			{
 				this.scrollTo(this.progress, false);
@@ -877,24 +877,7 @@ Reader.prototype = {
 		}
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
-		
-		/*var scroller = reader.children('.scroller');
-		var container = scroller.children('.container');
-		//var documentHeight = scroller[0].scrollHeight;
-		var documentHeight = container.outerHeight();
-		var windowHeight = scroller.outerHeight();
-		var length = documentHeight - windowHeight;
-		// Calculate progress percentage
-		// Todo: replace with something better (ie. figure out which element\line of text is visible at the top of the screen)
-		if (length < 0)
-		{
-			this.progress = 0;
-		}
-		else
-		{
-			//this.progress = scroller.scrollTop() / length;
-			this.progress = container.fakeScroll() / length;
-		}*/
+
 		/*if (this.currentFile != null)
 		{
 			localStorage['progress-' + this.currentHash] = this.progress;
@@ -939,7 +922,6 @@ Reader.prototype = {
 	},
 	scrollTo: function(progress, update, procentage)
 	{
-		
 		var self = this;
 		if (typeof update == "undefined")
 		{
@@ -949,7 +931,7 @@ Reader.prototype = {
 		{
 			procentage = true;
 		}
-		else
+		if (procentage == true)
 		{
 			progress = parseInt(progress);
 		}
@@ -988,12 +970,11 @@ Reader.prototype = {
 			}
 			this.progress = progress / length;
 			container.fakeScroll(Math.round(progress));
-		}
+		}*/
 		if (update)
 		{
 			self.updateStatus();
 		}
-		*/
 	},
 	// Code responsible for blinking the screen on eink display
 	// TODO: Needs to be optimized or better yet made into a plugin that can be used on any element, so we can blink the dictionary popup without blinking the whole screen
@@ -1041,7 +1022,7 @@ Reader.prototype = {
 				e.preventDefault();
 				ende.stopPropagation();
 				// Cancel touch to prevent accidential scrolling
-				self.screen.find('.container')[0].fakeScrollData.touchId = null;
+				self.screen.find('.container')[0].customScrollData.touchId = null;
 				self.anchorClick(a);
 			}
 		}
@@ -1072,8 +1053,8 @@ Reader.prototype = {
 		if (a.getAttribute("href").indexOf('#') == 0)
 		{
 			container = this.screen.find('.container');
-			var val = $(a.getAttribute("href")).offset().top - this.screen.find('.container').offset().top;//fakeScroll();
-			this.scrollTo(val, true, false);
+			//var val = $(a.getAttribute("href")).offset().top - this.screen.find('.container').offset().top;//fakeScroll();
+			//this.scrollTo(val, true, false);
 		}
 		else
 		{
