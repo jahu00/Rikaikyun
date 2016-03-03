@@ -720,7 +720,7 @@ Reader.prototype = {
 			{
 				elem = this.container.children().first();
 				offset = elem.offset();
-				if (offset.top - containerOffset.top - populationOffset < 0)
+				if (offset.top - containerOffset.top - populationOffset <= 0)
 				{
 					break;
 				}
@@ -878,10 +878,10 @@ Reader.prototype = {
 		// TODO: rename local variables to make them less misleading
 		var reader = this.screen;
 
-		/*if (this.currentFile != null)
+		if (this.currentFile != null)
 		{
 			localStorage['progress-' + this.currentHash] = this.progress;
-		}*/
+		}
 		// TODO: Optimize the element lookups
 		var statusBar = reader.children('.statusBar');
 		var percentage = (this.progress * 100).toFixed(2)+"%";
@@ -923,6 +923,10 @@ Reader.prototype = {
 	scrollTo: function(progress, update, procentage)
 	{
 		var self = this;
+		if (typeof self.document == "undefined" || self.document.count == 0)
+		{
+			return;
+		}
 		if (typeof update == "undefined")
 		{
 			update = true;
@@ -931,46 +935,50 @@ Reader.prototype = {
 		{
 			procentage = true;
 		}
-		if (procentage == true)
+		var containerOffset = self.container.parent().offset();
+		if (procentage == false)
 		{
-			progress = parseInt(progress);
-		}
-		
-		/*var reader = this.screen;
-		var scroller = reader.children('.scroller');
-		var container = scroller.children('.container');
-		//var documentHeight = scroller[0].scrollHeight;
-		var documentHeight = container.outerHeight();
-		var windowHeight = scroller.outerHeight();
-		var length = documentHeight - windowHeight;
-		// Calculate progress percentage
-		if (procentage)
-		{
-			if (length < 0)
+			var elem = self.container.find(progress);
+			if (elem.length == 0)
 			{
-				this.progress = 0;
+				var id = progress.substring(1);
+				if (typeof self.document.bookmarks[id] == "undefined")
+				{
+					return;
+				}
+				self.container.css("margin-top", "");
+				self.container.html(self.document.rows[self.document.bookmarks[id]].outerHTML);
+				self.populateContainer();
+				elem = self.container.find(progress);
 			}
-			else
-			{
-				this.progress = progress;
-			}
-			
-			//scroller.scrollTop(Math.round(length * this.progress));
-			container.fakeScroll(Math.round(length * this.progress));
+			var margin = parseInt(self.container.css("margin-top") || 0);
+			var val = elem.offset().top - containerOffset.top - margin; 
+			val = self.onScroll(val);
+			margin = parseInt(self.container.css("margin-top") || 0);
+			self.container.css("margin-top", (margin - val) + "px");
 		}
 		else
 		{
-			if (length < 0)
+			self.progress = progress;
+			var elemId = self.document.getElementIdAtPosition(progress);
+			var elem = self.container.find('[data-id=' + elemId + ']');
+			if (elem.length == 0)
 			{
-				progress = 0;
+				self.container.css("margin-top", "");
+				self.container.html(self.document.rows[elemId].outerHTML);
+				self.populateContainer();
+				elem = self.container.find('[data-id=' + elemId + ']');
 			}
-			else if (progress > length)
-			{
-				progress = length;
-			}
-			this.progress = progress / length;
-			container.fakeScroll(Math.round(progress));
-		}*/
+			var correction = parseInt(((progress * self.document.total - parseInt(elem.attr('data-position'))) / elem.attr('data-length')) * elem.outerHeight());
+			//console.log(correction);
+			var margin = parseInt(self.container.css("margin-top") || 0);
+			var val = elem.offset().top + correction - containerOffset.top - margin; 
+			val = self.onScroll(val);
+			margin = parseInt(self.container.css("margin-top") || 0);
+			self.container.css("margin-top", (margin - val) + "px");
+		}
+		self.depopulateContainer();
+
 		if (update)
 		{
 			self.updateStatus();
@@ -1052,9 +1060,7 @@ Reader.prototype = {
 	{
 		if (a.getAttribute("href").indexOf('#') == 0)
 		{
-			container = this.screen.find('.container');
-			//var val = $(a.getAttribute("href")).offset().top - this.screen.find('.container').offset().top;//fakeScroll();
-			//this.scrollTo(val, true, false);
+			this.scrollTo(a.getAttribute("href"), true, false);
 		}
 		else
 		{
