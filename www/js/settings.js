@@ -134,8 +134,7 @@ Settings.prototype = {
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{
 			self.reader.screen.find('.container').css('font-size', value/100 + "em");
-			$('.dynamicStyle').cssRule('.img-frame img').css('zoom', value + "%");
-			/*$('.dynamicStyle').cssRule('.spinner').css('zoom', value + "%");*/
+			$('.dynamicStyle').cssRule('.container img').css('zoom', value + "%");
 		},
 		parseFloat($('.container').css('font-size')) / parseFloat($(document.body).css('font-size')) * 100);
 		//self.reader.screen.find('.container').css('font-size'));

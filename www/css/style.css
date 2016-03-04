@@ -254,15 +254,11 @@ body
 
 .reader .container img
 {
-	/*margin:0 auto;*/
-	/*width: auto;*/
-	/*margin-top:5px;
-	margin-bottom:5px;
 	display: block;
-	text-align:center;
 	max-width:100%;
-	height: auto;*/
-	max-width:100%;
+	margin:0 auto;
+	margin-top:5px;
+	margin-bottom:5px;
 }
 
 /*.img-frame

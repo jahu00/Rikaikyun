@@ -152,7 +152,13 @@ Reader.prototype = {
 				document.querySelector(".main.menu .openFile input").dispatchEvent(new Event('click'));
 			}
 		});
-		
+		menu.find('.openUrl').click(function()
+		{
+			var url = prompt("Enter url");
+			if (url != null){
+				self.openFile(url);
+			}
+		});
 		menu.find('.openFile input').change(function(e)
 		{
 			var file = e.target.files[0];
@@ -323,7 +329,7 @@ Reader.prototype = {
 			}
 			else if (this.nodeName === "IMG")
 			{
-				elem.removeAttributes(null, ['id', 'src', 'alt', 'data-tempsrc']);
+				elem.removeAttributes(null, ['id', 'src', 'alt']);
 			}
 			else
 			{
@@ -364,17 +370,18 @@ Reader.prototype = {
 		
 		// Put imgaes in containers and adjust image path
 		App.log("Process images");
-		var filePath = fileHelpers.getParentPath(self.currentFile)
-		/*$temp.find('img').each(function()
+		var filePath = fileHelpers.getParentPath(self.currentFile);
+		/*if (filePath == self.currentFile)
 		{
-			this.outerHTML = '<div class="img-frame"><div class="img-container">' + this.outerHTML + '</div></div>';
-		});*/
+			filePath = "";
+		}*/
 
 		$temp.find('img').each(function()
 		{
 			var img = $(this);
 			var tempSrc = img.attr('src');
-			img.attr('src', (tempSrc.indexOf(':') > -1 ? tempSrc : filePath + tempSrc));
+			img.attr('data-src', (tempSrc.indexOf(':') > -1 ? tempSrc : filePath + tempSrc));
+			img.removeAttr('src');
 		});
 		
 		App.log("Split paragraphs");
@@ -382,7 +389,7 @@ Reader.prototype = {
 		{
 			this.outerHTML = flatterer.divide(this);
 		});
-		App.log("Compute position");
+		App.log("Compute chapter positions");
 		self.document = new ReaderDocument(data);
 		//window.readerDocument = self.document;
 
@@ -410,7 +417,7 @@ Reader.prototype = {
 	{
 		var self = this;
 		self.prepareLoad();
-		function openCallback(path, data)
+		function openCallback(path, data, isUrl)
 		{
 			localStorage["lastFile"] = path;
 			ReadingHistory.push(path);
@@ -420,7 +427,7 @@ Reader.prototype = {
 			var split = path.split('.');
 			var ext = split[split.length - 1].toLowerCase();
 			self.loadReady();
-			if (ext == 'htm' || ext == 'html')
+			if (ext == 'htm' || ext == 'html' || (isUrl && ext != 'txt'))
 			{
 				self.loadHtmlDocument(data);
 			}
@@ -460,11 +467,12 @@ Reader.prototype = {
 		}
 		if (typeof data == "undefined")
 		{
-			if (localStorage['openMethod'] == "AJAX")
+			var isUrl = path.indexOf('http') == 0;
+			if (localStorage['openMethod'] == "AJAX" || isUrl)
 			{
 				$.get(path, function(data)
 				{
-					openCallback(path, data);
+					openCallback(path, data, isUrl);
 				}, 'html').error(function()
 				{
 					failCallback(path);
@@ -699,7 +707,8 @@ Reader.prototype = {
 	},
 	populateContainer: function(populationOffset)
 	{
-		if (typeof this.document == "undefined" || this.document.count == 0)
+		var self = this;
+		if (typeof self.document == "undefined" || self.document.count == 0)
 		{
 			return;
 		}
@@ -707,18 +716,18 @@ Reader.prototype = {
 		{
 			populationOffset = 0;
 		}
-		var containerOffset = this.container.parent().offset();
-		var containerHeight = this.container.parent().outerHeight();
+		var containerOffset = self.container.parent().offset();
+		var containerHeight = self.container.parent().outerHeight();
 		var elemId = 0;
 		var newRow = '';
 		var elem = null;
 		var offset = null;
 		var margin = 0;
-		if (this.container.children().length > 0)
+		if (self.container.children().length > 0)
 		{
 			for (i = 0; i < 1000; i++)
 			{
-				elem = this.container.children().first();
+				elem = self.container.children().first();
 				offset = elem.offset();
 				if (offset.top - containerOffset.top - populationOffset <= 0)
 				{
@@ -729,34 +738,59 @@ Reader.prototype = {
 				{
 					break;
 				}
-				newRow = $(this.document.rows[elemId - 1].outerHTML)
-				this.container.prepend(newRow);
-				margin = parseInt(this.container.css('margin-top'));
-				this.container.css('margin-top', (margin - elem.offset().top + offset.top) + "px");
+				newRow = $(self.document.rows[elemId - 1].outerHTML)
+				self.container.prepend(newRow);
+				margin = parseInt(self.container.css('margin-top'));
+				self.container.css('margin-top', (margin - elem.offset().top + offset.top) + "px");
 			}
+			// When scrolling up move the position down when there is an image in the text
+			self.container.find('img[data-src]').each(function()
+			{
+				var img = $(this);
+				var startHeight = img.outerHeight();
+				img.on('load error', function()
+				{
+					endHeight = img.outerHeight();
+					if (startHeight != endHeight)
+					{
+						margin = parseInt(self.container.css('margin-top'));
+						//console.log(img.outerHeight(), startHeight, margin);
+						var zoom = img.absoluteZoom();
+						self.container.css('margin-top', (margin + zoom * (startHeight - img.outerHeight())) + "px");
+					}
+				});
+			});
 		}
 		else
 		{
-			elemId = this.document.getElementIdAtPosition(this.progress);
-			newRow = $(this.document.rows[elemId].outerHTML)
-			this.container.append(newRow);
+			elemId = self.document.getElementIdAtPosition(self.progress);
+			newRow = $(self.document.rows[elemId].outerHTML)
+			self.container.append(newRow);
 		}
 		for (i = 0; i < 1000; i++)
 		{
-			elem = this.container.children().last();
+			elem = self.container.children().last();
 			offset = elem.offset();
 			if (offset.top - containerOffset.top + elem.outerHeight() - populationOffset > containerHeight)
 			{
 				break;
 			}
 			elemId = parseInt(elem.attr('data-id')) + 1;
-			if (elemId >= this.document.count)
+			if (elemId >= self.document.count)
 			{
 				break;
 			}
-			var newRow = $(this.document.rows[elemId + i].outerHTML)
-			this.container.append(newRow);
+			var newRow = $(self.document.rows[elemId].outerHTML)
+			self.container.append(newRow);
 		}
+		// Set the source to start loading images
+		self.container.find('img[data-src]').each(function()
+		{
+			var elem = $(this);
+			var src = elem.attr('data-src');
+			elem.attr('src', src);
+			elem.removeAttr('data-src');
+		});
 	},
 	depopulateContainer: function()
 	{
@@ -774,7 +808,7 @@ Reader.prototype = {
 		for (i = 0; i < 1000; i++)
 		{
 			elem = this.container.children().first();
-			if (elem.offset().top - containerOffset.top + elem.outerHeight() > 0)
+			if (elem.offset().top - containerOffset.top + elem.outerHeight() >= 0)
 			{
 				break;
 			}
