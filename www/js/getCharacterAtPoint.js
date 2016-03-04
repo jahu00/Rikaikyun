@@ -61,7 +61,7 @@ getCharacterAtPoint = {
 								if (!this.isWhitepsace(node.nodeValue[nextPosition]))
 								{
 									var nextCharacterBoundingBox = this.getBoundingBox(node, nextPosition);
-									console.log(nextCharacterBoundingBox);
+									//console.log(nextCharacterBoundingBox);
 									if (nextCharacterBoundingBox.bottom == boundingBox.bottom)
 									{
 										boundingBox = {

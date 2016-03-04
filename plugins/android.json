@@ -24,6 +24,9 @@
         },
         "cordova-plugin-statusbar": {
             "PACKAGE_NAME": "com.phonegap.rikaikyun"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.phonegap.rikaikyun"
         }
     },
     "dependent_plugins": {}
