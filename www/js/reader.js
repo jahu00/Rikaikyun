@@ -29,7 +29,6 @@ Reader.prototype = {
 		self.screen.find('.floater .bar.bottom').html(self.screen.find('.floater .bar.top').html());
 		self.initDictionarySelection();
 		self.container = self.screen.find('.container');
-		//var container = this.screen.find('.container');
 		
 		// Our function for handling the event is inside another to not confuse what 'this' is
 		// clicks on the screen (handles word lookups)
@@ -1025,8 +1024,7 @@ Reader.prototype = {
 			}
 			correction = parseInt(correction * elem.outerHeight());
 			var margin = parseInt(self.container.css("margin-top") || 0);
-			var val = elem.offset().top + correction + containerOffset.top; 
-			containerOffset.top;
+			var val = elem.offset().top + correction - containerOffset.top; 
 			val = self.onScroll(val);
 			margin = parseInt(self.container.css("margin-top") || 0);
 			self.container.css("margin-top", (margin - val) + "px");
