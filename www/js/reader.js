@@ -35,6 +35,8 @@ Reader.prototype = {
 		// clicks on the screen (handles word lookups)
 		
 		self.container.click(function(e){ self.containerClick(e); });
+		self.container.on('click taphold', '*', function(e) { e.preventDefault(); });
+		//self.container.on('touchstart', '*', function(e) { console.log(e); e.preventDefault(); })
 		
 		// Handling resizes of the screen
 		$(window).resize(function()
@@ -44,7 +46,7 @@ Reader.prototype = {
 		// Handling scrolling within the document
 		var scrollDelay = 200;
 		self.scrollTimeout = null;
-		$('.reader > .scroller > .container').scroll(function()
+		self.container.scroll(function()
 		{
 			clearTimeout(self.scrollTimeout);
 			if(self.screen.is(':visible'))
@@ -56,7 +58,7 @@ Reader.prototype = {
 			}
 
 		});
-		$('.reader > .scroller > .container').customScrollOn(function(val)
+		self.container.customScrollOn(function(val)
 		{
 			return self.onScroll(val);
 		});
@@ -736,7 +738,7 @@ Reader.prototype = {
 			{
 				elem = self.container.children().first();
 				offset = elem.offset();
-				if (offset.top - containerOffset.top - populationOffset <= 0)
+				if (offset.top - containerOffset.top - populationOffset < 0)
 				{
 					break;
 				}
@@ -815,7 +817,7 @@ Reader.prototype = {
 		for (i = 0; i < 1000; i++)
 		{
 			elem = this.container.children().first();
-			if (elem.offset().top - containerOffset.top + elem.outerHeight() >= 0)
+			if (elem.offset().top - containerOffset.top + elem.outerHeight() > 0)
 			{
 				break;
 			}
@@ -885,7 +887,6 @@ Reader.prototype = {
 	// Updates reading status
 	updateStatus: function()
 	{
-		
 		var self = this;
 		clearTimeout(self.scrollTimeout);
 		
@@ -897,14 +898,15 @@ Reader.prototype = {
 		{
 			var containerOffset = self.container.parent().offset();
 			var elem = self.container.children().first();
-			var elemId = $(elem).attr('data-id');
-			var elemHeight = $(elem).outerHeight();
-			var position = parseInt($(elem).attr('data-position'));
+			var elemId = elem.attr('data-id');
+			//console.log(elemId);
+			var elemHeight = elem.outerHeight();
+			var position = parseInt(elem.attr('data-position'));
 			var correction = 0;
 			if (elemHeight > 0)
 			{
-				var length = parseInt($(elem).attr('data-length'));
-				correction = parseInt(length * ((containerOffset.top - elem.offset().top) / elemHeight));
+				var length = parseInt(elem.attr('data-length'));
+				correction = length * ((containerOffset.top - elem.offset().top) / elemHeight);
 				if (correction < 0)
 				{
 					correction = 0;
@@ -1005,15 +1007,26 @@ Reader.prototype = {
 			var elem = self.container.find('[data-id=' + elemId + ']');
 			if (elem.length == 0)
 			{
-				self.container.css("margin-top", "");
+				self.container.css("margin-top", "0");
 				self.container.html(self.document.rows[elemId].outerHTML);
 				self.populateContainer();
 				elem = self.container.find('[data-id=' + elemId + ']');
 			}
-			var correction = parseInt(((progress * self.document.total - parseInt(elem.attr('data-position'))) / elem.attr('data-length')) * elem.outerHeight());
-			//console.log(correction);
+			var position = parseInt(elem.attr('data-position'));
+			var length = parseInt(elem.attr('data-length'));
+			var correction = (progress * self.document.total - position) / length;
+			if (correction < 0)
+			{
+				correction = 0;
+			}
+			if (correction > 1)
+			{
+				correction = 1;
+			}
+			correction = parseInt(correction * elem.outerHeight());
 			var margin = parseInt(self.container.css("margin-top") || 0);
-			var val = elem.offset().top + correction - containerOffset.top - margin; 
+			var val = elem.offset().top + correction + containerOffset.top; 
+			containerOffset.top;
 			val = self.onScroll(val);
 			margin = parseInt(self.container.css("margin-top") || 0);
 			self.container.css("margin-top", (margin - val) + "px");

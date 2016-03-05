@@ -129,7 +129,7 @@ Settings.prototype = {
 		},
 		50);		
 		
-		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "FileSystem");
+		var openMethodControl = new DropdownControl(self.screen.find('.openMethod'), undefined, "AJAX");
 
 		var fontSizeControl = new SliderControl(self.screen.find('.fontSize'), function(value)
 		{

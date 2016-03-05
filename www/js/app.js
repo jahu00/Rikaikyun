@@ -6,6 +6,7 @@ var App = {
 		preloadStyleImages.preload();
 		//FastClick.attach(document.body);
 		this.reader = new Reader();//dict);
+		window.reader = this.reader;
 		// Block context menu (makes the app run less buggy on chrome on desktop)
 		$(document.body).on('contextmenu', function(e)
 		{
