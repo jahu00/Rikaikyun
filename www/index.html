@@ -11,9 +11,10 @@
 		<link href="./css/ruby.css" type="text/css" rel="stylesheet" />
 		<link href="./css/spinner.css" type="text/css" rel="stylesheet" />
 		<link href="./css/fileselect/file.css" type="text/css" rel="stylesheet" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self';connect-src * filesystem;img-src *;media-src *;style-src 'self' 'unsafe-inline'">
         <title>Rikaikyun</title>
     </head>
-    <body ondragstart="return false" onselectstart="return false">
+    <body>
 	<!--<body>-->
 		<style class="dynamicStyle">
 			.container img
@@ -54,7 +55,7 @@
 					<div class="col break left"></div>
 					<div class="col status left">
 						<span>
-							<div class="progress">1/1</div>
+							<div class="progress">0%</div>
 							<div class="time">12:00</div>
 							<div class="battery">??</div>
 						</span>
@@ -68,7 +69,7 @@
 					<div class="col break right"></div>
 					<div class="col status right">
 						<span>
-							<div class="progress">1/1</div>
+							<div class="progress">0%</div>
 							<div class="time">12:00</div>
 							<div class="battery">??</div>
 						</span>
@@ -285,48 +286,6 @@
 		<script src="./js/readerDocument.js"></script>
 		<script src="./js/reader.js"></script>
 		<script src="./js/app.js"></script>
-        <script type="text/javascript">
-			function run()
-			{
-				$(function()
-				{
-					/*window.onerror = function(a,b,c) {
-						alert(a);
-						alert(b);
-						alert(c);
-					}*/
-					/*try
-					{*/
-						App.init();
-					/*}
-					catch(e)
-					{*/
-						/*if (typeof e.message != "undefined")
-						{
-							alert(e.message);
-						}
-						else
-						{*/
-							//alert(JSON.stringify(e));
-						//}
-						//console.log(e);
-					//}
-					//fpsCount.go();
-				});
-			}
-			
-			if (typeof cordova !== 'undefined' || typeof PhoneGap !== 'undefined' || typeof phonegap !== 'undefined')
-			{
-				document.addEventListener("deviceready", function()
-				{
-					//deviceReady = true;
-					run();
-				}, false);
-			}
-			else
-			{
-				run();
-			}
-        </script>
+        <script src="./index.js"></script>
     </body>
 </html>

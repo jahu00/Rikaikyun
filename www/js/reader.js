@@ -156,6 +156,10 @@ Reader.prototype = {
 		{
 			var url = prompt("Enter url");
 			if (url != null){
+				if (url.indexOf('http') != 0)
+				{
+					url = "http://" + url;
+				}
 				self.openFile(url);
 			}
 		});
@@ -415,11 +419,12 @@ Reader.prototype = {
 	},
 	openFile: function(path, entry, data)//, preprare)
 	{
+		localStorage["loadingStatus"] = "LOADING";
+		localStorage["lastFile"] = path;
 		var self = this;
 		self.prepareLoad();
 		function openCallback(path, data, isUrl)
 		{
-			localStorage["lastFile"] = path;
 			ReadingHistory.push(path);
 			self.currentFile = path;
 			self.currentHash = XXH(path, 0).toString(16);
@@ -436,15 +441,17 @@ Reader.prototype = {
 				self.loadTextDocument(data);
 			}
 			self.populateContainer();
-			App.log('Loading file complete');
 			
 			// Adjust status etc.
 			self.resizeScreen(true);
 			//$(window).resize();
+			localStorage["loadingStatus"] = "OK";
+			App.log('Loading file complete');
 		}
 		function failCallback(path)
 		{
-			alert('Error: Opening file "' + path + '" failed!');
+			localStorage["loadingStatus"] = "ERROR";
+			alert('Error while opening "' + path + '"!');
 			self.selectScreen("main.menu");
 		}
 		function entryCallback(path, entry)
