@@ -33,9 +33,49 @@ Reader.prototype = {
 		// Our function for handling the event is inside another to not confuse what 'this' is
 		// clicks on the screen (handles word lookups)
 		
-		self.container.click(function(e){ self.containerClick(e); });
-		self.container.on('click taphold', '*', function(e) { e.preventDefault(); });
-		//self.container.on('touchstart', '*', function(e) { console.log(e); e.preventDefault(); })
+		//self.container.click(function(e){ self.containerClick(e); });
+		self.container.on('click taphold touchstart', '*', function(e) { e.preventDefault(); });
+		self.container.on('touchstart', function(e)
+		{
+			e.preventDefault();
+			
+			var elem = $(this);
+			var touch = e.originalEvent.touches[0];
+			var event = { target: e.target, pageX: touch.pageX, pageY: touch.pageY };
+			var touchId = touch.identifier;
+			var distance = 0;
+			function suicide()
+			{
+				elem.off('touchend', end);
+				clearTimeout(clearClick);
+			}
+			
+			function end(e)
+			{
+				self.containerClick(event);
+				suicide();
+			}
+			
+			function move(e)
+			{
+				var touch = e.originalEvent.touches[0];
+				if (touch.identifier == touchId)
+				{
+					distance += Math.abs(touch.pageX - event.pageX) + Math.abs(touch.pageY - event.pageY);
+					if (distance > 10)
+					{
+						suicide();
+					}
+				}
+			}
+			
+			var clearClick = setTimeout(function()
+			{
+				suicide();
+			}, 300);
+			
+			elem.on('touchend', end)
+		});
 		
 		// Handling resizes of the screen
 		$(window).resize(function()
@@ -100,7 +140,8 @@ Reader.prototype = {
 		//container.on('touchcancel', '*', function(e) { this.trigger('touchend'); });
 		
 		self.container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
+		//self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
+		
 		// Unused: Solved document length changing after image is loaded by forcing images to take a whole page using css
 		/*container.on('load error', 'img', function()
 		{
