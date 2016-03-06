@@ -3,10 +3,14 @@ var App = {
 	tempData: null,
 	init: function()
 	{
+		App.log("Start app initialization");
+		var self = this;
 		preloadStyleImages.preload();
-		//FastClick.attach(document.body);
-		this.reader = new Reader();//dict);
-		window.reader = this.reader;
+		App.log("Start reader initialization");
+		App.log(typeof Reader);
+		self.reader = new Reader();
+		App.log("Reader initialization complete");
+		//window.reader = this.reader;
 		// Block context menu (makes the app run less buggy on chrome on desktop)
 		$(document.body).on('contextmenu', function(e)
 		{
@@ -27,13 +31,12 @@ var App = {
 		{
 			return false;
 		});
-		//ondragstart="return false" onselectstart="return false"
 		
 		document.addEventListener("backbutton", function(e)
 		{
-			document.dispatchEvent(new CustomEvent('softbackbutton'))
+			self.triggerBackButton();
 		}, false);
-		
+		App.log("App initialization complete");
 		var lastFile = localStorage["lastFile"] || '';
 		if (lastFile != '')
 		{
@@ -49,7 +52,7 @@ var App = {
 			}
 			//console.log("Open: " + lastFile);
 		}
-		this.reader.selectScreen('main.menu');
+		self.reader.selectScreen('main.menu');
 	},
 	forceRefresh: function(elem)
 	{
@@ -80,6 +83,20 @@ var App = {
 	log: function(msg)
 	{
 		var date = new Date();
-		console.log(date.getTime() / 1000, msg);
+		console.log(date.getTime() / 1000 + ' ' + msg);
+	},
+	triggerBackButton: function()
+	{
+		var event = null;
+		if (typeof CustomEvent == "function")
+		{
+			event = new CustomEvent('softbackbutton');
+		}
+		else
+		{
+			event = document.createEvent('CustomEvent');
+			event.initCustomEvent('softbackbutton', true, true, {});
+		}
+		document.dispatchEvent(event);
 	}
 }

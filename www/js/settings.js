@@ -1,6 +1,7 @@
 function Settings(reader)
 {
 	this.reader = reader;
+	App.log("Load brightness plugin")
 	if (typeof cordova != "undefined")
 	{
 		this.brightness = cordova.require("cordova.plugin.Brightness.Brightness");

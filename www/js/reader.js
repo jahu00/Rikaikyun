@@ -1,18 +1,23 @@
-function Reader()//dict)
+function Reader()
 {
-	//this.dict = dict;
+	App.log("Set basic variables");
 	this.resizeStartPosition = 0;
 	this.resizeStartSize = 0;
 	this.lastPosition = null;
 	this.scrollDistance = 0;
 	this.progress = 0;
 	this.currentFile = null;
+	App.log("Set basic actions");
 	this.init();
+	App.log("Start settings initialization");
 	this.settings = new Settings(this);
+	App.log("Settings initialization complete");
 	this.initFileSelector();
 	this.initMenu();
+	App.log("Start dictionary initialization");
 	this.dict = new rcxDict(true);
-	this.navigation = [];
+	App.log("Dictionary initialization complete");
+	//this.navigation = [];
 }
 
 Reader.prototype = {
@@ -34,8 +39,19 @@ Reader.prototype = {
 		// clicks on the screen (handles word lookups)
 		
 		//self.container.click(function(e){ self.containerClick(e); });
-		self.container.on('click taphold touchstart touchend', '*', function(e) { e.preventDefault(); });
-		self.container.on('touchstart', function(e)
+		//$(document.body).on('click taphold touchstart touchend', function(e) { console.log('stuff detected'); });
+		/*$(document.body).on('click', function(e) { console.log('click leak'); });
+		$(document.body).on('touchstart touchend', function(e) { console.log('touch leak'); });*/
+		//self.container.on('click', '*', function(e) { e.preventDefault(); e.stopPropagation(); return false; });
+		self.container.on('click taphold'/* touchstart touchend'*/, '*', function(e) { e.preventDefault(); });
+		self.container.on('click', function(e)
+		{
+			self.containerClick(event);
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		});
+		/*self.container.on('touchstart', function(e)
 		{
 			e.preventDefault();
 			e.stopPropagation();
@@ -55,13 +71,14 @@ Reader.prototype = {
 			
 			function end(e)
 			{
+				suicide();
 				e.preventDefault();
+				e.stopPropagation();
 				if (trigger && distance < 10)
 				{
-					console.log(distance);
 					self.containerClick(event);
+					//console.log(window.getSelection().rangeCount);
 				}
-				suicide();
 			}
 			
 			function move(e)
@@ -81,7 +98,7 @@ Reader.prototype = {
 			elem.on('touchend', end);
 			elem.on('touchmove', move);
 			elem.on('touchcancel', suicide);
-		});
+		});*/
 		
 		// Handling resizes of the screen
 		$(window).resize(function()
@@ -148,23 +165,6 @@ Reader.prototype = {
 		self.container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
 		//self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		
-		// Unused: Solved document length changing after image is loaded by forcing images to take a whole page using css
-		/*container.on('load error', 'img', function()
-		{
-			if (this.currentFile != null)
-			{
-				self.scrollTo(parseFloat(localStorage['progress-' + self.currentHash]));
-			}
-		});*/
-		
-		/*document.addEventListener("menubutton", function(e)
-		{
-			if (self.screen.is(':visible'))
-			{
-				self.selectScreen('main.menu');
-				e.stop();
-			}
-		}, false);*/
 		document.addEventListener("softbackbutton", function(e)
 		{
 			if (self.screen.is(':visible'))
@@ -252,8 +252,7 @@ Reader.prototype = {
 		
 		$(document.body).on('click', '.menu > .item.back', function()
 		{
-			var event = new CustomEvent('softbackbutton');
-			document.dispatchEvent(event);
+			App.triggerBackButton();
 		});
 		
 		document.addEventListener("softbackbutton", function(e)
@@ -333,11 +332,27 @@ Reader.prototype = {
 		this.selectScreen("reader");
 		$('.container').html("");
 	},
+	parseHtml: function(data)
+	{
+		App.log("Trying to parse HTML data using DOMParser")
+		var result = (new DOMParser()).parseFromString(data, 'text/html');
+		//var result = null;
+		if (result != null)
+		{
+			return result;
+		}
+		App.log("Using DOMParser failed, using HTMLDocument as a fallback")
+		result = document.implementation.createHTMLDocument("Temp");
+		result.body.innerHTML = htmlHelpers.extractBody(data);
+		return result;
+	},
 	loadTextDocument: function(text)
 	{
 		// Here is a simple conversion txt => html
 		// TODO: Add injecting furigana
-		var data = (new DOMParser()).parseFromString("<div>" + text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>").trim() + "</div>", 'text/html');
+		//var data = (new DOMParser()).parseFromString("<div>" + text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>").trim() + "</div>", 'text/html');
+		var data = this.parseHtml("<div>" + text.replace(/^\s*(.*)?\s*$/gm, "<p>$1</p>").trim() + "</div>");
+		text = null;
 		this.processHtml(data.body);
 	},
 	loadHtmlDocument: function(data)
@@ -345,7 +360,8 @@ Reader.prototype = {
 		var self = this;
 		// extract body of the html file
 		App.log("Extract html body");
-		var doc = (new DOMParser()).parseFromString(data, 'text/html');
+		//var doc = (new DOMParser()).parseFromString(data, 'text/html');
+		var doc = this.parseHtml(data);
 		data = null;
 		// Create temporary element for storing the body (allows modifying the elements)
 		
@@ -405,12 +421,6 @@ Reader.prototype = {
 			}
 		});
 		
-		/*$temp.find('ruby').each(function()
-		{
-			var elem = $(this);
-			elem.replaceWith('<span class="ruby">' + elem.find('rb').text() + '<span class="rt">' + elem.find('rt').text() + '</span></span>');
-		});*/
-
 		// TODO: Insert detecting dot furigana
 		// Insert the text into reader
 		
@@ -423,10 +433,10 @@ Reader.prototype = {
 		// Put imgaes in containers and adjust image path
 		App.log("Process images");
 		var filePath = fileHelpers.getParentPath(self.currentFile);
-		/*if (filePath == self.currentFile)
-		{
-			filePath = "";
-		}*/
+		//if (filePath == self.currentFile)
+		//{
+		//	filePath = "";
+		//}
 
 		$temp.find('img').each(function()
 		{
@@ -457,13 +467,11 @@ Reader.prototype = {
 		}
 		
 		App.log('Insert the text into reader');
-
-		//console.log(self.navigation);
 		
-		/*container.find('*').each(function()
-		{
-			this.unselectable = "on";
-		});*/
+		//container.find('*').each(function()
+		//{
+		//	this.unselectable = "on";
+		//});
 	},
 	openFile: function(path, entry, data)//, preprare)
 	{
@@ -734,7 +742,7 @@ Reader.prototype = {
 	onScroll: function(val)
 	{
 		var self = this;
-		if (typeof self.document == "undefined" || self.document == 0)
+		if (self.document == null || self.document == 0)
 		{
 			return 0;
 		}
@@ -763,7 +771,7 @@ Reader.prototype = {
 	populateContainer: function(populationOffset)
 	{
 		var self = this;
-		if (typeof self.document == "undefined" || self.document.count == 0)
+		if (self.document == null || self.document.count == 0)
 		{
 			return;
 		}
@@ -936,7 +944,7 @@ Reader.prototype = {
 		var self = this;
 		clearTimeout(self.scrollTimeout);
 		
-		if (typeof self.document == "undefined" || self.document.count == 0 || self.container.children().length == 0)
+		if (self.document == null || self.document.count == 0 || self.container.children().length == 0)
 		{
 			this.progress = 0;
 		}
@@ -978,41 +986,33 @@ Reader.prototype = {
 		//var statusBar = reader.find('> .statusBar');
 		// using > selector with find was causing infinite executions of scroll event for some reason
 		statusBar.find('> .grid  .progress > .bar').css('width', percentage);
-		/*var pages = Math.ceil(documentHeight / windowHeight);
-		var page = parseInt((container.fakeScroll() / documentHeight) * pages  + 1.5);*/
 
 		// Update the page count
-		/*if (localStorage['statusPaged'] == "true")
-		{
-			statusBar.find('.status .progress').html(page+"/"+pages);
-		}
-		else
-		{*/
-			statusBar.find('.status .progress').html(percentage);
-		//}
+		statusBar.find('.status .progress').html(percentage);
+
 		// After updating the page count measure it's width and adjust the size of the container holding the page count
 		self.adjustStatusWidth();
 		
 		// This part is responsible for measuring how many pages we have traveled and if we should do an eink blink
 		// TODO: The blink (should we use it or not) as well as the amount of pages after which the blink occurs should be customizable in the settings
-		/*
-		if (this.lastPosition == null)
-		{
-			lastPosition = container.fakeScroll();
-		}
+		
+		//if (this.lastPosition == null)
+		//{
+		//	lastPosition = container.fakeScroll();
+		//}
 
-		this.scrollDistance += Math.abs(container.fakeScroll() - this.lastPosition);
-		if (this.scrollDistance >= windowHeight * 3)
-		{
-			this.blink();
-		}
-		this.lastPosition = container.fakeScroll();
-		*/
+		//this.scrollDistance += Math.abs(container.fakeScroll() - this.lastPosition);
+		//if (this.scrollDistance >= windowHeight * 3)
+		//{
+		//	this.blink();
+		//}
+		//this.lastPosition = container.fakeScroll();
+		
 	},
 	scrollTo: function(progress, update, procentage)
 	{
 		var self = this;
-		if (typeof self.document == "undefined" || self.document.count == 0)
+		if (self.document == null || self.document.count == 0)
 		{
 			return;
 		}
@@ -1089,16 +1089,16 @@ Reader.prototype = {
 	{
 		this.scrollDistance = 0;
 		// Temporarily disable because it was working too slow on a device
-		/*$('.blink').show();
-		setTimeout(function()
-		{
-			$('.blink').addClass("white");
-			setTimeout(function()
-			{
-				$('.blink').hide();
-				$('.blink').removeClass("white");
-			}, 200);
-		}, 200);*/
+		//$('.blink').show();
+		//setTimeout(function()
+		//{
+//			$('.blink').addClass("white");
+//			setTimeout(function()
+//			{
+//				$('.blink').hide();
+//				$('.blink').removeClass("white");
+//			}, 200);
+//		}, 200);
 	},
 	anchorTimer: null,
 	anchorTouchStart: function(e, a)

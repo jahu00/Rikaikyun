@@ -1,5 +1,6 @@
 function run()
 {
+	App.log("Application started!");
 	$(function()
 	{
 		/*window.onerror = function(a,b,c) {
@@ -7,8 +8,8 @@ function run()
 			alert(b);
 			alert(c);
 		}*/
-		/*try
-		{*/
+		//try
+		//{
 			App.init();
 		/*}
 		catch(e)
