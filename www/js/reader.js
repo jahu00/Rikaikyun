@@ -34,25 +34,33 @@ Reader.prototype = {
 		// clicks on the screen (handles word lookups)
 		
 		//self.container.click(function(e){ self.containerClick(e); });
-		self.container.on('click taphold touchstart', '*', function(e) { e.preventDefault(); });
+		self.container.on('click taphold touchstart touchend', '*', function(e) { e.preventDefault(); });
 		self.container.on('touchstart', function(e)
 		{
 			e.preventDefault();
-			
+			e.stopPropagation();
 			var elem = $(this);
 			var touch = e.originalEvent.touches[0];
 			var event = { target: e.target, pageX: touch.pageX, pageY: touch.pageY };
 			var touchId = touch.identifier;
 			var distance = 0;
+			var trigger = true;
 			function suicide()
 			{
 				elem.off('touchend', end);
+				elem.off('touchmove', move);
+				elem.off('touchcancel', suicide);
 				clearTimeout(clearClick);
 			}
 			
 			function end(e)
 			{
-				self.containerClick(event);
+				e.preventDefault();
+				if (trigger && distance < 10)
+				{
+					console.log(distance);
+					self.containerClick(event);
+				}
 				suicide();
 			}
 			
@@ -62,19 +70,17 @@ Reader.prototype = {
 				if (touch.identifier == touchId)
 				{
 					distance += Math.abs(touch.pageX - event.pageX) + Math.abs(touch.pageY - event.pageY);
-					if (distance > 10)
-					{
-						suicide();
-					}
 				}
 			}
 			
 			var clearClick = setTimeout(function()
 			{
-				suicide();
+				trigger = false;
 			}, 300);
 			
-			elem.on('touchend', end)
+			elem.on('touchend', end);
+			elem.on('touchmove', move);
+			elem.on('touchcancel', suicide);
 		});
 		
 		// Handling resizes of the screen
