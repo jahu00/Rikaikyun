@@ -4,7 +4,15 @@ function Settings(reader)
 	App.log("Load brightness plugin")
 	if (typeof cordova != "undefined")
 	{
-		this.brightness = cordova.require("cordova.plugin.Brightness.Brightness");
+		try
+		{
+			this.brightness = cordova.require("cordova.plugin.Brightness.Brightness");
+		}
+		catch(e)
+		{
+			App.log('Warnning: Can\'t load brightness controll!');
+			this.brightness = null;
+		}
 	}
 	else
 	{
@@ -295,7 +303,7 @@ Settings.prototype = {
 		
 		var useGpuHackControl = new CheckboxControl(self.screen.find('.useGpuHack'), function(value)
 		{
-			// This hack is applied directly in reader code, so there is nothing to do here
+			// This hack is applied directly in reader code, so there is nothing to be done here
 		},
 		"false");
 		
@@ -323,6 +331,37 @@ Settings.prototype = {
 			else
 			{
 				$(window).off("popstate", backButtonDummy);
+			}
+		},
+		"false");
+		
+		var droid4HacksControl = new CheckboxControl(self.screen.find('.useDroid4Hacks'), function(value)
+		{
+			var container = $('.container');
+			if (value)
+			{
+				if (!container.hasClass('brHack'))
+				{
+					container.addClass('brHack');
+				}
+			}
+			else
+			{
+				container.removeClass('brHack');
+			}
+		},
+		"false");
+		
+		var droid5HacksStartValue = null;
+		var droid5HacksControl = new CheckboxControl(self.screen.find('.useDroid5Hacks'), function(value)
+		{
+			if (droid5HacksStartValue == null)
+			{
+				droid5HacksStartValue = value;
+			}
+			else if (droid5HacksStartValue != value)
+			{
+				alert('This change requires restarting the app!');
 			}
 		},
 		"false");

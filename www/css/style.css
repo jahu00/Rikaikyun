@@ -630,3 +630,11 @@ body
 	background-size: 100% 100%;
 	background-image: url("back.png");
 }*/
+
+.container.brHack > br
+{
+	display:block;
+	line-height: 1;
+	content: " ";
+	min-height:1em;
+}

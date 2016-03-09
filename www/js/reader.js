@@ -39,66 +39,69 @@ Reader.prototype = {
 		// clicks on the screen (handles word lookups)
 		
 		//self.container.click(function(e){ self.containerClick(e); });
-		//$(document.body).on('click taphold touchstart touchend', function(e) { console.log('stuff detected'); });
-		/*$(document.body).on('click', function(e) { console.log('click leak'); });
-		$(document.body).on('touchstart touchend', function(e) { console.log('touch leak'); });*/
-		//self.container.on('click', '*', function(e) { e.preventDefault(); e.stopPropagation(); return false; });
-		self.container.on('click taphold'/* touchstart touchend'*/, '*', function(e) { e.preventDefault(); });
-		self.container.on('click', function(e)
+		self.container.on('click taphold', '*', function(e) { e.preventDefault(); });
+		if (localStorage["useDroid5Hacks"] == "true")
 		{
-			self.containerClick(event);
-			e.preventDefault();
-			e.stopPropagation();
-			return false;
-		});
-		/*self.container.on('touchstart', function(e)
-		{
-			e.preventDefault();
-			e.stopPropagation();
-			var elem = $(this);
-			var touch = e.originalEvent.touches[0];
-			var event = { target: e.target, pageX: touch.pageX, pageY: touch.pageY };
-			var touchId = touch.identifier;
-			var distance = 0;
-			var trigger = true;
-			function suicide()
+			self.container.on('touchstart touchend touchcancel', '*', function(e) { e.preventDefault(); });
+			self.container.on('touchstart', function(e)
 			{
-				elem.off('touchend', end);
-				elem.off('touchmove', move);
-				elem.off('touchcancel', suicide);
-				clearTimeout(clearClick);
-			}
-			
-			function end(e)
-			{
-				suicide();
 				e.preventDefault();
 				e.stopPropagation();
-				if (trigger && distance < 10)
-				{
-					self.containerClick(event);
-					//console.log(window.getSelection().rangeCount);
-				}
-			}
-			
-			function move(e)
-			{
+				var elem = $(this);
 				var touch = e.originalEvent.touches[0];
-				if (touch.identifier == touchId)
+				var event = { target: e.target, pageX: touch.pageX, pageY: touch.pageY };
+				var touchId = touch.identifier;
+				var distance = 0;
+				var trigger = true;
+				function suicide()
 				{
-					distance += Math.abs(touch.pageX - event.pageX) + Math.abs(touch.pageY - event.pageY);
+					elem.off('touchend', end);
+					elem.off('touchmove', move);
+					elem.off('touchcancel', suicide);
+					clearTimeout(clearClick);
 				}
-			}
-			
-			var clearClick = setTimeout(function()
+				
+				function end(e)
+				{
+					suicide();
+					e.preventDefault();
+					e.stopPropagation();
+					if (trigger && distance < 10)
+					{
+						self.containerClick(event);
+					}
+				}
+				
+				function move(e)
+				{
+					var touch = e.originalEvent.touches[0];
+					if (touch.identifier == touchId)
+					{
+						distance += Math.abs(touch.pageX - event.pageX) + Math.abs(touch.pageY - event.pageY);
+					}
+				}
+				
+				var clearClick = setTimeout(function()
+				{
+					trigger = false;
+				}, 300);
+				
+				elem.on('touchend', end);
+				elem.on('touchmove', move);
+				elem.on('touchcancel', suicide);
+			});
+		}
+		else
+		{
+			self.container.on('click', function(e)
 			{
-				trigger = false;
-			}, 300);
-			
-			elem.on('touchend', end);
-			elem.on('touchmove', move);
-			elem.on('touchcancel', suicide);
-		});*/
+				e.preventDefault();
+				e.stopPropagation();
+				self.containerClick(e);
+				return false;
+			});
+		}
+
 		
 		// Handling resizes of the screen
 		$(window).resize(function()
@@ -163,7 +166,7 @@ Reader.prototype = {
 		//container.on('touchcancel', '*', function(e) { this.trigger('touchend'); });
 		
 		self.container.on('touchstart', 'a', function(e) { self.anchorTouchStart(e, this); });
-		//self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
+		self.container.on('click', 'a', function(e){ self.containerClick(e); return false; });
 		
 		document.addEventListener("softbackbutton", function(e)
 		{

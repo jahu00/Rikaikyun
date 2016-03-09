@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.phonegap.rikaikyun" version="0.13" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="com.phonegap.rikaikyun" version="0.14" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Rikaikyun</name>
     <description>
-        Reader app in making for japanese text
+        Rikaichan based Phonegap App for reading Japanese text
     </description>
     <author email="" href="http://smallhax.wordpress.com/">
 		jahu00
