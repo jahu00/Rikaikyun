@@ -238,6 +238,11 @@ Reader.prototype = {
 			ReadingHistory.open();
 		});
 		
+		menu.find('.navigation').click(function()
+		{
+			Navigation.open();
+		});
+		
 		menu.find('.exit').click(function()
 		{
 			if (confirm('Close app?'))

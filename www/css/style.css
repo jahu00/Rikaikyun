@@ -605,13 +605,13 @@ body
 }
 
 /* History */
-.history .item.entry
+.history .item.entry, .navigation .item.entry
 {
 	padding-right: 4.5em;
 	position:relative;
 }
 
-.history .item.entry .right
+.history .item.entry .right, .navigation .item.entry .right
 {
 	float:none;
 	position:absolute;
@@ -631,10 +631,14 @@ body
 	background-image: url("back.png");
 }*/
 
-.container.brHack > br
+.container.brHack > br, .container.brHack > div
 {
 	display:block;
 	line-height: 1;
-	content: " ";
 	min-height:1em;
+}
+
+.container.brHack > br
+{
+	content: " ";
 }

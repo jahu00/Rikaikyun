@@ -105,8 +105,9 @@
 			</div>
 		</div>
 		<div class="screen scrollable main menu gui">
-			<!--<div class="header">Menu</div>-->
+			<div class="header">Menu</div>
 			<div class="item back">Resume reading</div>
+			<div class="item navigation">Navigation</div>
 			<div class="item openFile">Load file
 				<input type="file"/>
 			</div>
@@ -116,7 +117,13 @@
 			<div class="item exit">Exit</div>
 		</div>
 		<div class="screen scrollable navigation menu gui" data-screen="navigation">
+			<div class="item back">Back<i></i></div>
 			<div class="header">Navigation</div>
+			<div class="item slider-control goToPosition" data-system-name="goToPosition">
+				<span class="name">Position:</span><span class="right"><span class="value"></span>%</span><br/>
+				<div class="slider" data-min="0" data-max="100" data-step="0.01"></div>
+			</div>
+			<div class="header">Chapters</div>
 		</div>
 		<div class="screen scrollable history menu gui" data-screen="settings">
 			<div class="header">History</div>
@@ -293,6 +300,7 @@
 		<script src="./js/sliderControl.js"></script>
 		<script src="./js/settings.js"></script>
 		<script src="./js/history.js"></script>
+		<script src="./js/navigation.js"></script>
 		<script src="./js/readerDocument.js"></script>
 		<script src="./js/reader.js"></script>
 		<script src="./js/app.js"></script>

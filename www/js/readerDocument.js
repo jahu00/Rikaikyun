@@ -63,8 +63,13 @@ ReaderDocument.prototype = {
 		}
 		for (var navId in self.navigation)
 		{
-			var elem = $(self.navigation[navId].elem);
-			result.push(elem.attr('data-position') / self.total);
+			var nav = self.navigation[navId];
+			if (typeof nav.progress == "undefined")
+			{
+				var elem = $(nav.elem);
+				nav.progress = elem.attr('data-position') / self.total;
+			}
+			result.push(nav.progress);
 		}
 		return result;
 	},
