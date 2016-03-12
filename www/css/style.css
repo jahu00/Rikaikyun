@@ -631,14 +631,15 @@ body
 	background-image: url("back.png");
 }*/
 
-.container.brHack > br, .container.brHack > div
+.container.brHack > *
 {
-	display:block;
-	line-height: 1;
-	min-height:1em;
+	min-height: 1px;
 }
 
 .container.brHack > br
 {
 	content: " ";
+	display:block;
+	line-height: 1;
+	min-height:1em;
 }

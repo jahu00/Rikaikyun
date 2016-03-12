@@ -66,7 +66,8 @@ Reader.prototype = {
 					suicide();
 					e.preventDefault();
 					e.stopPropagation();
-					if (trigger && distance < 10)
+					//console.log(trigger, distance)
+					if (trigger && distance < 20)
 					{
 						self.containerClick(event);
 					}
@@ -84,7 +85,7 @@ Reader.prototype = {
 				var clearClick = setTimeout(function()
 				{
 					trigger = false;
-				}, 300);
+				}, 500);
 				
 				elem.on('touchend', end);
 				elem.on('touchmove', move);

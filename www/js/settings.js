@@ -335,7 +335,7 @@ Settings.prototype = {
 		},
 		"false");
 		
-		var droid4HacksControl = new CheckboxControl(self.screen.find('.useDroid4Hacks'), function(value)
+		/*var droid4HacksControl = new CheckboxControl(self.screen.find('.useDroid4Hacks'), function(value)
 		{
 			var container = $('.container');
 			if (value)
@@ -350,7 +350,7 @@ Settings.prototype = {
 				container.removeClass('brHack');
 			}
 		},
-		"false");
+		"true");*/
 		
 		var droid5HacksStartValue = null;
 		var droid5HacksControl = new CheckboxControl(self.screen.find('.useDroid5Hacks'), function(value)
